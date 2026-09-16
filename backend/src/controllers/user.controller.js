@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { generateToken, cookieOptions } from "../utils/token.js";
+import { sendWelcomeEmail } from "../utils/sendEmail.js";
 
 // POST /register
 export const registerUser = async (req, res) => {
@@ -25,7 +26,15 @@ export const registerUser = async (req, res) => {
             email,
             phoneNumber,
             password: hashedPassword,
-            role: role || "user",
+            role: "user",
+        });
+
+        // Send luxury welcome email to the newly registered user
+        sendWelcomeEmail({
+            name: newUser.name,
+            email: newUser.email,
+        }).catch((emailErr) => {
+            console.error("[Register] Error triggering welcome email:", emailErr.message);
         });
 
         const token = generateToken(newUser);
@@ -120,15 +129,14 @@ export const getUserById = async (req, res) => {
 // PUT /:id
 export const updateUser = async (req, res) => {
     try {
-        const updates = { ...req.body };
-        if (updates.password) {
-            const salt = await bcrypt.genSalt(10);
-            updates.password = await bcrypt.hash(updates.password, salt);
-        }
+        const { name, phoneNumber } = req.body;
+        const safeUpdates = {};
+        if (name) safeUpdates.name = name;
+        if (phoneNumber) safeUpdates.phoneNumber = phoneNumber;
 
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            { $set: updates },
+            { $set: safeUpdates },
             { new: true, runValidators: true }
         ).select("-password");
 
