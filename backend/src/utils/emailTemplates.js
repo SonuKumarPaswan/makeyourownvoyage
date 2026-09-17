@@ -64,6 +64,7 @@ export const welcomeEmailTemplate = ({ name, email }) => {
     <!--[if mso]>
     <style type="text/css">
         body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
+        table {mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !important;}
     </style>
     <![endif]-->
     <style>
@@ -81,8 +82,6 @@ export const welcomeEmailTemplate = ({ name, email }) => {
 
         table {
             border-spacing: 0;
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
         }
 
         td {
