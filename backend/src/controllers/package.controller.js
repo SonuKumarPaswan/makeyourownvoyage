@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 import Package from "../models/package.model.js";
 import ItineraryTemplate from "../models/itineraryTemplate.model.js";
 import Destination from "../models/destination.model.js";
+import {
+    uploadToCloudinary,
+    uploadMultipleToCloudinary,
+    isBase64Image,
+    parseJsonField,
+    isCloudinaryConfigured,
+} from "../services/cloudinary.service.js";
 
 // Helper to resolve destination ObjectId from ID or slug
 const resolveDestinationId = async (destParam) => {
@@ -51,6 +58,47 @@ export const createPackage = async (req, res) => {
             destination,
             ...restPackageData
         } = req.body;
+
+        // Safely parse JSON strings if sent via multipart/form-data
+        if (restPackageData.priceSlabs) restPackageData.priceSlabs = parseJsonField(restPackageData.priceSlabs, restPackageData.priceSlabs);
+        if (restPackageData.corporateFacilities) restPackageData.corporateFacilities = parseJsonField(restPackageData.corporateFacilities, restPackageData.corporateFacilities);
+        if (restPackageData.inclusions) restPackageData.inclusions = parseJsonField(restPackageData.inclusions, restPackageData.inclusions);
+        if (restPackageData.exclusions) restPackageData.exclusions = parseJsonField(restPackageData.exclusions, restPackageData.exclusions);
+        if (restPackageData.gallery) restPackageData.gallery = parseJsonField(restPackageData.gallery, restPackageData.gallery || []);
+
+        // Handle single cover image upload via Multer
+        if (req.files?.image?.[0] && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.files.image[0], "makeyourownvoyage/packages");
+            restPackageData.image = uploaded.secure_url;
+        } else if (req.file && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.file, "makeyourownvoyage/packages");
+            restPackageData.image = uploaded.secure_url;
+        }
+
+        // Handle gallery images upload via Multer
+        if (req.files?.gallery && Array.isArray(req.files.gallery) && req.files.gallery.length > 0 && isCloudinaryConfigured()) {
+            const uploadedGallery = await uploadMultipleToCloudinary(req.files.gallery, "makeyourownvoyage/packages");
+            const urls = uploadedGallery.map((g) => g.secure_url);
+            restPackageData.gallery = Array.isArray(restPackageData.gallery)
+                ? [...restPackageData.gallery, ...urls]
+                : urls;
+        }
+
+        // Handle base64 cover image
+        if (typeof restPackageData.image === "string" && isBase64Image(restPackageData.image) && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(restPackageData.image, "makeyourownvoyage/packages");
+            restPackageData.image = uploaded.secure_url;
+        }
+
+        // Handle base64 gallery images
+        if (Array.isArray(restPackageData.gallery) && isCloudinaryConfigured()) {
+            for (let i = 0; i < restPackageData.gallery.length; i++) {
+                if (typeof restPackageData.gallery[i] === "string" && isBase64Image(restPackageData.gallery[i])) {
+                    const uploaded = await uploadToCloudinary(restPackageData.gallery[i], "makeyourownvoyage/packages");
+                    restPackageData.gallery[i] = uploaded.secure_url;
+                }
+            }
+        }
 
         if (!restPackageData.title || !restPackageData.title.trim()) {
             return res.status(400).json({
@@ -349,6 +397,48 @@ export const updatePackage = async (req, res) => {
         }
 
         const updates = { ...req.body };
+
+        // Safely parse JSON strings if sent via multipart/form-data
+        if (updates.priceSlabs) updates.priceSlabs = parseJsonField(updates.priceSlabs, updates.priceSlabs);
+        if (updates.corporateFacilities) updates.corporateFacilities = parseJsonField(updates.corporateFacilities, updates.corporateFacilities);
+        if (updates.inclusions) updates.inclusions = parseJsonField(updates.inclusions, updates.inclusions);
+        if (updates.exclusions) updates.exclusions = parseJsonField(updates.exclusions, updates.exclusions);
+        if (updates.gallery) updates.gallery = parseJsonField(updates.gallery, updates.gallery);
+        if (updates.itinerary) updates.itinerary = parseJsonField(updates.itinerary, updates.itinerary);
+
+        // Handle single cover image upload via Multer
+        if (req.files?.image?.[0] && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.files.image[0], "makeyourownvoyage/packages");
+            updates.image = uploaded.secure_url;
+        } else if (req.file && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.file, "makeyourownvoyage/packages");
+            updates.image = uploaded.secure_url;
+        }
+
+        // Handle gallery images upload via Multer
+        if (req.files?.gallery && Array.isArray(req.files.gallery) && req.files.gallery.length > 0 && isCloudinaryConfigured()) {
+            const uploadedGallery = await uploadMultipleToCloudinary(req.files.gallery, "makeyourownvoyage/packages");
+            const urls = uploadedGallery.map((g) => g.secure_url);
+            updates.gallery = Array.isArray(updates.gallery)
+                ? [...updates.gallery, ...urls]
+                : urls;
+        }
+
+        // Handle base64 cover image
+        if (typeof updates.image === "string" && isBase64Image(updates.image) && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(updates.image, "makeyourownvoyage/packages");
+            updates.image = uploaded.secure_url;
+        }
+
+        // Handle base64 gallery images
+        if (Array.isArray(updates.gallery) && isCloudinaryConfigured()) {
+            for (let i = 0; i < updates.gallery.length; i++) {
+                if (typeof updates.gallery[i] === "string" && isBase64Image(updates.gallery[i])) {
+                    const uploaded = await uploadToCloudinary(updates.gallery[i], "makeyourownvoyage/packages");
+                    updates.gallery[i] = uploaded.secure_url;
+                }
+            }
+        }
 
         if (updates.destination) {
             const destId = await resolveDestinationId(updates.destination);

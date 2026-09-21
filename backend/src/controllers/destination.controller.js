@@ -6,6 +6,13 @@ import Hotel from "../models/hotel.model.js";
 import ActivityMaster from "../models/activityMaster.model.js";
 import Faq from "../models/faq.model.js";
 import { generateSlug } from "../utils/generateHotelSlug.js";
+import {
+    uploadToCloudinary,
+    uploadMultipleToCloudinary,
+    isBase64Image,
+    parseJsonField,
+    isCloudinaryConfigured,
+} from "../services/cloudinary.service.js";
 
 // Helper to resolve destination by slug or ObjectId
 const resolveDestination = async (identifier) => {
@@ -23,6 +30,51 @@ const resolveDestination = async (identifier) => {
 export const createDestination = async (req, res) => {
     try {
         const destData = { ...req.body };
+
+        // Safely parse JSON strings if sent via multipart/form-data
+        destData.type = parseJsonField(destData.type, destData.type);
+        destData.location = parseJsonField(destData.location, destData.location);
+        destData.bestTimeToVisit = parseJsonField(destData.bestTimeToVisit, destData.bestTimeToVisit);
+        destData.recommendedDuration = parseJsonField(destData.recommendedDuration, destData.recommendedDuration);
+        destData.howToReach = parseJsonField(destData.howToReach, destData.howToReach);
+        destData.estimatedBudget = parseJsonField(destData.estimatedBudget, destData.estimatedBudget);
+        destData.attractions = parseJsonField(destData.attractions, destData.attractions);
+        destData.activities = parseJsonField(destData.activities, destData.activities);
+        destData.suitableFor = parseJsonField(destData.suitableFor, destData.suitableFor);
+        destData.travelTips = parseJsonField(destData.travelTips, destData.travelTips);
+        destData.images = parseJsonField(destData.images, destData.images || []);
+        destData.seo = parseJsonField(destData.seo, destData.seo);
+
+        // Handle files uploaded via Multer (multipart form)
+        if (req.files && Array.isArray(req.files) && req.files.length > 0 && isCloudinaryConfigured()) {
+            const uploaded = await uploadMultipleToCloudinary(req.files, "makeyourownvoyage/destinations");
+            const formatted = uploaded.map((img, idx) => ({
+                url: img.secure_url,
+                alt: destData.name || "Destination Image",
+                type: idx === 0 && (!destData.images || destData.images.length === 0) ? "cover" : "gallery",
+                order: (Array.isArray(destData.images) ? destData.images.length : 0) + idx + 1,
+            }));
+            destData.images = Array.isArray(destData.images) ? [...destData.images, ...formatted] : formatted;
+        }
+
+        // Handle any Base64 strings sent in destData.images
+        if (Array.isArray(destData.images) && isCloudinaryConfigured()) {
+            for (let i = 0; i < destData.images.length; i++) {
+                const item = destData.images[i];
+                if (typeof item === "string" && isBase64Image(item)) {
+                    const uploaded = await uploadToCloudinary(item, "makeyourownvoyage/destinations");
+                    destData.images[i] = {
+                        url: uploaded.secure_url,
+                        alt: destData.name || "Destination Image",
+                        type: i === 0 ? "cover" : "gallery",
+                        order: i + 1,
+                    };
+                } else if (item && typeof item === "object" && isBase64Image(item.url)) {
+                    const uploaded = await uploadToCloudinary(item.url, "makeyourownvoyage/destinations");
+                    item.url = uploaded.secure_url;
+                }
+            }
+        }
 
         if (!destData.name || !destData.name.trim()) {
             return res.status(400).json({
@@ -212,6 +264,51 @@ export const updateDestination = async (req, res) => {
         }
 
         const updates = { ...req.body };
+
+        // Safely parse JSON strings if sent via multipart/form-data
+        if (updates.type) updates.type = parseJsonField(updates.type, updates.type);
+        if (updates.location) updates.location = parseJsonField(updates.location, updates.location);
+        if (updates.bestTimeToVisit) updates.bestTimeToVisit = parseJsonField(updates.bestTimeToVisit, updates.bestTimeToVisit);
+        if (updates.recommendedDuration) updates.recommendedDuration = parseJsonField(updates.recommendedDuration, updates.recommendedDuration);
+        if (updates.howToReach) updates.howToReach = parseJsonField(updates.howToReach, updates.howToReach);
+        if (updates.estimatedBudget) updates.estimatedBudget = parseJsonField(updates.estimatedBudget, updates.estimatedBudget);
+        if (updates.attractions) updates.attractions = parseJsonField(updates.attractions, updates.attractions);
+        if (updates.activities) updates.activities = parseJsonField(updates.activities, updates.activities);
+        if (updates.suitableFor) updates.suitableFor = parseJsonField(updates.suitableFor, updates.suitableFor);
+        if (updates.travelTips) updates.travelTips = parseJsonField(updates.travelTips, updates.travelTips);
+        if (updates.images) updates.images = parseJsonField(updates.images, updates.images);
+        if (updates.seo) updates.seo = parseJsonField(updates.seo, updates.seo);
+
+        // Handle files uploaded via Multer
+        if (req.files && Array.isArray(req.files) && req.files.length > 0 && isCloudinaryConfigured()) {
+            const uploaded = await uploadMultipleToCloudinary(req.files, "makeyourownvoyage/destinations");
+            const formatted = uploaded.map((img, idx) => ({
+                url: img.secure_url,
+                alt: updates.name || "Destination Image",
+                type: "gallery",
+                order: idx + 1,
+            }));
+            updates.images = Array.isArray(updates.images) ? [...updates.images, ...formatted] : formatted;
+        }
+
+        // Handle any Base64 strings sent in updates.images
+        if (Array.isArray(updates.images) && isCloudinaryConfigured()) {
+            for (let i = 0; i < updates.images.length; i++) {
+                const item = updates.images[i];
+                if (typeof item === "string" && isBase64Image(item)) {
+                    const uploaded = await uploadToCloudinary(item, "makeyourownvoyage/destinations");
+                    updates.images[i] = {
+                        url: uploaded.secure_url,
+                        alt: updates.name || "Destination Image",
+                        type: "gallery",
+                        order: i + 1,
+                    };
+                } else if (item && typeof item === "object" && isBase64Image(item.url)) {
+                    const uploaded = await uploadToCloudinary(item.url, "makeyourownvoyage/destinations");
+                    item.url = uploaded.secure_url;
+                }
+            }
+        }
 
         // Handle slug formatting or auto-regeneration
         if (updates.name && !updates.slug) {

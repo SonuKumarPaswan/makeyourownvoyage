@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 import Transport from "../models/transport.model.js";
 import { generateSlug } from "../utils/generateHotelSlug.js";
+import {
+    uploadToCloudinary,
+    uploadMultipleToCloudinary,
+    isBase64Image,
+    parseJsonField,
+    isCloudinaryConfigured,
+} from "../services/cloudinary.service.js";
 
 // Helper to sanitize available cities
 const sanitizeCities = (cities) => {
@@ -14,6 +21,45 @@ const sanitizeCities = (cities) => {
 export const addTransport = async (req, res) => {
     try {
         const data = { ...req.body };
+
+        // Safely parse JSON strings if sent via multipart/form-data
+        data.capacity = parseJsonField(data.capacity, data.capacity);
+        data.specifications = parseJsonField(data.specifications, data.specifications);
+        data.images = parseJsonField(data.images, data.images || []);
+        data.availableCities = parseJsonField(data.availableCities, data.availableCities || []);
+        data.serviceTypes = parseJsonField(data.serviceTypes, data.serviceTypes);
+        data.pricing = parseJsonField(data.pricing, data.pricing);
+        data.routes = parseJsonField(data.routes, data.routes);
+        data.policies = parseJsonField(data.policies, data.policies);
+
+        // Handle files uploaded via Multer (multipart form)
+        if (req.files && Array.isArray(req.files) && req.files.length > 0 && isCloudinaryConfigured()) {
+            const uploaded = await uploadMultipleToCloudinary(req.files, "makeyourownvoyage/transports");
+            const formatted = uploaded.map((img, idx) => ({
+                url: img.secure_url,
+                alt: data.title || "Vehicle Image",
+                isCover: idx === 0 && (!data.images || data.images.length === 0),
+            }));
+            data.images = Array.isArray(data.images) ? [...data.images, ...formatted] : formatted;
+        }
+
+        // Handle any Base64 strings sent in data.images
+        if (Array.isArray(data.images) && isCloudinaryConfigured()) {
+            for (let i = 0; i < data.images.length; i++) {
+                const item = data.images[i];
+                if (typeof item === "string" && isBase64Image(item)) {
+                    const uploaded = await uploadToCloudinary(item, "makeyourownvoyage/transports");
+                    data.images[i] = {
+                        url: uploaded.secure_url,
+                        alt: data.title || "Vehicle Image",
+                        isCover: i === 0,
+                    };
+                } else if (item && typeof item === "object" && isBase64Image(item.url)) {
+                    const uploaded = await uploadToCloudinary(item.url, "makeyourownvoyage/transports");
+                    item.url = uploaded.secure_url;
+                }
+            }
+        }
 
         if (!data.title || !data.title.trim()) {
             return res.status(400).json({
@@ -158,6 +204,45 @@ export const updateTransport = async (req, res) => {
         }
 
         const updates = { ...req.body };
+
+        // Safely parse JSON strings if sent via multipart/form-data
+        if (updates.capacity) updates.capacity = parseJsonField(updates.capacity, updates.capacity);
+        if (updates.specifications) updates.specifications = parseJsonField(updates.specifications, updates.specifications);
+        if (updates.images) updates.images = parseJsonField(updates.images, updates.images);
+        if (updates.availableCities) updates.availableCities = parseJsonField(updates.availableCities, updates.availableCities);
+        if (updates.serviceTypes) updates.serviceTypes = parseJsonField(updates.serviceTypes, updates.serviceTypes);
+        if (updates.pricing) updates.pricing = parseJsonField(updates.pricing, updates.pricing);
+        if (updates.routes) updates.routes = parseJsonField(updates.routes, updates.routes);
+        if (updates.policies) updates.policies = parseJsonField(updates.policies, updates.policies);
+
+        // Handle files uploaded via Multer
+        if (req.files && Array.isArray(req.files) && req.files.length > 0 && isCloudinaryConfigured()) {
+            const uploaded = await uploadMultipleToCloudinary(req.files, "makeyourownvoyage/transports");
+            const formatted = uploaded.map((img, idx) => ({
+                url: img.secure_url,
+                alt: updates.title || "Transport Image",
+                isCover: false,
+            }));
+            updates.images = Array.isArray(updates.images) ? [...updates.images, ...formatted] : formatted;
+        }
+
+        // Handle any Base64 strings sent in updates.images
+        if (Array.isArray(updates.images) && isCloudinaryConfigured()) {
+            for (let i = 0; i < updates.images.length; i++) {
+                const item = updates.images[i];
+                if (typeof item === "string" && isBase64Image(item)) {
+                    const uploaded = await uploadToCloudinary(item, "makeyourownvoyage/transports");
+                    updates.images[i] = {
+                        url: uploaded.secure_url,
+                        alt: updates.title || "Transport Image",
+                        isCover: false,
+                    };
+                } else if (item && typeof item === "object" && isBase64Image(item.url)) {
+                    const uploaded = await uploadToCloudinary(item.url, "makeyourownvoyage/transports");
+                    item.url = uploaded.secure_url;
+                }
+            }
+        }
 
         if (updates.availableCities) {
             updates.availableCities = sanitizeCities(updates.availableCities);

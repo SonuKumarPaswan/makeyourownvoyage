@@ -1,5 +1,6 @@
 import express from "express";
 import { verifyAdmin } from "../middleware/role.js";
+import { upload } from "../middleware/upload.js";
 import {
     createPackage,
     getPackageBySlug,
@@ -11,10 +12,15 @@ import {
 
 const router = express.Router();
 
+const packageUpload = upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "gallery", maxCount: 20 },
+]);
+
 // Admin Package management routes
-router.post('/', verifyAdmin, createPackage);
-router.post('/create', verifyAdmin, createPackage);
-router.put('/:id', verifyAdmin, updatePackage);
+router.post('/', verifyAdmin, packageUpload, createPackage);
+router.post('/create', verifyAdmin, packageUpload, createPackage);
+router.put('/:id', verifyAdmin, packageUpload, updatePackage);
 router.delete('/:id', verifyAdmin, deletePackage);
 
 // Public fetch routes (no login required)

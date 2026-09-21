@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 import Hotel from "../models/hotel.model.js";
 import Destination from "../models/destination.model.js";
 import { generateSlug } from "../utils/generateHotelSlug.js";
+import {
+    uploadToCloudinary,
+    uploadMultipleToCloudinary,
+    isBase64Image,
+    parseJsonField,
+    isCloudinaryConfigured,
+} from "../services/cloudinary.service.js";
 
 // Helper to resolve destination ObjectId from ID or slug
 const resolveDestinationId = async (destParam) => {
@@ -15,6 +22,47 @@ const resolveDestinationId = async (destParam) => {
 export const addHotel = async (req, res) => {
   try {
     const hotelData = { ...req.body };
+
+    // Safely parse JSON strings if sent via multipart/form-data
+    hotelData.location = parseJsonField(hotelData.location, hotelData.location);
+    hotelData.contact = parseJsonField(hotelData.contact, hotelData.contact);
+    hotelData.amenities = parseJsonField(hotelData.amenities, hotelData.amenities);
+    hotelData.rooms = parseJsonField(hotelData.rooms, hotelData.rooms);
+    hotelData.policies = parseJsonField(hotelData.policies, hotelData.policies);
+    hotelData.images = parseJsonField(hotelData.images, hotelData.images || []);
+
+    // Handle files uploaded via Multer (multipart form)
+    if (req.files && Array.isArray(req.files) && req.files.length > 0 && isCloudinaryConfigured()) {
+      const uploaded = await uploadMultipleToCloudinary(req.files, "makeyourownvoyage/hotels");
+      const formatted = uploaded.map((img, idx) => ({
+        url: img.secure_url,
+        alt: hotelData.name || "Hotel Image",
+        type: idx === 0 && (!hotelData.images || hotelData.images.length === 0) ? "cover" : "room",
+        order: (Array.isArray(hotelData.images) ? hotelData.images.length : 0) + idx + 1,
+      }));
+      hotelData.images = Array.isArray(hotelData.images)
+        ? [...hotelData.images, ...formatted]
+        : formatted;
+    }
+
+    // Handle any Base64 strings sent in hotelData.images
+    if (Array.isArray(hotelData.images) && isCloudinaryConfigured()) {
+      for (let i = 0; i < hotelData.images.length; i++) {
+        const item = hotelData.images[i];
+        if (typeof item === "string" && isBase64Image(item)) {
+          const uploaded = await uploadToCloudinary(item, "makeyourownvoyage/hotels");
+          hotelData.images[i] = {
+            url: uploaded.secure_url,
+            alt: hotelData.name || "Hotel Image",
+            type: i === 0 ? "cover" : "room",
+            order: i + 1,
+          };
+        } else if (item && typeof item === "object" && isBase64Image(item.url)) {
+          const uploaded = await uploadToCloudinary(item.url, "makeyourownvoyage/hotels");
+          item.url = uploaded.secure_url;
+        }
+      }
+    }
 
     // Validate required fields
     if (!hotelData.name || !hotelData.name.trim()) {
@@ -220,6 +268,47 @@ export const updateHotel = async (req, res) => {
     }
 
     const updates = { ...req.body };
+
+    // Safely parse JSON strings if sent via multipart/form-data
+    if (updates.location) updates.location = parseJsonField(updates.location, updates.location);
+    if (updates.contact) updates.contact = parseJsonField(updates.contact, updates.contact);
+    if (updates.amenities) updates.amenities = parseJsonField(updates.amenities, updates.amenities);
+    if (updates.rooms) updates.rooms = parseJsonField(updates.rooms, updates.rooms);
+    if (updates.policies) updates.policies = parseJsonField(updates.policies, updates.policies);
+    if (updates.images) updates.images = parseJsonField(updates.images, updates.images);
+
+    // Handle files uploaded via Multer
+    if (req.files && Array.isArray(req.files) && req.files.length > 0 && isCloudinaryConfigured()) {
+      const uploaded = await uploadMultipleToCloudinary(req.files, "makeyourownvoyage/hotels");
+      const formatted = uploaded.map((img, idx) => ({
+        url: img.secure_url,
+        alt: updates.name || "Hotel Image",
+        type: "room",
+        order: idx + 1,
+      }));
+      updates.images = Array.isArray(updates.images)
+        ? [...updates.images, ...formatted]
+        : formatted;
+    }
+
+    // Handle any Base64 strings sent in updates.images
+    if (Array.isArray(updates.images) && isCloudinaryConfigured()) {
+      for (let i = 0; i < updates.images.length; i++) {
+        const item = updates.images[i];
+        if (typeof item === "string" && isBase64Image(item)) {
+          const uploaded = await uploadToCloudinary(item, "makeyourownvoyage/hotels");
+          updates.images[i] = {
+            url: uploaded.secure_url,
+            alt: updates.name || "Hotel Image",
+            type: "room",
+            order: i + 1,
+          };
+        } else if (item && typeof item === "object" && isBase64Image(item.url)) {
+          const uploaded = await uploadToCloudinary(item.url, "makeyourownvoyage/hotels");
+          item.url = uploaded.secure_url;
+        }
+      }
+    }
 
     if (updates.destination) {
       const destId = await resolveDestinationId(updates.destination);
