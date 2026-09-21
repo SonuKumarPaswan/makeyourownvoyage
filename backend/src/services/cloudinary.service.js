@@ -112,14 +112,23 @@ export const uploadMultipleToCloudinary = async (files, folder = "makeyourownvoy
  * @param {string} publicId - Cloudinary public ID
  * @returns {Promise<object>}
  */
-export const deleteFromCloudinary = async (publicId) => {
+export const deleteFromCloudinary = async (publicIdOrUrl) => {
     if (!isCloudinaryConfigured()) {
         throw new Error("Cloudinary credentials missing in .env");
     }
-    if (!publicId) {
-        throw new Error("Cloudinary public_id is required for deletion");
+    if (!publicIdOrUrl) {
+        throw new Error("Cloudinary public_id or URL is required for deletion");
     }
-    return await cloudinary.uploader.destroy(publicId);
+
+    const targetId = (typeof publicIdOrUrl === "string" && publicIdOrUrl.startsWith("http"))
+        ? extractPublicId(publicIdOrUrl)
+        : publicIdOrUrl;
+
+    if (!targetId) {
+        throw new Error("Could not extract valid public_id for deletion");
+    }
+
+    return await cloudinary.uploader.destroy(targetId);
 };
 
 /**
@@ -165,10 +174,13 @@ export const parseJsonField = (val, fallback = undefined) => {
     return val !== undefined ? val : fallback;
 };
 
+export const uploadBufferToCloudinary = uploadToCloudinary;
+
 export default {
     cloudinary,
     isCloudinaryConfigured,
     uploadToCloudinary,
+    uploadBufferToCloudinary,
     uploadMultipleToCloudinary,
     deleteFromCloudinary,
     extractPublicId,
