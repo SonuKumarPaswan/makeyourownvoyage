@@ -439,6 +439,27 @@ Requires Admin JWT token.
 
 ---
 
+### 10. Frequently Asked Questions (`/api/faqs` & `/api/faq`)
+
+- **Public (No Login Required)**:
+  - `GET /api/faqs` — List all published FAQs (supports `?destination=<slug|id>`, `?search=<keyword>`, `?isPublished=true`, and pagination `?page=1&limit=10`).
+  - `GET /api/faqs/id/:id` — Single FAQ by ID.
+- **Admin Only (`verifyAdmin`)**:
+  - `POST /api/faqs/create` — Create a new FAQ.
+  - `PUT /api/faqs/:id` or `PATCH /api/faqs/:id` — Update FAQ question, answer, destination, or display order.
+  - `DELETE /api/faqs/:id` — Delete FAQ record.
+
+---
+
+### 11. Global Multi-Entity Search (`/api/search`)
+
+- **Public (No Login Required)**:
+  - `GET /api/search?q=<keyword>&type=all&limit=6` — Global federated search across Destinations, Tour Packages, Hotels, Transports, States, and Activities. Returns category-grouped arrays and a unified `combined` array.
+  - `GET /api/search/suggestions?q=<term>` or `/api/search/autocomplete?q=<term>` — Ultra-fast typeahead autocomplete for navbar dropdowns.
+  - `GET /api/search/trending` — Trending destination tags and featured package chips for homepage search bars.
+
+---
+
 ## 🎨 Automated Email Engine
 
 When an inquiry is submitted or a user registers, Nodemailer formats and dispatches an HTML email.
