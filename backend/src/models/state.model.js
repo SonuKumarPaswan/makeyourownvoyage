@@ -34,5 +34,7 @@ const stateSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+stateSchema.index({ isPublished: 1 });
+
 const State = mongoose.model("State", stateSchema);
 export default State;

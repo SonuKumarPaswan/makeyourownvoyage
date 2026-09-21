@@ -140,6 +140,9 @@ const destinationSchema = new mongoose.Schema(
 );
 
 destinationSchema.index({ state: 1, slug: 1 }, { unique: true });
+destinationSchema.index({ slug: 1 });
+destinationSchema.index({ isPublished: 1 });
+destinationSchema.index({ state: 1, isPublished: 1 });
 
 const Destination = mongoose.model("Destination", destinationSchema);
 export default Destination;

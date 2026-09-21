@@ -340,5 +340,11 @@ const hotelSchema = new mongoose.Schema(
     }
 );
 
+// Production Indexes for Public & Admin Searches
+hotelSchema.index({ "location.city": 1, status: 1 });
+hotelSchema.index({ destination: 1, status: 1 });
+hotelSchema.index({ starCategory: 1, status: 1 });
+hotelSchema.index({ isFeatured: 1, status: 1 });
+
 const Hotel = mongoose.model("Hotel", hotelSchema);
 export default Hotel;

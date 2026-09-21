@@ -240,5 +240,11 @@ enquirySchema.pre("save", function (next) {
     if (typeof next === "function") next();
 });
 
+// Production Indexes for High-Frequency Queries
+enquirySchema.index({ enquiryCode: 1 }, { unique: true });
+enquirySchema.index({ customerEmail: 1, createdAt: -1 });
+enquirySchema.index({ customerPhone: 1, createdAt: -1 });
+enquirySchema.index({ enquiryType: 1, status: 1, createdAt: -1 });
+
 const Enquiry = mongoose.model("Enquiry", enquirySchema);
 export default Enquiry;

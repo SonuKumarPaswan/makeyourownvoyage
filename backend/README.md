@@ -1,6 +1,6 @@
 # 🌍 Make Your Own Voyage (MYOV) — Backend API Documentation
 
-A modern, robust Node.js REST API engineered for **Make Your Own Voyage**, a luxury travel, tour package, hotel, flight, and transport booking & enquiry platform.
+A modern, high-performance, production-ready Node.js REST API engineered for **Make Your Own Voyage**, an experiential travel, tour package, luxury hotel, flight, transport rental, and custom itinerary planning platform.
 
 ---
 
@@ -10,56 +10,87 @@ A modern, robust Node.js REST API engineered for **Make Your Own Voyage**, a lux
 - [Key Features](#-key-features)
 - [Access Control & Security Principles](#-access-control--security-principles)
 - [Tech Stack](#-tech-stack)
+- [Production Hardening & Security](#-production-hardening--security)
 - [Directory Structure](#-directory-structure)
 - [Environment Variables & Setup](#-environment-variables--setup)
 - [API Endpoints Reference](#-api-endpoints-reference)
-  - [1. Universal Category Enquiries](#1-universal-category-enquiries-apienquiries)
-  - [2. Authentication & Users](#2-authentication--users-apiauth)
-  - [3. Hotels](#3-hotels-apihotels--apihotel)
-  - [4. Transports & Cabs](#4-transports--cabs-apitransports--apiadmintransports)
-  - [5. Tour Packages](#5-tour-packages-apipackages)
-  - [6. Destinations](#6-destinations-apidestinations)
-  - [7. Activities](#7-activities-apiactivities)
-  - [8. Itinerary Templates](#8-itinerary-templates-apiitinerary-templates)
-  - [9. States](#9-states-apistates)
+  - [1. Health & Status](#1-health--status-apihealth)
+  - [2. Universal Category Enquiries & CRM](#2-universal-category-enquiries--crm-apienquiries)
+  - [3. Global Multi-Category Search](#3-global-multi-category-search-apisearch)
+  - [4. Cloudinary Media & File Uploads](#4-cloudinary-media--file-uploads-apiupload)
+  - [5. Authentication & User Management](#5-authentication--user-management-apiauth)
+  - [6. Hotels (Public & Admin)](#6-hotels-apihotels--apihotel--apiadminhotels)
+  - [7. Transports & Vehicle Rentals](#7-transports--vehicle-rentals-apitransports--apiadmintransports)
+  - [8. Tour Packages](#8-tour-packages-apipackages)
+  - [9. Destinations & State Explore](#9-destinations--state-explore-apidestinations--apistates)
+  - [10. Frequently Asked Questions (FAQ)](#10-frequently-asked-questions-faq-apifaqs--apifaq)
+  - [11. Activities Master & Itinerary Templates](#11-activities-master--itinerary-templates)
 - [Automated Email Engine](#-automated-email-engine)
-- [Data Models Overview](#-data-models-overview)
-- [Running & Testing](#-running--testing)
+- [Database Compound Indexing](#-database-compound-indexing)
+- [Running & Deployment](#-running--deployment)
 
 ---
 
 ## 🚀 Overview & Architecture
 
-The **Make Your Own Voyage** backend is structured around an **inquiry-driven model** rather than direct online credit-card checkout. Travelers configure custom itineraries, hotels, flights, packages, weekend trips, and cabs/transports, then submit specialized enquiry forms.
+The **Make Your Own Voyage** backend is structured around an **inquiry-first model** rather than rigid online credit-card checkout. Travelers configure custom itineraries, explore hotels, flight quotes, vacation packages, weekend trips, and vehicle rentals, then submit specialized enquiry forms.
 
-### 🌟 Key Pillars:
-1. **Zero Login Barriers for Customers**: Visitors and guests can freely browse, configure, and submit inquiries without needing to create an account or log in.
-2. **Category-Isolated Inquiries**: Distinct, tailored payloads for **Hotels**, **Flights**, **Packages/Weekend Trips**, and **Cabs/Transports**.
-3. **Automated Luxury Branded Emails**: Customers receive immediate, high-touch HTML confirmation emails with category-specific color branding and an embedded company logo (`cid:brand-logo`).
-4. **Comprehensive Admin CRM**: Behind `verifyAdmin` security, administrators can inspect leads, filter by category/status, send price quotes, and log notes.
+### 🌟 Key Architectural Pillars:
+1. **Zero Login Barriers for Customers**: Visitors and guests can freely browse, search, and submit travel inquiries without mandatory registration or login walls.
+2. **Category-Isolated Inquiries**: Dedicated data models and payloads for **Hotels**, **Flights**, **Packages/Weekend Trips**, and **Cabs/Transports**.
+3. **Auto-Calculated Pricing Breakdown**: Itemized price calculations (room nights, traveler slabs, rental durations) populated automatically on inquiry creation and itemized in customer/admin confirmation emails.
+4. **Global Unified Search Engine**: High-speed, regex-escaped, parallel multi-collection search across destinations, packages, hotels, transports, states, and activities with instant auto-suggestions.
+5. **In-Memory Cloudinary Pipeline**: Zero disk-clutter buffer streaming upload via Multer memory storage, supporting direct admin form uploads, base64 strings, and a dedicated upload API.
+6. **Comprehensive Admin CRM**: Behind `verifyAdmin` security, administrators can inspect leads, filter by category/status, send price quotes, and log timestamped internal notes.
 
 ---
 
 ## 🔐 Access Control & Security Principles
 
-The backend divides endpoints into two distinct tiers:
+The backend enforces a clean two-tier access architecture:
 
-| Route Type | Authentication | Description |
+| Route Tier | Authentication | Description |
 | :--- | :--- | :--- |
-| **Customer / Public Routes** | **None (No login required)** | Open to all visitors. Inquiry submissions, inquiry tracking via email/phone, public catalog search, and profile lookups require **no JWT token or session**. |
-| **Admin Routes** | **Strict `verifyAdmin`** | Restricted to users with `role: "admin"`. Requires a valid JWT token via Cookie or `Authorization: Bearer <token>` header. |
+| **Customer / Public Routes** | **None (Login-Free)** | Open to all visitors. Inquiry submissions, tracking via email/phone, catalog searches, suggestions, and public detail pages require **no JWT token or session**. |
+| **Admin Routes** | **Strict `verifyAdmin`** | Guarded by JWT authentication requiring `role: "admin"`. Accepts tokens via HttpOnly Cookies or `Authorization: Bearer <token>` headers. |
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Runtime**: Node.js (ES Modules: `"type": "module"`)
+- **Runtime Environment**: Node.js (ES Modules: `"type": "module"`)
 - **Web Framework**: Express.js (v5)
-- **Database**: MongoDB via Mongoose (v9)
-- **Authentication / Hashing**: JSON Web Tokens (`jsonwebtoken`) & `bcryptjs`
+- **Database**: MongoDB with Mongoose (v9)
+- **Media Hosting**: Cloudinary (v2) with direct memory buffer streaming
+- **File Uploads**: Multer (in-memory storage with MIME validation)
+- **Security & Headers**: Helmet (Cross-Origin Resource Policy configured)
+- **Rate Limiting**: `express-rate-limit` (Tiered: General, Auth/Enquiry, Upload)
+- **Performance**: `compression` (Gzip/Brotli) & `morgan` (HTTP logging)
+- **Authentication**: JSON Web Tokens (`jsonwebtoken`) & `bcryptjs`
 - **Validation**: Joi
-- **Email Delivery**: Nodemailer (HTML templates with embedded CID attachments)
-- **Security & Utilities**: CORS, Cookie-Parser, Dotenv
+- **Email Delivery**: Nodemailer (Branded luxury HTML templates with CID attachments)
+
+---
+
+## 🛡️ Production Hardening & Security
+
+The backend is hardened for cloud deployments (AWS, Render, Railway, DigitalOcean, Docker):
+
+1. **Reverse Proxy Trust**: `app.set("trust proxy", 1)` enabled for accurate client IP resolution and HTTPS detection behind reverse proxies.
+2. **Cross-Origin Cookie Handling**: Cookies dynamically use `sameSite: "none"` and `secure: true` in production, eliminating cross-domain cookie blocks when frontend and backend are hosted on separate domains.
+3. **Tiered Rate Limiting**:
+   - **General API**: 500 requests / 15 minutes per IP.
+   - **Auth & Enquiries**: 30 requests / 15 minutes per IP (blocks brute-force and lead spam bots).
+   - **Media Uploads**: 50 uploads / 15 minutes per IP (prevents quota exhaustion).
+4. **Centralized Error & 404 Handling**:
+   - Transforms Mongoose `CastError` (bad ObjectId) into clean 404 responses.
+   - Converts MongoDB code `11000` duplicate key clashes into informative 409 Conflict messages.
+   - Normalizes JWT expiration and signature errors to clean 401 Unauthorized responses.
+   - Automatically hides raw error stack traces when `NODE_ENV=production`.
+5. **Process Lifecycle & Graceful Shutdown**:
+   - Catches `unhandledRejection` and `uncaughtException` to log fatal errors safely.
+   - Listens for `SIGTERM` and `SIGINT` signals to finish active HTTP requests and close MongoDB connections cleanly.
+6. **Memory Safety**: Multer memory storage enforces a strict 10MB per-file and 20-file maximum ceiling, preventing Node.js process Out-Of-Memory (OOM) crashes.
 
 ---
 
@@ -67,64 +98,74 @@ The backend divides endpoints into two distinct tiers:
 
 ```text
 backend/
-├── server.js                        # App entry point & MongoDB connection listener
+├── server.js                        # App entry point, crash guards & graceful shutdown
 ├── package.json                     # Dependencies & npm scripts
-├── .env                             # Environment configuration
+├── .env                             # Environment configuration (Keep secret!)
+├── .gitignore                       # Production ignore rules
 ├── README.md                        # Complete backend documentation
 └── src/
-    ├── app.js                       # Express app configuration & route mounting
+    ├── app.js                       # Express configuration, security, & route mounting
     ├── assets/
     │   └── logo.png                 # Local brand logo used in email templates
     ├── config/
-    │   └── db.js                    # Mongoose MongoDB connection pool
+    │   └── db.js                    # Production MongoDB connection pool & listeners
     ├── controllers/
     │   ├── activityMaster.controller.js
     │   ├── destination.controller.js
-    │   ├── enquiry.controller.js    # Universal enquiry submission & CRM handlers
-    │   ├── hotel.controller.js       # Admin hotel management
-    │   ├── hotel.public.controller.js # Public hotel search & detail
+    │   ├── enquiry.controller.js    # Universal enquiry engine & CRM logic
+    │   ├── faq.controller.js        # FAQ management & category lookups
+    │   ├── hotel.controller.js       # Admin hotel management & Cloudinary sync
+    │   ├── hotel.public.controller.js # Public hotel catalog & filters
     │   ├── itineraryTemplate.controller.js
-    │   ├── package.controller.js
-    │   ├── state.controller.js
+    │   ├── package.controller.js    # Tour package builder & slab pricing
+    │   ├── search.controller.js     # Multi-category search & auto-suggestions
+    │   ├── state.controller.js      # States & full exploration bundles
     │   ├── transport.admin.controller.js
     │   ├── transport.public.controller.js
-    │   └── user.controller.js
+    │   ├── upload.controller.js     # Cloudinary single/multiple uploads
+    │   └── user.controller.js       # Authentication & profile management
     ├── middleware/
-    │   ├── role.js                  # verifyAdmin middleware
+    │   ├── errorHandler.js          # Centralized Mongoose/JWT/Multer error handler
+    │   ├── role.js                  # verifyAdmin RBAC middleware
+    │   ├── security.js              # Helmet, Rate Limiters, Compression, Morgan
+    │   ├── upload.js                # Multer memory storage & MIME filtering
     │   ├── user.js                  # isLoggedIn optional auth helper
     │   └── validate.js              # Joi request validation middleware
     ├── models/
     │   ├── activityMaster.model.js
     │   ├── destination.model.js
-    │   ├── destination.js           # Re-export shim
-    │   ├── enquiry.model.js         # Unified enquiry schema (Hotels, Flights, etc.)
-    │   ├── faq.model.js
-    │   ├── hotel.model.js
+    │   ├── enquiry.model.js         # Polymorphic inquiry schema with compound indexes
+    │   ├── faq.model.js             # Categorized FAQ schema
+    │   ├── hotel.model.js           # Multi-room hotel schema with compound indexes
     │   ├── itineraryTemplate.model.js
-    │   ├── package.model.js
+    │   ├── package.model.js         # Tour package schema with pricing slabs
     │   ├── state.model.js
-    │   ├── state.js                 # Re-export shim
-    │   ├── transport.model.js
+    │   ├── transport.model.js       # Cab/Bus/Bike/Traveller schema with virtuals
     │   └── user.model.js
     ├── routes/
     │   ├── activityMaster.routes.js
     │   ├── destination.routes.js
-    │   ├── enquiry.routes.js        # Public submission + Admin CRM routes
-    │   ├── hotels.admin.routes.js   # Admin hotel CRUD (verifyAdmin)
-    │   ├── hotels.public.routes.js  # Public hotel discovery
+    │   ├── enquiry.routes.js
+    │   ├── faq.routes.js
+    │   ├── hotels.admin.routes.js
+    │   ├── hotels.public.routes.js
     │   ├── itineraryTemplate.routes.js
     │   ├── package.routes.js
+    │   ├── search.routes.js
     │   ├── state.routes.js
-    │   ├── transport.admin.routes.js# Admin transport CRUD (verifyAdmin)
-    │   ├── transport.public.routes.js# Public transport search
-    │   └── user.routes.js           # Auth & user management
+    │   ├── transport.admin.routes.js
+    │   ├── transport.public.routes.js
+    │   ├── upload.routes.js
+    │   └── user.routes.js
+    ├── services/
+    │   └── cloudinary.service.js    # Cloudinary buffer stream, deletion, & parsing
     ├── utils/
-    │   ├── emailTemplates.js        # Branded HTML email templates
-    │   ├── generateHotelSlug.js     # Slug generator utility
-    │   ├── sendEmail.js             # Nodemailer transporter & dispatch methods
-    │   └── token.js                 # JWT generator & cookie configuration
+    │   ├── emailTemplates.js        # Branded responsive HTML templates
+    │   ├── generateHotelSlug.js     # Safe slug generator
+    │   ├── sendEmail.js             # Nodemailer transporter & email dispatchers
+    │   └── token.js                 # JWT generator & cross-origin cookieOptions
     └── validations/
-        └── user.validation.js       # Joi schemas for auth
+        └── user.validation.js       # Joi schemas for auth validation
 ```
 
 ---
@@ -134,392 +175,290 @@ backend/
 Create a `.env` file in the `backend/` directory:
 
 ```env
+# Server Configuration
 PORT=5000
+NODE_ENV=development                # Switch to 'production' on live server
+CLIENT_URL=http://localhost:3000   # Live frontend URL in production (e.g., https://makeyourownvoyage.com)
+
+# Database
 MONGODB_URI=mongodb://localhost:27017/MakeYourOwnVoyage
-JWT_SECRET=your_super_secret_jwt_key_2026
+# For production Atlas: mongodb+srv://<user>:<password>@cluster0.mongodb.net/MakeYourOwnVoyage?retryWrites=true&w=majority
+
+# Authentication
+JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRE=7d
-CLIENT_URL=http://localhost:3000
-NODE_ENV=development
 
-# SMTP Email Configuration (Nodemailer)
+# Email SMTP (Gmail App Password or Transactional Provider)
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_16_digit_google_app_password
-```
+EMAIL_PASS=your_16_digit_app_password
 
-### Installation & Run
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Run in development mode (with auto-reload)
-npm run dev
-
-# 3. Run in production mode
-npm start
+# Cloudinary Media Configuration
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ---
 
 ## 📡 API Endpoints Reference
 
-Base URL: `http://localhost:5000`
-
----
-
-### 1. Universal Category Enquiries (`/api/enquiries`)
-
-The core lead-generation engine. All customer submissions are **login-free**.
-
-#### 🏨 Hotel Enquiry
-- **Method**: `POST`
-- **Path**: `/api/enquiries/hotel`
-- **Auth**: Public (No login required)
-- **Request Body**:
-```json
-{
-  "customerName": "Rahul Sharma",
-  "email": "rahul.sharma@example.com",
-  "phoneNumber": "+91 9876543210",
-  "hotelDetails": {
-    "hotelId": "65b4c123...",
-    "hotelName": "Taj Lake Palace",
-    "roomType": "Deluxe Lake View",
-    "checkInDate": "2026-10-15",
-    "checkOutDate": "2026-10-18",
-    "numberOfRooms": 1,
-    "adults": 2,
-    "children": 1,
-    "mealPlan": "Breakfast Included"
-  },
-  "budget": "₹35,000 - ₹50,000",
-  "specialRequests": "High floor room preferred."
-}
-```
-- **Response** `201 Created`:
-```json
-{
-  "success": true,
-  "message": "Hotel enquiry submitted successfully. A confirmation email has been sent.",
-  "referenceCode": "ENQ-HTL-1726912345-AB12",
-  "enquiry": { ... }
-}
-```
-
----
-
-#### ✈️ Flight Enquiry
-- **Method**: `POST`
-- **Path**: `/api/enquiries/flight`
-- **Auth**: Public (No login required)
-- **Request Body**:
-```json
-{
-  "customerName": "Ananya Roy",
-  "email": "ananya.roy@example.com",
-  "phoneNumber": "+91 9123456789",
-  "flightDetails": {
-    "tripType": "round-trip",
-    "fromCity": "New Delhi (DEL)",
-    "toCity": "Goa (GOI)",
-    "departureDate": "2026-11-10",
-    "returnDate": "2026-11-15",
-    "travelClass": "Economy",
-    "passengers": {
-      "adults": 2,
-      "children": 1,
-      "infants": 0
-    },
-    "preferredAirline": "IndiGo"
-  }
-}
-```
-- **Response** `201 Created`: Generates reference code prefix `ENQ-FLT-...`.
-
----
-
-#### 🎒 Tour Package & Weekend Trip Enquiry
-- **Method**: `POST`
-- **Path**: `/api/enquiries/package`
-- **Auth**: Public (No login required)
-- **Request Body**:
-```json
-{
-  "customerName": "Suresh Raina",
-  "email": "suresh@example.com",
-  "phoneNumber": "+91 9988776655",
-  "packageDetails": {
-    "packageId": "65b4f890...",
-    "packageTitle": "Mystical Ladakh 7D/6N Expedition",
-    "destination": "Leh Ladakh",
-    "isWeekendTrip": false,
-    "departureDate": "2026-07-10",
-    "duration": "7 Days / 6 Nights",
-    "travelersCount": 4,
-    "roomSharing": "Double Sharing",
-    "corporateOrGroup": false
-  },
-  "budget": "₹1,50,000",
-  "specialRequests": "Include oxygen cylinder during Nubra valley pass."
-}
-```
-- **Response** `201 Created`: Generates reference code prefix `ENQ-PKG-...`.
-
----
-
-#### 🚗 Transport & Cab Enquiry
-- **Method**: `POST`
-- **Path**: `/api/enquiries/transport`
-- **Auth**: Public (No login required)
-- **Request Body**:
-```json
-{
-  "customerName": "Vikas Gupta",
-  "email": "vikas@example.com",
-  "phoneNumber": "+91 9811223344",
-  "transportDetails": {
-    "transportId": "65b4e777...",
-    "vehicleCategory": "Cab",
-    "vehicleModel": "Toyota Innova Crysta",
-    "pickupLocation": "Delhi Airport Terminal 3",
-    "dropLocation": "Agra Fort",
-    "serviceType": "Outstation One-Way",
-    "pickupDateTime": "2026-09-25T06:00:00Z",
-    "passengers": 4,
-    "luggageCount": 3
-  }
-}
-```
-- **Response** `201 Created`: Generates reference code prefix `ENQ-TRP-...`.
-
----
-
-#### 🔍 Customer Lead Tracking
-- **Method**: `GET`
-- **Path**: `/api/enquiries/my-enquiries?email=customer@example.com` OR `?phone=+919876543210`
-- **Auth**: Public (No login required)
-- **Query Params**:
-  - `email`: Lookup inquiries matching this email.
-  - `phone`: Lookup inquiries matching this phone number.
-- **Response** `200 OK`: Returns list of customer's inquiries with current statuses (`pending`, `contacted`, `quoted`, `converted`, `cancelled`).
-
----
-
-#### 🛡️ Admin CRM Endpoints (Secured with `verifyAdmin`)
-Requires Admin JWT token.
-
-- **Get All Enquiries**:
-  - `GET /api/enquiries/admin/all?enquiryType=hotel&status=pending&search=Taj&page=1&limit=10`
-  - Filters: `enquiryType` (`hotel`, `flight`, `package`, `transport`), `status`, `search` (name, email, phone, reference code), pagination (`page`, `limit`).
-- **Get Enquiry by ID**:
-  - `GET /api/enquiries/admin/:id`
-- **Update Lead Status & Quoted Price**:
-  - `PATCH /api/enquiries/admin/:id`
-  - **Body**:
-    ```json
-    {
-      "status": "quoted",
-      "quotedPrice": 48500,
-      "adminNote": "Spoke to customer. Offered 10% seasonal discount for Taj Lake Palace."
-    }
-    ```
-- **Delete Enquiry**:
-  - `DELETE /api/enquiries/admin/:id`
-
----
-
-### 2. Authentication & Users (`/api/auth`)
+### 1. Health & Status (`/api/health`)
 
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Public | Register new user. Triggers welcome email and issues JWT cookie. |
-| `POST` | `/api/auth/login` | Public | Authenticate with email/phone & password. Issues JWT cookie. |
-| `POST` | `/api/auth/logout` | Public | Clears authentication token cookie. |
-| `GET` | `/api/auth/me` | Public / Optional | Returns user details via token cookie or query `?id=...`. |
-| `GET` | `/api/auth/:id` | Public | Lookup user profile by MongoDB ObjectId. |
-| `PUT` | `/api/auth/:id` | Public | Update user profile (name, phone, email, password). |
-| `GET` | `/api/auth/` | **Admin Only** | List all platform users with search, role filter & pagination. |
-| `GET` | `/api/auth/get-all`| **Admin Only** | Alias for admin user listing. |
+| `GET` | `/api/health` | Public | System uptime, health status, and active environment |
 
 ---
 
-### 3. Hotels (`/api/hotels` & `/api/hotel`)
+### 2. Universal Category Enquiries & CRM (`/api/enquiries` or `/api/enquiry`)
 
-#### Public Search & Detail (`/api/hotels`)
-- `GET /api/hotels/search?destination=Goa&city=Calangute&starRating=5&minPrice=3000&maxPrice=15000`
-- `GET /api/hotels/:slug` — Fetch complete hotel information by URL slug.
+#### Customer Submission Endpoints (No Login Required)
 
-#### Admin Management (`/api/hotel` — Secured with `verifyAdmin`)
-- `POST /api/hotel/` or `/create` — Create a new hotel (auto-calculates room tax and final price).
-- `GET /api/hotel/` or `/get-all` — List all hotels for administration.
-- `GET /api/hotel/:id` — Admin view of hotel by ID.
-- `PUT /api/hotel/:id` — Update hotel details or room inventory.
-- `DELETE /api/hotel/:id` — Soft-delete or remove hotel.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/enquiries/hotel` | Submit customized hotel room inquiry (auto-calculates estimated total) |
+| `POST` | `/api/enquiries/flight` | Submit one-way or round-trip flight booking inquiry |
+| `POST` | `/api/enquiries/package` | Submit tour package inquiry (calculates slab / traveler total) |
+| `POST` | `/api/enquiries/transport` | Submit vehicle rental inquiry (cab, bus, bike, traveller) |
+| `POST` | `/api/enquiries/custom` | Submit generalized bespoke travel inquiry |
+| `GET` | `/api/enquiries/track?contact=...` | Track submitted inquiries by customer phone or email |
+| `GET` | `/api/enquiries/code/:enquiryCode` | Fetch full inquiry details by unique code (e.g. `ENQ-HTL-12345678`) |
+| `GET` | `/api/enquiries/my-enquiries` | Authenticated user inquiry history (optional) |
 
----
+#### Admin Lead CRM Endpoints (`verifyAdmin` Required)
 
-### 4. Transports & Cabs (`/api/transports` & `/api/admin/transports`)
-
-#### Public Search (`/api/transports`)
-- `GET /api/transports/search?category=Cab&city=Delhi` — Supports comma-separated city matches.
-- `GET /api/transports/:slug` — Transport detail page by slug.
-
-#### Admin Management (`/api/admin/transports` — Secured with `verifyAdmin`)
-- `POST /api/admin/transports/` or `/create` — Add vehicle / transport service.
-- `GET /api/admin/transports/` or `/get-all` — List all vehicles.
-- `GET /api/admin/transports/:id` — Inspect specific vehicle.
-- `PUT /api/admin/transports/:id` — Update vehicle pricing, specifications, or images.
-- `DELETE /api/admin/transports/:id` — Remove vehicle.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/enquiries/admin/all` | Filter leads by `enquiryType`, `status`, search name/phone/code + pagination |
+| `GET` | `/api/enquiries/admin/:id` | View detailed inquiry with populated item references |
+| `PATCH` | `/api/enquiries/admin/:id` | Update lead status (`contacted`, `quoted`, `converted`), quoted price, & notes |
+| `DELETE` | `/api/enquiries/admin/:id` | Delete spam or duplicate lead |
 
 ---
 
-### 5. Tour Packages (`/api/packages`)
+### 3. Global Multi-Category Search (`/api/search`)
 
-- **Public**:
-  - `GET /api/packages` & `GET /api/packages/get-all-packages` — List all packages.
-  - `GET /api/packages/id/:id` — Lookup by package ID.
-  - `GET /api/packages/:slug` — Lookup by friendly SEO slug.
-- **Admin Only (`verifyAdmin`)**:
-  - `POST /api/packages/` or `/create` — Create holiday or weekend package.
-  - `PUT /api/packages/:id` — Update package pricing, inclusions, and itineraries.
-  - `DELETE /api/packages/:id` — Delete package.
+High-speed, parallel query execution with ReDoS protection and capped result sets:
 
----
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/search?q=manali&type=all&limit=6` | Public | Search across destinations, packages, hotels, transports, states, & activities |
+| `GET` | `/api/search/suggestions?q=manali` | Public | Lightweight instant autosuggestion pills for search bars |
+| `GET` | `/api/search/trending` | Public | Top 8 featured destinations and packages |
 
-### 6. Destinations (`/api/destinations`)
-
-- **Public**:
-  - `GET /api/destinations` — List active destinations.
-  - `GET /api/destinations/:slug` — Get destination overview by slug.
-  - `GET /api/destinations/:destinationId/packages` — Packages mapped to destination.
-  - `GET /api/destinations/:destinationId/hotels` — Hotels in destination.
-  - `GET /api/destinations/:destinationId/activities` — Activities available.
-  - `GET /api/destinations/:destinationId/faqs` — Published FAQs for destination.
-  - `GET /api/destinations/:destinationId/guides` — Travel guides.
-- **Admin Only (`verifyAdmin`)**:
-  - `POST /api/destinations/` — Create destination.
-  - `PUT /api/destinations/:id` — Update destination info, images, or SEO meta.
-  - `DELETE /api/destinations/:id` — Remove destination.
+**Supported `type` query parameters**: `all`, `destinations`, `packages`, `hotels`, `transports`, `states`, `activities`.
 
 ---
 
-### 7. Activities (`/api/activities`)
+### 4. Cloudinary Media & File Uploads (`/api/upload`)
 
-- **Public**:
-  - `GET /api/activities` & `/get-all-activities` — Discover experiences & adventures.
-  - `GET /api/activities/:id` — Activity detail by ID.
-- **Admin Only (`verifyAdmin`)**:
-  - `POST /api/activities/` or `/create` — Add new activity master record.
-  - `PUT /api/activities/:id` — Update activity.
-  - `DELETE /api/activities/:id` — Remove activity.
+Direct buffer streaming to Cloudinary (in-memory storage with zero leftover files on server):
 
----
+| Method | Endpoint | Access | Payload | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/api/upload/image` | `verifyAdmin` | `multipart/form-data` (`image` or `file`) | Upload a single image to Cloudinary |
+| `POST` | `/api/upload/multiple` | `verifyAdmin` | `multipart/form-data` (`images`, max 20) | Upload multiple images in parallel |
+| `DELETE` | `/api/upload` | `verifyAdmin` | JSON `{ public_id }` or `{ url }` | Delete an image from Cloudinary |
 
-### 8. Itinerary Templates (`/api/itinerary-templates`)
-
-- **Public**:
-  - `GET /api/itinerary-templates` & `/get-all-templates` — View reusable itinerary blueprints.
-  - `GET /api/itinerary-templates/:id` — Template detail by ID.
-- **Admin Only (`verifyAdmin`)**:
-  - `POST /api/itinerary-templates/` or `/create` — Create reusable day-by-day plan.
-  - `PUT /api/itinerary-templates/:id` — Modify itinerary structure.
-  - `DELETE /api/itinerary-templates/:id` — Delete template.
+> **Dual Upload Support**: In addition to `/api/upload`, administrators can attach files (`multipart/form-data`) or pass Base64 data URIs directly inside Hotel, Package, Transport, Destination, and State create/update endpoints!
 
 ---
 
-### 9. States (`/api/states`)
+### 5. Authentication & User Management (`/api/auth`)
 
-- **Public**:
-  - `GET /api/states` — List all Indian states / travel regions.
-  - `GET /api/states/:slug` — View state by slug.
-- **Admin Only (`verifyAdmin`)**:
-  - `POST /api/states/` — Create state.
-  - `PUT /api/states/:id` — Update state details.
-  - `DELETE /api/states/:id` — Delete state.
-
----
-
-### 10. Frequently Asked Questions (`/api/faqs` & `/api/faq`)
-
-- **Public (No Login Required)**:
-  - `GET /api/faqs` — List all published FAQs (supports `?destination=<slug|id>`, `?search=<keyword>`, `?isPublished=true`, and pagination `?page=1&limit=10`).
-  - `GET /api/faqs/id/:id` — Single FAQ by ID.
-- **Admin Only (`verifyAdmin`)**:
-  - `POST /api/faqs/create` — Create a new FAQ.
-  - `PUT /api/faqs/:id` or `PATCH /api/faqs/:id` — Update FAQ question, answer, destination, or display order.
-  - `DELETE /api/faqs/:id` — Delete FAQ record.
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Public | Register new user; sends luxury welcome email |
+| `POST` | `/api/auth/login` | Public | Login with email or phone + password; sets JWT cookie |
+| `POST` | `/api/auth/logout` | Public | Clears authorization cookie |
+| `GET` | `/api/auth/me` | Public | Fetch current authenticated profile (via cookie or Bearer token) |
+| `GET` | `/api/auth/` or `/get-all` | `verifyAdmin` | List all registered users (admin only) |
+| `GET` | `/api/auth/:id` | Public/Owner | Get user details by ID |
+| `PUT` | `/api/auth/:id` | Public/Owner | Update name, phone, or password |
 
 ---
 
-### 11. Global Multi-Entity Search (`/api/search`)
+### 6. Hotels (`/api/hotels`, `/api/hotel`, & `/api/admin/hotels`)
 
-- **Public (No Login Required)**:
-  - `GET /api/search?q=<keyword>&type=all&limit=6` — Global federated search across Destinations, Tour Packages, Hotels, Transports, States, and Activities. Returns category-grouped arrays and a unified `combined` array.
-  - `GET /api/search/suggestions?q=<term>` or `/api/search/autocomplete?q=<term>` — Ultra-fast typeahead autocomplete for navbar dropdowns.
-  - `GET /api/search/trending` — Trending destination tags and featured package chips for homepage search bars.
+#### Public Endpoints (`/api/hotels`)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/hotels` | List active hotels with city, destination, price, star rating filters & pagination |
+| `GET` | `/api/hotels/:id` | Get single hotel by MongoDB ID or slug |
+| `GET` | `/api/hotels/destination/:destinationId` | Get all hotels for a specific destination |
 
----
-
-## 🎨 Automated Email Engine
-
-When an inquiry is submitted or a user registers, Nodemailer formats and dispatches an HTML email.
-
-### Features:
-1. **Embedded Brand Logo (`cid:brand-logo`)**: The local brand logo located at `src/assets/logo.png` is attached as an inline MIME Content-ID. Images display instantly in Gmail, Apple Mail, and Outlook without third-party image hosting or CDN dependencies.
-2. **Category-Specific Color Grading**:
-   - 🏨 **Hotel Inquiries**: Luxury Warm Amber & Gold badge (`#d97706`)
-   - ✈️ **Flight Inquiries**: Sky Cyan & Cobalt Blue badge (`#0284c7`)
-   - 🎒 **Package Inquiries**: Forest Emerald & Jade badge (`#059669`)
-   - 🏖️ **Weekend Trip Inquiries**: Vibrant Royal Purple badge (`#7c3aed`)
-   - 🚗 **Transport Inquiries**: High-Visibility Coral & Tangerine badge (`#ea580c`)
-3. **Reference Code Box**: Prominently displays the unique tracking code (`ENQ-HTL-...`, `ENQ-FLT-...`, etc.).
-4. **Itemized Summary Table**: Clearly presents travel dates, guest split, room type, or vehicle category.
+#### Admin Endpoints (`/api/hotel` or `/api/admin/hotels` — `verifyAdmin` Required)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/hotel/create` | Create new hotel (supports multipart images & base64) |
+| `GET` | `/api/hotel/get-all` | List all hotels with admin status filters and pagination |
+| `GET` | `/api/hotel/:id` | Inspect hotel details by ID or slug |
+| `PUT` | `/api/hotel/:id` | Update hotel details & upload additional photos |
+| `DELETE` | `/api/hotel/:id` | Delete hotel |
 
 ---
 
-## 📊 Data Models Overview
+### 7. Transports & Vehicle Rentals (`/api/transports` & `/api/admin/transports`)
 
-### Enquiry Schema Highlights (`src/models/enquiry.model.js`)
-- `referenceCode`: Unique index, auto-generated format `ENQ-{TYPE}-{TIMESTAMP}-{RANDOM}`.
-- `enquiryType`: Enum `['hotel', 'flight', 'package', 'transport']`.
-- `status`: Enum `['pending', 'contacted', 'quoted', 'converted', 'cancelled']`.
-- `quotedPrice`: Number (set by admin upon review).
-- `adminNotes`: Array of `{ note, addedBy, createdAt }`.
-- Polymorphic sub-documents: `hotelDetails`, `flightDetails`, `packageDetails`, `transportDetails`.
+Supports **Cabs** (Sedan, SUV, Luxury), **Buses** (Volvo Sleeper, Seater), **Bikes** (Cruiser, Scooter), and **Travellers** (12/17/26 Seater).
+
+#### Public Endpoints (`/api/transports`)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/transports` | Filter vehicles by category, city, service type, fuel, AC, with pagination |
+| `GET` | `/api/transports/:id` | Get single vehicle details by ID or slug |
+| `GET` | `/api/transports/category/:category` | Get vehicles by category (`Cab`, `Bus`, `Bike`, `Traveller`) |
+| `GET` | `/api/transports/city/:city` | Get vehicles available in a specific city |
+
+#### Admin Endpoints (`/api/admin/transports` — `verifyAdmin` Required)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/admin/transports/create` | Add new vehicle (auto-slug generation & Cloudinary upload) |
+| `GET` | `/api/admin/transports/get-all` | List all vehicles with operational status filter |
+| `GET` | `/api/admin/transports/:id` | Fetch vehicle by ID or slug |
+| `PUT` | `/api/admin/transports/:id` | Update vehicle details and pricing |
+| `DELETE` | `/api/admin/transports/:id` | Delete vehicle |
 
 ---
 
-## 🧪 Running & Testing
+### 8. Tour Packages (`/api/packages`)
 
-### Test an Inquiry Submission using cURL:
+#### Public Endpoints
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/packages` | List active packages with destination, packageType, duration filters |
+| `GET` | `/api/packages/:slug` | Fetch complete day-by-day customized itinerary by slug |
+| `GET` | `/api/packages/id/:id` | Fetch package by MongoDB ID |
 
-```bash
-curl -X POST http://localhost:5000/api/enquiries/hotel \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customerName": "Vikram Seth",
-    "email": "vikram@example.com",
-    "phoneNumber": "+91 9876543210",
-    "hotelDetails": {
-      "hotelName": "Grand Hyatt Mumbai",
-      "roomType": "Club King",
-      "checkInDate": "2026-12-01",
-      "checkOutDate": "2026-12-05",
-      "numberOfRooms": 1,
-      "adults": 2,
-      "children": 0
-    }
-  }'
+#### Admin Endpoints (`verifyAdmin` Required)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/packages/create` | Build package (from template clone or custom day plan) with Cloudinary images |
+| `PUT` | `/api/packages/:id` | Update package details, pricing slabs, or media |
+| `DELETE` | `/api/packages/:id` | Delete package |
+
+---
+
+### 9. Destinations & State Explore (`/api/destinations` & `/api/states`)
+
+#### Destinations (`/api/destinations`)
+- `GET /api/destinations`: List published destinations with state & type filters.
+- `GET /api/destinations/:slug`: Destination details, weather, best time to visit, and attractions.
+- `GET /api/destinations/:destinationId/packages`: Tour packages tied to destination.
+- `GET /api/destinations/:destinationId/hotels`: Hotels situated in destination.
+- `GET /api/destinations/:destinationId/activities`: Activities tied to destination.
+- `GET /api/destinations/:destinationId/faqs`: Destination FAQs.
+- `POST /api/destinations`, `PUT /:id`, `DELETE /:id`: Admin management (`verifyAdmin`).
+
+#### States (`/api/states`)
+- `GET /api/states`: List published states.
+- `GET /api/states/:slug`: Get state info.
+- `GET /api/states/:slug/explore`: **All-in-one explorer bundle** returning state info, all destinations in state, top packages, hotels, and available transports in a single request.
+- `POST /api/states`, `PUT /:id`, `DELETE /:id`: Admin management (`verifyAdmin`).
+
+---
+
+### 10. Frequently Asked Questions (FAQ) (`/api/faqs` or `/api/faq`)
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/faqs` | Public | Get all published global FAQs ordered by sequence |
+| `GET` | `/api/faqs/destination/:destinationId` | Public | Get FAQs specific to a destination |
+| `GET` | `/api/faqs/:id` | Public | Get single FAQ by ID |
+| `POST` | `/api/faqs/create` | `verifyAdmin` | Create new FAQ (global or destination-specific) |
+| `PUT` | `/api/faqs/:id` | `verifyAdmin` | Update question, answer, order, or publication status |
+| `DELETE` | `/api/faqs/:id` | `verifyAdmin` | Delete FAQ |
+
+---
+
+### 11. Activities Master & Itinerary Templates
+
+- **Activities Master (`/api/activities`)**:
+  - `GET /api/activities`: List master activities.
+  - `POST /api/activities/create` (`verifyAdmin`): Create activity with Cloudinary photo.
+  - `PUT /:id`, `DELETE /:id` (`verifyAdmin`).
+- **Itinerary Templates (`/api/itinerary-templates`)**:
+  - Reusable day-by-day blueprints cloned by admins to generate tour packages rapidly.
+  - `GET /api/itinerary-templates`: List templates.
+  - `POST /api/itinerary-templates`: Create template.
+  - `PUT /:id`, `DELETE /:id` (`verifyAdmin`).
+
+---
+
+## 📧 Automated Email Engine
+
+The platform features an automated transactional email engine powered by Nodemailer:
+
+1. **Brand Identity**: Emails embed the official company logo via inline MIME attachment (`cid:brand-logo`), ensuring high-trust rendering across Gmail, Apple Mail, and Outlook without external image blocking.
+2. **Category Color Schemes**:
+   - **Hotels**: Emerald Teal (`#0D9488`)
+   - **Flights**: Sky Blue (`#0284C7`)
+   - **Packages / Weekend Trips**: Royal Indigo (`#4F46E5`)
+   - **Transports / Cabs**: Sunset Amber (`#D97706`)
+3. **Itemized Pricing Breakdown**: Automatically computes and displays itemized cost breakdowns (nights × rooms, passenger slabs, rental duration) in confirmation emails sent to both customer and admin.
+4. **Resilient Non-Blocking Dispatch**: All email promises are handled with `.catch()` wrappers, ensuring email provider timeouts never block or fail client HTTP requests.
+
+---
+
+## ⚡ Database Compound Indexing
+
+To maintain lightning-fast query execution under heavy production load, compound indexes are active on all primary collections:
+
+```javascript
+// Hotels
+hotelSchema.index({ "location.city": 1, status: 1 });
+hotelSchema.index({ destination: 1, status: 1 });
+hotelSchema.index({ starCategory: 1, status: 1 });
+hotelSchema.index({ isFeatured: 1, status: 1 });
+
+// Tour Packages
+PackageSchema.index({ destination: 1, isActive: 1 });
+PackageSchema.index({ packageType: 1, isActive: 1 });
+PackageSchema.index({ isFeatured: 1, isActive: 1 });
+
+// Transports
+transportSchema.index({ category: 1, status: 1 });
+transportSchema.index({ availableCities: 1, status: 1 });
+transportSchema.index({ vehicleType: 1, status: 1 });
+
+// Enquiries (CRM)
+enquirySchema.index({ enquiryCode: 1 }, { unique: true });
+enquirySchema.index({ customerEmail: 1, createdAt: -1 });
+enquirySchema.index({ customerPhone: 1, createdAt: -1 });
+enquirySchema.index({ enquiryType: 1, status: 1, createdAt: -1 });
+
+// Destinations & FAQs
+destinationSchema.index({ state: 1, isPublished: 1 });
+faqSchema.index({ destination: 1, isPublished: 1, order: 1 });
 ```
 
-### Accessing Admin Routes:
-
-1. Log in via `POST /api/auth/login` with an admin account.
-2. Extract the returned JWT token.
-3. Pass the token in subsequent admin requests:
-   - As a Cookie named `token`, or
-   - In the header: `Authorization: Bearer <YOUR_JWT_TOKEN>`.
-
 ---
 
-© 2026 **Make Your Own Voyage**. All rights reserved.
+## 🚀 Running & Deployment
+
+### Local Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start development server with live reload:
+   ```bash
+   npm run dev
+   ```
+
+3. Production start:
+   ```bash
+   npm start
+   ```
+
+### Production Deployment Checklist
+
+- [ ] Set `NODE_ENV=production` in environment variables.
+- [ ] Connect production MongoDB Atlas URI with network access enabled (`0.0.0.0/0`).
+- [ ] Set `CLIENT_URL` to your production frontend domain (e.g., `https://makeyourownvoyage.com`).
+- [ ] Configure live Cloudinary credentials (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`).
+- [ ] Configure live SMTP credentials (`EMAIL_USER`, `EMAIL_PASS`).
+- [ ] Verify healthcheck endpoint responds: `GET /api/health`.
+- [ ] In frontend `next.config.ts`, ensure `res.cloudinary.com` is listed under `images.remotePatterns`.
