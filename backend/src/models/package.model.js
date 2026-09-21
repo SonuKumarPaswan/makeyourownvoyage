@@ -274,8 +274,10 @@ const PackageSchema = new mongoose.Schema(
     }
 );
 
-
-
+// Production Indexes for Public Listing & Filtering
+PackageSchema.index({ destination: 1, isActive: 1 });
+PackageSchema.index({ packageType: 1, isActive: 1 });
+PackageSchema.index({ isFeatured: 1, isActive: 1 });
 
 PackageSchema.pre('save', function (next) {
     if (this.isModified('title') || !this.slug) {

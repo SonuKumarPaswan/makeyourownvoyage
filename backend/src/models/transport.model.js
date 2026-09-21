@@ -240,6 +240,12 @@ const transportSchema = new mongoose.Schema(
     }
 );
 
+// Production Indexes for Public & Admin Searches
+transportSchema.index({ category: 1, status: 1 });
+transportSchema.index({ availableCities: 1, status: 1 });
+transportSchema.index({ vehicleType: 1, status: 1 });
+transportSchema.index({ isFeatured: 1, status: 1 });
+
 // Virtual: Dynamic Display Price based on Category
 transportSchema.virtual("displayPrice").get(function () {
     if (this.category === "Bike") {

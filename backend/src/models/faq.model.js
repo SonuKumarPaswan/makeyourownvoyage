@@ -31,5 +31,7 @@ const faqSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+faqSchema.index({ destination: 1, isPublished: 1, order: 1 });
+
 const Faq = mongoose.model("Faq", faqSchema);
 export default Faq;
