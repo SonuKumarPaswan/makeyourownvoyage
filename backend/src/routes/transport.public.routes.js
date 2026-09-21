@@ -9,9 +9,12 @@ const router = express.Router();
 
 
 
-// Public search: /api/transports/search?category=Cab&city=delhi
+// Public listing & search: /api/transports or /api/transports/search?category=Cab&city=delhi
+router.get("/", searchTransports);
 router.get("/search", searchTransports);
-// Public detail page: /api/transports/:slug
+
+// Public detail page: /api/transports/:slug or /api/transports/id/:id
+router.get("/id/:slug", getTransportBySlug);
 router.get("/:slug", getTransportBySlug);
 
 

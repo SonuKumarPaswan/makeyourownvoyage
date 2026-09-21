@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true,
-            select:false
+            select: false
         },
         role: {
             type: String,
@@ -32,7 +32,9 @@ const userSchema = new mongoose.Schema(
             trim: true,
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true
+    }
 );
 
 const User = mongoose.model("User", userSchema);

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 
+// Optional auth helper: decodes user if token provided, but never blocks requests
 export const isLoggedIn = (req, res, next) => {
     try {
         const token =
@@ -8,14 +9,12 @@ export const isLoggedIn = (req, res, next) => {
                 ? req.headers.authorization.split(" ")[1]
                 : null);
 
-        if (!token) {
-            return res.status(401).json({ message: "Please login to access this resource." });
+        if (token && process.env.JWT_SECRET) {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = decoded;
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        req.user = decoded;
-        next();
     } catch (error) {
-        return res.status(401).json({ message: "Invalid or expired session. Please login again." });
+        // Silently continue without blocking
     }
+    next();
 };

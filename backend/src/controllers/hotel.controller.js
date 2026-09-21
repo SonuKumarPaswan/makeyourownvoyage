@@ -1,16 +1,56 @@
 import mongoose from "mongoose";
 import Hotel from "../models/hotel.model.js";
+import Destination from "../models/destination.model.js";
 import { generateSlug } from "../utils/generateHotelSlug.js";
+
+// Helper to resolve destination ObjectId from ID or slug
+const resolveDestinationId = async (destParam) => {
+    if (!destParam) return null;
+    if (mongoose.isValidObjectId(destParam)) return destParam;
+    const dest = await Destination.findOne({ slug: String(destParam).toLowerCase() });
+    return dest ? dest._id : null;
+};
 
 // 1. POST /create - Hotel create karne ke liye
 export const addHotel = async (req, res) => {
   try {
     const hotelData = { ...req.body };
 
-    // Agar client ne slug nahi bheja toh name aur city se auto-generate karega
+    // Validate required fields
+    if (!hotelData.name || !hotelData.name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Hotel name is required",
+      });
+    }
+
+    if (!hotelData.destination) {
+      return res.status(400).json({
+        success: false,
+        message: "Destination is required",
+      });
+    }
+
+    const resolvedDestId = await resolveDestinationId(hotelData.destination);
+    if (!resolvedDestId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid destination ID or slug provided",
+      });
+    }
+    hotelData.destination = resolvedDestId;
+
+    // Ensure lowercase city
+    if (hotelData.location?.city) {
+      hotelData.location.city = hotelData.location.city.toLowerCase().trim();
+    }
+
+    // Generate slug without newlines or extra whitespace
     if (!hotelData.slug && hotelData.name) {
       const cityPart = hotelData.location?.city || "";
       hotelData.slug = `${generateSlug(hotelData.name)}${cityPart ? `-${generateSlug(cityPart)}` : ""}`;
+    } else if (hotelData.slug) {
+      hotelData.slug = generateSlug(hotelData.slug);
     }
 
     // Check duplicate slug
@@ -22,7 +62,24 @@ export const addHotel = async (req, res) => {
       });
     }
 
+    // Auto-calculate room pricing if taxAmount or finalPrice omitted
+    if (Array.isArray(hotelData.rooms)) {
+      hotelData.rooms = hotelData.rooms.map((room) => {
+        if (room.pricing && typeof room.pricing.basePrice === "number") {
+          const taxPct = typeof room.pricing.taxPercentage === "number" ? room.pricing.taxPercentage : 18;
+          if (room.pricing.taxAmount === undefined) {
+            room.pricing.taxAmount = Math.round((room.pricing.basePrice * taxPct) / 100);
+          }
+          if (room.pricing.finalPrice === undefined) {
+            room.pricing.finalPrice = room.pricing.basePrice + room.pricing.taxAmount;
+          }
+        }
+        return room;
+      });
+    }
+
     const hotel = await Hotel.create(hotelData);
+    await hotel.populate("destination", "name slug");
 
     return res.status(201).json({
       success: true,
@@ -38,26 +95,68 @@ export const addHotel = async (req, res) => {
   }
 };
 
-// 2. GET /get-all - Saare hotels fetch karne ke liye (Admin with pagination)
+// 2. GET /get-all - Saare hotels fetch karne ke liye (Admin with filters and pagination)
 export const getAllHotelsAdmin = async (req, res) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.max(1, parseInt(req.query.limit, 10) || 10);
-    const skip = (page - 1) * limit;
+    const { search, city, destination, propertyType, status, starCategory, page = 1, limit = 10 } = req.query;
+    const query = {};
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search.trim(), $options: "i" } },
+        { "location.city": { $regex: search.trim(), $options: "i" } },
+      ];
+    }
+
+    if (city) {
+      query["location.city"] = city.toLowerCase().trim();
+    }
+
+    if (propertyType) {
+      query.propertyType = { $regex: propertyType.trim(), $options: "i" };
+    }
+
+    if (status) {
+      query.status = status;
+    }
+
+    if (starCategory) {
+      query.starCategory = Number(starCategory);
+    }
+
+    if (destination) {
+      const destId = await resolveDestinationId(destination);
+      if (destId) {
+        query.destination = destId;
+      } else {
+        return res.status(200).json({
+          success: true,
+          totalHotels: 0,
+          totalPages: 0,
+          currentPage: Number(page),
+          hotels: [],
+        });
+      }
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const skip = (pageNum - 1) * limitNum;
 
     const [hotels, totalHotels] = await Promise.all([
-      Hotel.find()
+      Hotel.find(query)
+        .populate("destination", "name slug")
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit),
-      Hotel.countDocuments(),
+        .limit(limitNum),
+      Hotel.countDocuments(query),
     ]);
 
     return res.status(200).json({
       success: true,
       totalHotels,
-      totalPages: Math.ceil(totalHotels / limit),
-      currentPage: page,
+      totalPages: Math.ceil(totalHotels / limitNum),
+      currentPage: pageNum,
       hotels,
     });
   } catch (error) {
@@ -69,19 +168,19 @@ export const getAllHotelsAdmin = async (req, res) => {
   }
 };
 
-// 3. GET /:id - Single hotel fetch karne ke liye by ID
+// 3. GET /:id - Single hotel fetch karne ke liye by ID or slug
 export const getHotelByIdAdmin = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid hotel ID format",
-      });
+    let hotel = null;
+    if (mongoose.isValidObjectId(id)) {
+      hotel = await Hotel.findById(id).populate("destination", "name slug");
     }
 
-    const hotel = await Hotel.findById(id);
+    if (!hotel) {
+      hotel = await Hotel.findOne({ slug: id.toLowerCase() }).populate("destination", "name slug");
+    }
 
     if (!hotel) {
       return res.status(404).json({
@@ -108,18 +207,38 @@ export const updateHotel = async (req, res) => {
   try {
     const { id } = req.params;
 
+    let hotelId = id;
     if (!mongoose.isValidObjectId(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid hotel ID format",
-      });
+      const matched = await Hotel.findOne({ slug: id.toLowerCase() });
+      if (matched) hotelId = matched._id;
+      else {
+        return res.status(404).json({
+          success: false,
+          message: "Hotel not found",
+        });
+      }
     }
 
     const updates = { ...req.body };
 
-    // Agar name ya city update ho raha hai aur explicit slug nahi diya gaya
+    if (updates.destination) {
+      const destId = await resolveDestinationId(updates.destination);
+      if (!destId) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid destination ID or slug provided",
+        });
+      }
+      updates.destination = destId;
+    }
+
+    if (updates.location?.city) {
+      updates.location.city = updates.location.city.toLowerCase().trim();
+    }
+
+    // Slug update
     if ((updates.name || updates.location?.city) && !updates.slug) {
-      const existingHotel = await Hotel.findById(id).select("name location.city");
+      const existingHotel = await Hotel.findById(hotelId).select("name location.city");
       if (!existingHotel) {
         return res.status(404).json({
           success: false,
@@ -131,10 +250,9 @@ export const updateHotel = async (req, res) => {
       const targetCity = updates.location?.city || existingHotel.location?.city || "";
       updates.slug = `${generateSlug(targetName)}${targetCity ? `-${generateSlug(targetCity)}` : ""}`;
 
-      // Slug collision check
       const slugClash = await Hotel.findOne({
         slug: updates.slug,
-        _id: { $ne: id },
+        _id: { $ne: hotelId },
       });
 
       if (slugClash) {
@@ -143,13 +261,40 @@ export const updateHotel = async (req, res) => {
           message: "Updated name/city generates a slug that already belongs to another hotel.",
         });
       }
+    } else if (updates.slug) {
+      updates.slug = generateSlug(updates.slug);
+      const slugClash = await Hotel.findOne({
+        slug: updates.slug,
+        _id: { $ne: hotelId },
+      });
+      if (slugClash) {
+        return res.status(409).json({
+          success: false,
+          message: "Slug already exists for another hotel",
+        });
+      }
+    }
+
+    if (Array.isArray(updates.rooms)) {
+      updates.rooms = updates.rooms.map((room) => {
+        if (room.pricing && typeof room.pricing.basePrice === "number") {
+          const taxPct = typeof room.pricing.taxPercentage === "number" ? room.pricing.taxPercentage : 18;
+          if (room.pricing.taxAmount === undefined) {
+            room.pricing.taxAmount = Math.round((room.pricing.basePrice * taxPct) / 100);
+          }
+          if (room.pricing.finalPrice === undefined) {
+            room.pricing.finalPrice = room.pricing.basePrice + room.pricing.taxAmount;
+          }
+        }
+        return room;
+      });
     }
 
     const updatedHotel = await Hotel.findByIdAndUpdate(
-      id,
+      hotelId,
       { $set: updates },
       { new: true, runValidators: true }
-    );
+    ).populate("destination", "name slug");
 
     if (!updatedHotel) {
       return res.status(404).json({
@@ -177,14 +322,12 @@ export const deleteHotel = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid hotel ID format",
-      });
+    let deletedHotel = null;
+    if (mongoose.isValidObjectId(id)) {
+      deletedHotel = await Hotel.findByIdAndDelete(id);
+    } else {
+      deletedHotel = await Hotel.findOneAndDelete({ slug: id.toLowerCase() });
     }
-
-    const deletedHotel = await Hotel.findByIdAndDelete(id);
 
     if (!deletedHotel) {
       return res.status(404).json({
@@ -196,7 +339,7 @@ export const deleteHotel = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Hotel deleted successfully",
-      deletedHotelId: id,
+      deletedHotelId: deletedHotel._id,
     });
   } catch (error) {
     return res.status(500).json({

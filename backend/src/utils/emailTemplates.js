@@ -14,17 +14,7 @@ export const getLogoAttachment = () => {
         fs.mkdirSync(assetsDir, { recursive: true });
     }
 
-    if (!fs.existsSync(logoDest)) {
-        // Fallback to the user-uploaded artifact logo if present
-        const possibleSource = "C:\\Users\\iammo\\.gemini\\antigravity-ide\\brain\\56589408-c857-4db3-b154-385dd0017d1c\\.user_uploaded\\media_1789551727287.png";
-        if (fs.existsSync(possibleSource)) {
-            try {
-                fs.copyFileSync(possibleSource, logoDest);
-            } catch (err) {
-                console.error("Could not copy logo to assets:", err.message);
-            }
-        }
-    }
+
 
     if (fs.existsSync(logoDest)) {
         return {
@@ -410,3 +400,297 @@ Need assistance? Reply directly to this email or write to us at support@makeyour
 
     return { html, text };
 };
+
+/**
+ * Generate a colorful, luxury branded Enquiry Confirmation Email for Make Your Own Voyage.
+ */
+export const enquiryConfirmationEmailTemplate = ({
+    customerName,
+    customerEmail,
+    enquiryCode,
+    enquiryType,
+    detailsSummary = [],
+    specialRequests = "",
+}) => {
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+    const year = new Date().getFullYear();
+    const formattedDate = new Date().toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+    });
+
+    const categoryThemes = {
+        hotel: {
+            title: "Hotel Reservation Enquiry",
+            badgeText: "🏨 HOTEL ENQUIRY",
+            gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+            badgeBg: "rgba(245, 158, 11, 0.15)",
+            badgeColor: "#fbbf24",
+            accentColor: "#f59e0b",
+        },
+        flight: {
+            title: "Flight Booking Enquiry",
+            badgeText: "✈️ FLIGHT ENQUIRY",
+            gradient: "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
+            badgeBg: "rgba(6, 182, 212, 0.15)",
+            badgeColor: "#38bdf8",
+            accentColor: "#38bdf8",
+        },
+        package: {
+            title: "Holiday Tour Package Enquiry",
+            badgeText: "🎒 TOUR PACKAGE ENQUIRY",
+            gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+            badgeBg: "rgba(16, 185, 129, 0.15)",
+            badgeColor: "#34d399",
+            accentColor: "#10b981",
+        },
+        weekend_trip: {
+            title: "Weekend Getaway Enquiry",
+            badgeText: "⛰️ WEEKEND TRIP ENQUIRY",
+            gradient: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
+            badgeBg: "rgba(139, 92, 246, 0.15)",
+            badgeColor: "#a78bfa",
+            accentColor: "#8b5cf6",
+        },
+        transport: {
+            title: "Cab & Transport Rental Enquiry",
+            badgeText: "🚗 TRANSPORT ENQUIRY",
+            gradient: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+            badgeBg: "rgba(249, 115, 22, 0.15)",
+            badgeColor: "#fb923c",
+            accentColor: "#f97316",
+        },
+        custom: {
+            title: "Bespoke Travel Enquiry",
+            badgeText: "✨ CUSTOM TRAVEL ENQUIRY",
+            gradient: "linear-gradient(135deg, #c89d3c 0%, #d4af37 100%)",
+            badgeBg: "rgba(200, 157, 60, 0.15)",
+            badgeColor: "#e5c378",
+            accentColor: "#c89d3c",
+        },
+    };
+
+    const currentTheme = categoryThemes[enquiryType] || categoryThemes.custom;
+
+    const detailsRowsHtml = detailsSummary
+        .filter((item) => item && item.value)
+        .map(
+            (item) => `
+            <tr>
+                <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); width: 38%;">
+                    ${item.label}
+                </td>
+                <td style="padding: 10px 16px; font-size: 14px; color: #ffffff; font-weight: 500; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    ${item.value}
+                </td>
+            </tr>`
+        )
+        .join("");
+
+    const html = `
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquiry Received - Make Your Own Voyage</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050b14;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #cbd5e1;
+        }
+        @media screen and (max-width: 600px) {
+            .email-container { width: 100% !important; }
+            .mobile-stack { display: block !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #050b14;">
+
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#050b14">
+        <tr>
+            <td align="center" style="padding: 30px 15px;">
+
+                <!-- Main Container -->
+                <table class="email-container" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%; background-color: #0b1325; border: 1px solid rgba(200, 157, 60, 0.35); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);">
+                    
+                    <!-- Decorative Top Header Gradient -->
+                    <tr>
+                        <td style="height: 6px; background: ${currentTheme.gradient}; font-size: 0; line-height: 0;">&nbsp;</td>
+                    </tr>
+
+                    <!-- Brand Header with Logo -->
+                    <tr>
+                        <td align="center" style="padding: 35px 25px 20px 25px; background-color: #070e1c;">
+                            <img src="cid:brand-logo" alt="Make Your Own Voyage" width="170" style="display: block; width: 170px; max-width: 100%; height: auto;" />
+                            <p style="margin: 10px 0 0 0; font-size: 11px; letter-spacing: 2.5px; color: #c89d3c; text-transform: uppercase; font-weight: 700;">
+                                EXPLORE • EXPERIENCE • EXTRAORDINARY
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Badge & Hero Title -->
+                    <tr>
+                        <td align="center" style="padding: 25px 30px 15px 30px;">
+                            <div style="display: inline-block; padding: 6px 16px; background-color: ${currentTheme.badgeBg}; border: 1px solid ${currentTheme.badgeColor}; border-radius: 50px; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: ${currentTheme.badgeColor}; text-transform: uppercase; margin-bottom: 18px;">
+                                ${currentTheme.badgeText}
+                            </div>
+                            <h1 style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 26px; line-height: 34px; color: #ffffff; font-weight: 700;">
+                                Thank You For Your Enquiry!
+                            </h1>
+                            <p style="margin: 12px 0 0 0; font-size: 15px; line-height: 24px; color: #94a3b8;">
+                                We have received your request and our travel specialists will contact you shortly with the best personalized options and pricing.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Reference Code Box -->
+                    <tr>
+                        <td style="padding: 10px 30px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: rgba(200, 157, 60, 0.08); border: 1px dashed rgba(200, 157, 60, 0.4); border-radius: 10px;">
+                                <tr>
+                                    <td align="center" style="padding: 16px 20px;">
+                                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #c89d3c; font-weight: 700; margin-bottom: 4px;">
+                                            YOUR ENQUIRY REFERENCE CODE
+                                        </div>
+                                        <div style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 2px; font-family: monospace;">
+                                            ${enquiryCode}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Enquiry Details Table Card -->
+                    <tr>
+                        <td style="padding: 20px 30px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #0e182e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden;">
+                                <tr>
+                                    <td colspan="2" style="padding: 14px 16px; background-color: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px; font-weight: 700; color: #e2e8f0; letter-spacing: 0.5px; text-transform: uppercase;">
+                                        📋 Enquiry Details Summary
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); width: 38%;">
+                                        Customer Name
+                                    </td>
+                                    <td style="padding: 10px 16px; font-size: 14px; color: #ffffff; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        ${customerName}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        Contact Email
+                                    </td>
+                                    <td style="padding: 10px 16px; font-size: 14px; color: #cbd5e1; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        ${customerEmail}
+                                    </td>
+                                </tr>
+                                ${detailsRowsHtml}
+                                ${
+                                    specialRequests
+                                        ? `
+                                <tr>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        Special Requests
+                                    </td>
+                                    <td style="padding: 10px 16px; font-size: 14px; color: #f1f5f9; font-style: italic;">
+                                        "${specialRequests}"
+                                    </td>
+                                </tr>`
+                                        : ""
+                                }
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- What Happens Next Section -->
+                    <tr>
+                        <td style="padding: 10px 30px 25px 30px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: rgba(11, 23, 47, 0.8); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 18px;">
+                                <tr>
+                                    <td style="padding-bottom: 12px; font-size: 14px; font-weight: 700; color: #ffffff;">
+                                        ⏳ What Happens Next?
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 13px; line-height: 22px; color: #94a3b8;">
+                                        <div style="margin-bottom: 8px;">
+                                            <strong style="color: #38bdf8;">1. Request Review:</strong> Our destination team reviews your requested dates and inventory.
+                                        </div>
+                                        <div style="margin-bottom: 8px;">
+                                            <strong style="color: #fbbf24;">2. Curated Quotation:</strong> We negotiate the best exclusive rates and prepare a customized quote.
+                                        </div>
+                                        <div>
+                                            <strong style="color: #34d399;">3. Direct Consultation:</strong> Our travel specialist connects with you directly via call or WhatsApp.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Call To Action -->
+                    <tr>
+                        <td align="center" style="padding: 10px 30px 30px 30px;">
+                            <a href="${clientUrl}" target="_blank" style="display: inline-block; padding: 14px 34px; background: ${currentTheme.gradient}; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 14px; letter-spacing: 1px; border-radius: 50px; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);">
+                                Visit Make Your Own Voyage
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 25px 30px; background-color: #060b14; border-top: 1px solid rgba(255, 255, 255, 0.06); text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 18px;">
+                                Need immediate assistance? Reply directly to this email or reach us at <strong style="color: #c89d3c;">support@makeyourownvoyage.com</strong>
+                            </p>
+                            <p style="margin: 10px 0 0 0; font-size: 11px; color: #475569;">
+                                © ${year} Make Your Own Voyage. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- End Main Container -->
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
+    `.trim();
+
+    const text = `
+Thank you for your enquiry with Make Your Own Voyage, ${customerName}!
+
+ENQUIRY REFERENCE: ${enquiryCode}
+CATEGORY: ${currentTheme.title}
+DATE: ${formattedDate}
+
+We have received your enquiry and our dedicated travel specialist is currently preparing the best tailored options and pricing for you. We will contact you shortly via phone or email.
+
+ENQUIRY DETAILS:
+${detailsSummary.filter((d) => d && d.value).map((d) => `- ${d.label}: ${d.value}`).join("\n")}
+${specialRequests ? `- Special Requests: ${specialRequests}\n` : ""}
+
+WHAT HAPPENS NEXT:
+1. Our destination team reviews your requested dates and inventory.
+2. We negotiate the best exclusive rates and prepare a customized quote.
+3. Our specialist connects with you directly.
+
+Visit us: ${clientUrl}
+
+© ${year} Make Your Own Voyage. All rights reserved.
+    `.trim();
+
+    return { html, text };
+};
+

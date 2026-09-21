@@ -10,8 +10,9 @@ import {
 
 const router = express.Router();
 
-// Sirf Admin dashboard ke liye
+router.post("/", verifyAdmin, addHotel);
 router.post("/create", verifyAdmin, addHotel);
+router.get("/", verifyAdmin, getAllHotelsAdmin);
 router.get("/get-all", verifyAdmin, getAllHotelsAdmin);
 router.get("/:id", verifyAdmin, getHotelByIdAdmin);
 router.put("/:id", verifyAdmin, updateHotel);
