@@ -58,7 +58,9 @@ const ActivitySchema = new mongoose.Schema(
             trim: true,
         },
     },
-    { _id: true }
+    {
+        _id: true
+    }
 );
 
 
@@ -94,7 +96,9 @@ const OvernightSchema = new mongoose.Schema(
             trim: true,
         },
     },
-    { _id: false }
+    {
+        _id: false
+    }
 );
 
 
@@ -143,9 +147,23 @@ const PackageSchema = new mongoose.Schema(
             index: true,
         },
         destination: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Destination",
+            required: true,
+            index: true,
+        },
+        packageType: {
             type: String,
-            required: [true, 'Destination name is required'],
-            trim: true,
+            enum: [
+                "domestic",
+                "weekend",
+                "family",
+                "couple",
+                "corporate",
+                "group",
+                "custom",
+            ],
+            required: true,
             index: true,
         },
         region: {
@@ -259,7 +277,7 @@ const PackageSchema = new mongoose.Schema(
 
 
 
-PackageSchema.pre('save', function () {
+PackageSchema.pre('save', function (next) {
     if (this.isModified('title') || !this.slug) {
         this.slug =
             this.title
@@ -269,7 +287,8 @@ PackageSchema.pre('save', function () {
             '-' +
             Date.now().toString().slice(-4);
     }
-    this.duration = `${this.days} Days / ${this.nights} Nights`;
+    this.duration = `${this.days || 1} Days / ${this.nights !== undefined ? this.nights : 0} Nights`;
+    if (typeof next === 'function') next();
 });
 const Package = mongoose.model('Package', PackageSchema);
 export default Package;

@@ -24,16 +24,16 @@ export const registerSchema = Joi.object({
 
 // Login validation (email OR phone + password)
 export const loginSchema = Joi.object({
-    email: Joi.string().trim().email().lowercase(),
-    phoneNumber: Joi.string().pattern(/^[0-9+]{10,15}$/),
+    email: Joi.string().trim().email().lowercase().empty(""),
+    phoneNumber: Joi.string().pattern(/^[0-9+]{10,15}$/).empty(""),
     password: Joi.string().required(),
 }).xor("email", "phoneNumber"); // requires either email or phoneNumber
 
 export const updateUserSchema = Joi.object({
     name: Joi.string().trim().min(2).max(50),
-    email: Joi.string().trim().email().lowercase(),
-    phoneNumber: Joi.string().pattern(/^[0-9+]{10,15}$/),
-    password: Joi.string().min(6),
+    email: Joi.string().trim().email().lowercase().empty(""),
+    phoneNumber: Joi.string().pattern(/^[0-9+]{10,15}$/).empty(""),
+    password: Joi.string().min(6).empty(""),
 }).min(1); // at least one field is required to update
 
 // Param ID validation

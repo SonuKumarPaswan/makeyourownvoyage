@@ -77,7 +77,9 @@ const roomSchema = new mongoose.Schema(
             },
         },
     },
-    { _id: true }
+    {
+        _id: true
+    }
 );
 
 // Main Hotel Schema
@@ -105,6 +107,12 @@ const hotelSchema = new mongoose.Schema(
             min: 1,
             max: 5,
             default: 3
+        },
+        destination: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Destination",
+            required: true,
+            index: true,
         },
 
         location: {

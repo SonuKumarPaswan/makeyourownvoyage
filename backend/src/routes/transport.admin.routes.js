@@ -10,9 +10,9 @@ import {
 
 const router = express.Router();
 
-
-// Admin protection on all routes
+router.post("/", verifyAdmin, addTransport);
 router.post("/create", verifyAdmin, addTransport);
+router.get("/", verifyAdmin, getAllTransportsAdmin);
 router.get("/get-all", verifyAdmin, getAllTransportsAdmin);
 router.get("/:id", verifyAdmin, getTransportByIdAdmin);
 router.put("/:id", verifyAdmin, updateTransport);

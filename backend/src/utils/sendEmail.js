@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { welcomeEmailTemplate, getLogoAttachment } from "./emailTemplates.js";
+import { welcomeEmailTemplate, enquiryConfirmationEmailTemplate, getLogoAttachment } from "./emailTemplates.js";
 
 /**
  * Lazily initialize transporter to ensure environment variables
@@ -61,6 +61,57 @@ export const sendWelcomeEmail = async ({ name, email }) => {
         return { success: true, messageId: result.messageId };
     } catch (error) {
         console.error(`[Email Service] Failed to send welcome email to ${email}:`, error.message);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Send colorful luxury branded confirmation email upon inquiry submission
+ */
+export const sendEnquiryConfirmationEmail = async ({
+    customerName,
+    customerEmail,
+    enquiryCode,
+    enquiryType,
+    detailsSummary = [],
+    specialRequests = "",
+}) => {
+    try {
+        const { html, text } = enquiryConfirmationEmailTemplate({
+            customerName,
+            customerEmail,
+            enquiryCode,
+            enquiryType,
+            detailsSummary,
+            specialRequests,
+        });
+
+        const logoAttachment = getLogoAttachment();
+        const attachments = logoAttachment ? [logoAttachment] : [];
+
+        const subjectTypeMap = {
+            hotel: "🏨 Hotel Enquiry Received! We're Crafting Your Stay",
+            flight: "✈️ Flight Enquiry Received! Searching The Best Fares",
+            package: "🎒 Tour Package Enquiry Received! Your Adventure Begins",
+            weekend_trip: "⛰️ Weekend Trip Enquiry Received! Get Ready To Unwind",
+            transport: "🚗 Transport Enquiry Received! We're Preparing Your Ride",
+            custom: "✨ Travel Enquiry Received! We Will Contact You Soon",
+        };
+
+        const subject = `${subjectTypeMap[enquiryType] || "✈️ Travel Enquiry Received!"} [${enquiryCode}]`;
+
+        const result = await sendEmail({
+            to: customerEmail,
+            subject,
+            html,
+            text,
+            attachments,
+        });
+
+        console.log(`[Email Service] Enquiry confirmation email successfully sent to: ${customerEmail} (${enquiryCode})`);
+        return { success: true, messageId: result.messageId };
+    } catch (error) {
+        console.error(`[Email Service] Failed to send enquiry email to ${customerEmail}:`, error.message);
         return { success: false, error: error.message };
     }
 };
