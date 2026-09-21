@@ -27,6 +27,7 @@ import faqRoutes from "./routes/faq.routes.js";
 import searchRoutes from "./routes/search.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import collectionRoutes from "./routes/collection.routes.js";
+import seoRoutes from "./routes/seo.routes.js";
 
 const app = express();
 
@@ -99,14 +100,11 @@ app.use("/api/destinations", destinationRoutes);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/faq", faqRoutes);
 app.use("/api/search", searchRoutes);
-
-// Routes setup
 app.use("/api/collections", collectionRoutes);
+app.use("/", seoRoutes);
 
-// 404 Route Not Found Handler
+
 app.use(notFoundHandler);
-
-// Global Error Handler Middleware
 app.use(errorHandler);
 
 export default app;
