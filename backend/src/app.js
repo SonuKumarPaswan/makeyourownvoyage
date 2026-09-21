@@ -14,6 +14,7 @@ import stateRoutes from "./routes/state.routes.js";
 import destinationRoutes from "./routes/destination.routes.js";
 import enquiryRouter from "./routes/enquiry.routes.js";
 import faqRoutes from "./routes/faq.routes.js";
+import searchRoutes from "./routes/search.routes.js";
 
 const app = express();
 
@@ -41,5 +42,6 @@ app.use("/api/destinations", destinationRoutes);
 app.use("/api/enquiries", enquiryRouter);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/faq", faqRoutes);
+app.use("/api/search", searchRoutes);
 
 export default app;
