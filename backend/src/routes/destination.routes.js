@@ -12,11 +12,12 @@ import {
     getDestinationGuides,
 } from "../controllers/destination.controller.js";
 import { verifyAdmin } from "../middleware/role.js";
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
-router.post("/", verifyAdmin, createDestination);
-router.put("/:id", verifyAdmin, updateDestination);
+router.post("/", verifyAdmin, upload.array("images", 20), createDestination);
+router.put("/:id", verifyAdmin, upload.array("images", 20), updateDestination);
 router.delete("/:id", verifyAdmin, deleteDestination);
 
 // Public fetch routes

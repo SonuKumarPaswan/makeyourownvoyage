@@ -69,6 +69,9 @@ const enquirySchema = new mongoose.Schema(
                         children: { type: Number, default: 0, min: 0 },
                     },
                     mealPlan: { type: String, default: "" },
+                    pricePerNight: { type: Number, default: 0 },
+                    totalEstimatedPrice: { type: Number, default: 0 },
+                    currency: { type: String, default: "INR" },
                 },
                 { _id: false }
             ),
@@ -135,6 +138,9 @@ const enquirySchema = new mongoose.Schema(
                         teamBuilding: { type: Boolean, default: false },
                         djAndSound: { type: Boolean, default: false },
                     },
+                    pricePerPerson: { type: Number, default: 0 },
+                    totalEstimatedPrice: { type: Number, default: 0 },
+                    currency: { type: String, default: "INR" },
                 },
                 { _id: false }
             ),
@@ -174,6 +180,8 @@ const enquirySchema = new mongoose.Schema(
                     pickupTime: { type: String, default: "" },
                     returnDate: { type: Date },
                     passengersCount: { type: Number, default: 1 },
+                    estimatedPrice: { type: Number, default: 0 },
+                    currency: { type: String, default: "INR" },
                 },
                 { _id: false }
             ),

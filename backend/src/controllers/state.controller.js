@@ -1,12 +1,42 @@
 import mongoose from "mongoose";
 import { generateSlug } from "../utils/generateHotelSlug.js";
 import State from "../models/state.model.js";
+import Destination from "../models/destination.model.js";
+import Package from "../models/package.model.js";
+import Hotel from "../models/hotel.model.js";
+import Transport from "../models/transport.model.js";
+import {
+    uploadToCloudinary,
+    isBase64Image,
+    parseJsonField,
+    isCloudinaryConfigured,
+} from "../services/cloudinary.service.js";
 
 // 1. POST /api/states - Create a new state
 export const createState = async (req, res) => {
     try {
-        const { name, description, image, isPublished } = req.body;
+        let { name, description, isPublished } = req.body;
+        let image = parseJsonField(req.body.image, req.body.image || {});
         let slug = req.body.slug;
+
+        // Handle file uploaded via Multer
+        if (req.file && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.file, "makeyourownvoyage/states");
+            image = {
+                url: uploaded.secure_url,
+                alt: name || "State Image",
+            };
+        } else if (typeof image === "string") {
+            if (isBase64Image(image) && isCloudinaryConfigured()) {
+                const uploaded = await uploadToCloudinary(image, "makeyourownvoyage/states");
+                image = { url: uploaded.secure_url, alt: name || "State Image" };
+            } else {
+                image = { url: image, alt: name || "State Image" };
+            }
+        } else if (image && image.url && isBase64Image(image.url) && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(image.url, "makeyourownvoyage/states");
+            image.url = uploaded.secure_url;
+        }
 
         if (!name || !name.trim()) {
             return res.status(400).json({
@@ -174,6 +204,29 @@ export const updateState = async (req, res) => {
 
         const updates = { ...req.body };
 
+        if (updates.image) {
+            updates.image = parseJsonField(updates.image, updates.image);
+        }
+
+        // Handle file uploaded via Multer
+        if (req.file && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.file, "makeyourownvoyage/states");
+            updates.image = {
+                url: uploaded.secure_url,
+                alt: updates.name || "State Image",
+            };
+        } else if (typeof updates.image === "string") {
+            if (isBase64Image(updates.image) && isCloudinaryConfigured()) {
+                const uploaded = await uploadToCloudinary(updates.image, "makeyourownvoyage/states");
+                updates.image = { url: uploaded.secure_url, alt: updates.name || "State Image" };
+            } else {
+                updates.image = { url: updates.image, alt: updates.name || "State Image" };
+            }
+        } else if (updates.image && updates.image.url && isBase64Image(updates.image.url) && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(updates.image.url, "makeyourownvoyage/states");
+            updates.image.url = uploaded.secure_url;
+        }
+
         // Handle slug updates or name change without explicit slug
         if (updates.name && !updates.slug) {
             updates.slug = generateSlug(updates.name);
@@ -268,6 +321,85 @@ export const deleteState = async (req, res) => {
             success: false,
             message: "Failed to delete state",
             error: error.message,
+        });
+    }
+};
+
+
+export const getStateFullDetails = async (req, res) => {
+    try {
+        const { slug } = req.params;
+
+        // 1. Find State by slug
+        const state = await State.findOne({ slug }).lean();
+        if (!state) {
+            return res.status(404).json({ success: false, message: "State not found" });
+        }
+
+        // 2. State ke saare Destinations nikalo
+        const destinations = await Destination.find({
+            $or: [{ state: state._id }, { state: state.name }]
+        }).lean();
+
+        const destinationNames = destinations.map((d) => d.name);
+        const destinationIds = destinations.map((d) => d._id);
+
+        // 3. Parallel Fetch: Packages, Hotels, Transports mapped to this State
+        const lowerDestinationNames = destinationNames.map((n) => n.toLowerCase());
+        const [packages, hotels, transports] = await Promise.all([
+            // Packages in this state or its destinations
+            Package.find({
+                isActive: true,
+                $or: [
+                    { destination: { $in: destinationIds } },
+                    { region: { $regex: new RegExp(state.name, "i") } },
+                ]
+            })
+                .select("title slug duration days nights startingPrice image packageType isFeatured")
+                .limit(12)
+                .lean(),
+
+            // Hotels in these destinations or state/city matches
+            Hotel.find({
+                status: "active",
+                $or: [
+                    { destination: { $in: destinationIds } },
+                    { "location.state": { $regex: new RegExp(state.name, "i") } },
+                    { "location.city": { $in: lowerDestinationNames } }
+                ]
+            })
+                .select("name slug propertyType starCategory location rooms images")
+                .limit(12)
+                .lean(),
+
+            // Transports operating in this state/city
+            Transport.find({
+                status: "active",
+                $or: [
+                    { availableCities: { $in: lowerDestinationNames } },
+                    { availableCities: { $in: [state.name.toLowerCase()] } }
+                ]
+            })
+                .select("title slug category vehicleType brand modelName capacity pricing images availableCities")
+                .limit(10)
+                .lean()
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                state,
+                destinations,
+                packages,
+                hotels,
+                transports
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching state voyage catalog",
+            error: error.message
         });
     }
 };

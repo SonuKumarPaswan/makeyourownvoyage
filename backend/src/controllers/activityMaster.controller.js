@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import ActivityMaster from "../models/activityMaster.model.js";
 import Destination from "../models/destination.model.js";
+import {
+    uploadToCloudinary,
+    isBase64Image,
+    isCloudinaryConfigured,
+} from "../services/cloudinary.service.js";
 
 // Helper to resolve destination ObjectId from ID or slug
 const resolveDestinationId = async (destParam) => {
@@ -14,6 +19,15 @@ const resolveDestinationId = async (destParam) => {
 export const createActivity = async (req, res) => {
     try {
         const data = { ...req.body };
+
+        // Handle image upload via Multer or base64
+        if (req.file && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.file, "makeyourownvoyage/activities");
+            data.image = uploaded.secure_url;
+        } else if (data.image && isBase64Image(data.image) && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(data.image, "makeyourownvoyage/activities");
+            data.image = uploaded.secure_url;
+        }
 
         if (!data.title || !data.title.trim()) {
             return res.status(400).json({
@@ -175,6 +189,15 @@ export const updateActivity = async (req, res) => {
         }
 
         const updates = { ...req.body };
+
+        // Handle image upload via Multer or base64
+        if (req.file && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(req.file, "makeyourownvoyage/activities");
+            updates.image = uploaded.secure_url;
+        } else if (updates.image && isBase64Image(updates.image) && isCloudinaryConfigured()) {
+            const uploaded = await uploadToCloudinary(updates.image, "makeyourownvoyage/activities");
+            updates.image = uploaded.secure_url;
+        }
 
         if (updates.destination) {
             const destId = await resolveDestinationId(updates.destination);

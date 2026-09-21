@@ -111,10 +111,43 @@ export const submitHotelEnquiry = async (req, res) => {
 
         // Calculate stay duration (nights) if both dates exist
         let stayDuration = "";
+        let nightsCount = 1;
         if (checkInDate && checkOutDate) {
             const diffMs = Math.abs(new Date(checkOutDate) - new Date(checkInDate));
             const nights = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-            if (nights > 0) stayDuration = `${nights} Night(s)`;
+            if (nights > 0) {
+                nightsCount = nights;
+                stayDuration = `${nights} Night(s)`;
+            }
+        }
+
+        // Resolve room price per night and estimated total
+        let resolvedPricePerNight = Number(req.body.pricePerNight || hData.pricePerNight || req.body.price || hData.price) || 0;
+        if (hotelDoc && hotelDoc.rooms && hotelDoc.rooms.length > 0) {
+            if (!resolvedPricePerNight) {
+                if (roomType) {
+                    const matchedRoom = hotelDoc.rooms.find(
+                        (r) => r.roomType && r.roomType.toLowerCase().trim() === String(roomType).toLowerCase().trim()
+                    );
+                    if (matchedRoom?.pricing) {
+                        resolvedPricePerNight = matchedRoom.pricing.finalPrice || matchedRoom.pricing.basePrice || 0;
+                    }
+                }
+                if (!resolvedPricePerNight) {
+                    const validPrices = hotelDoc.rooms
+                        .map((r) => r.pricing?.finalPrice || r.pricing?.basePrice || 0)
+                        .filter((p) => p > 0);
+                    if (validPrices.length > 0) {
+                        resolvedPricePerNight = Math.min(...validPrices);
+                    }
+                }
+            }
+        }
+
+        const totalRooms = Number(roomsCount) || 1;
+        let resolvedTotalEstimatedPrice = Number(req.body.totalEstimatedPrice || hData.totalEstimatedPrice) || 0;
+        if (!resolvedTotalEstimatedPrice && resolvedPricePerNight > 0) {
+            resolvedTotalEstimatedPrice = resolvedPricePerNight * totalRooms * nightsCount;
         }
 
         const enquiry = await Enquiry.create({
@@ -129,7 +162,7 @@ export const submitHotelEnquiry = async (req, res) => {
                 hotelId: validHotelId,
                 hotelName: resolvedHotelName,
                 roomType: roomType,
-                roomsCount: Number(roomsCount) || 1,
+                roomsCount: totalRooms,
                 checkInDate: checkInDate ? new Date(checkInDate) : undefined,
                 checkOutDate: checkOutDate ? new Date(checkOutDate) : undefined,
                 guests: {
@@ -137,6 +170,9 @@ export const submitHotelEnquiry = async (req, res) => {
                     children,
                 },
                 mealPlan: mealPlan,
+                pricePerNight: resolvedPricePerNight,
+                totalEstimatedPrice: resolvedTotalEstimatedPrice,
+                currency: "INR",
             },
         });
 
@@ -181,6 +217,14 @@ export const submitHotelEnquiry = async (req, res) => {
                     value: `${enquiry.hotelDetails.guests.adults} Adult(s)${enquiry.hotelDetails.guests.children ? `, ${enquiry.hotelDetails.guests.children} Child(ren)` : ""}`,
                 },
                 { label: "Meal Plan", value: enquiry.hotelDetails.mealPlan || "As per hotel policy" },
+                ...(resolvedPricePerNight > 0
+                    ? [
+                          { label: "Rate per Night", value: `₹${resolvedPricePerNight.toLocaleString("en-IN")}` },
+                          ...(resolvedTotalEstimatedPrice > 0
+                              ? [{ label: "Estimated Total Price", value: `₹${resolvedTotalEstimatedPrice.toLocaleString("en-IN")} (${totalRooms} Room(s) × ${nightsCount} Night(s))` }]
+                              : []),
+                      ]
+                    : []),
             ],
         }).catch((err) => console.error("[Hotel Enquiry Email Error]:", err.message));
 
@@ -383,6 +427,31 @@ export const submitPackageEnquiry = async (req, res) => {
         const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
         const packagePageUrl = resolvedPkgSlug ? `${clientUrl}/packages/${resolvedPkgSlug}` : "";
 
+        // Resolve package price per person and estimated total
+        const totalTravelers = adults + children;
+        let resolvedPricePerPerson = Number(req.body.pricePerPerson || pData.pricePerPerson || req.body.price || pData.price) || 0;
+
+        if (pkgDoc) {
+            if (!resolvedPricePerPerson) {
+                if (pkgDoc.priceSlabs && pkgDoc.priceSlabs.length > 0) {
+                    const matchedSlab = pkgDoc.priceSlabs.find(
+                        (s) => totalTravelers >= s.minPax && totalTravelers <= s.maxPax
+                    );
+                    if (matchedSlab?.pricePerPerson) {
+                        resolvedPricePerPerson = matchedSlab.pricePerPerson;
+                    }
+                }
+                if (!resolvedPricePerPerson && pkgDoc.startingPrice) {
+                    resolvedPricePerPerson = pkgDoc.startingPrice;
+                }
+            }
+        }
+
+        let resolvedTotalEstimatedPrice = Number(req.body.totalEstimatedPrice || pData.totalEstimatedPrice) || 0;
+        if (!resolvedTotalEstimatedPrice && resolvedPricePerPerson > 0) {
+            resolvedTotalEstimatedPrice = resolvedPricePerPerson * totalTravelers;
+        }
+
         const enquiry = await Enquiry.create({
             enquiryType: enquiryCategory,
             user: getOptionalUserId(req),
@@ -403,6 +472,9 @@ export const submitPackageEnquiry = async (req, res) => {
                     children,
                 },
                 corporateFacilitiesNeeded: corporateFacilitiesNeeded || {},
+                pricePerPerson: resolvedPricePerPerson,
+                totalEstimatedPrice: resolvedTotalEstimatedPrice,
+                currency: "INR",
             },
         });
 
@@ -438,6 +510,14 @@ export const submitPackageEnquiry = async (req, res) => {
                     label: "Travelers",
                     value: `${enquiry.packageDetails.travelers.adults} Adults${enquiry.packageDetails.travelers.children ? `, ${enquiry.packageDetails.travelers.children} Children` : ""}`,
                 },
+                ...(resolvedPricePerPerson > 0
+                    ? [
+                          { label: "Price per Person", value: `₹${resolvedPricePerPerson.toLocaleString("en-IN")}` },
+                          ...(resolvedTotalEstimatedPrice > 0
+                              ? [{ label: "Estimated Package Total", value: `₹${resolvedTotalEstimatedPrice.toLocaleString("en-IN")} (${totalTravelers} Traveler${totalTravelers > 1 ? "s" : ""})` }]
+                              : []),
+                      ]
+                    : []),
             ],
         }).catch((err) => console.error("[Package Enquiry Email Error]:", err.message));
 
@@ -511,21 +591,39 @@ export const submitTransportEnquiry = async (req, res) => {
         if (transportId) {
             if (mongoose.isValidObjectId(transportId)) {
                 validTransportId = transportId;
-                const vehicleDoc = await Transport.findById(transportId).select("vehicleType brand modelName slug");
+                const vehicleDoc = await Transport.findById(transportId).select("vehicleType brand modelName slug pricing");
                 if (vehicleDoc) {
                     if (!resolvedVehicleType) {
                         resolvedVehicleType = `${vehicleDoc.brand || ""} ${vehicleDoc.modelName || ""}`.trim();
                     }
                     resolvedVehicleSlug = vehicleDoc.slug || "";
+                    if (!resolvedEstimatedPrice && vehicleDoc.pricing) {
+                        if (category === "Bike") {
+                            resolvedEstimatedPrice = vehicleDoc.pricing.dailyRentalPrice || 0;
+                        } else if (category === "Bus") {
+                            resolvedEstimatedPrice = (vehicleDoc.pricing.seatTicketPrice || 0) * (Number(passengersCount) || 1);
+                        } else {
+                            resolvedEstimatedPrice = vehicleDoc.pricing.basePrice || vehicleDoc.pricing.perKmRate || 0;
+                        }
+                    }
                 }
             } else {
-                const vehicleDoc = await Transport.findOne({ slug: String(transportId).toLowerCase().trim() }).select("vehicleType brand modelName slug");
+                const vehicleDoc = await Transport.findOne({ slug: String(transportId).toLowerCase().trim() }).select("vehicleType brand modelName slug pricing");
                 if (vehicleDoc) {
                     validTransportId = vehicleDoc._id;
                     if (!resolvedVehicleType) {
                         resolvedVehicleType = `${vehicleDoc.brand || ""} ${vehicleDoc.modelName || ""}`.trim();
                     }
                     resolvedVehicleSlug = vehicleDoc.slug || "";
+                    if (!resolvedEstimatedPrice && vehicleDoc.pricing) {
+                        if (category === "Bike") {
+                            resolvedEstimatedPrice = vehicleDoc.pricing.dailyRentalPrice || 0;
+                        } else if (category === "Bus") {
+                            resolvedEstimatedPrice = (vehicleDoc.pricing.seatTicketPrice || 0) * (Number(passengersCount) || 1);
+                        } else {
+                            resolvedEstimatedPrice = vehicleDoc.pricing.basePrice || vehicleDoc.pricing.perKmRate || 0;
+                        }
+                    }
                 }
             }
         }
@@ -552,6 +650,8 @@ export const submitTransportEnquiry = async (req, res) => {
                 pickupTime: pickupTime || "",
                 returnDate: returnDate ? new Date(returnDate) : undefined,
                 passengersCount: Number(passengersCount) || 1,
+                estimatedPrice: resolvedEstimatedPrice,
+                currency: "INR",
             },
         });
 
@@ -581,6 +681,9 @@ export const submitTransportEnquiry = async (req, res) => {
                     value: `${enquiry.transportDetails.pickupDate ? new Date(enquiry.transportDetails.pickupDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD"} ${enquiry.transportDetails.pickupTime || ""}`.trim(),
                 },
                 { label: "Passengers", value: `${enquiry.transportDetails.passengersCount} Person(s)` },
+                ...(resolvedEstimatedPrice > 0
+                    ? [{ label: "Estimated Rental / Fare", value: `₹${resolvedEstimatedPrice.toLocaleString("en-IN")}` }]
+                    : []),
             ],
         }).catch((err) => console.error("[Transport Enquiry Email Error]:", err.message));
 
@@ -674,9 +777,9 @@ export const getMyEnquiries = async (req, res) => {
         }
 
         const enquiries = await Enquiry.find(filter)
-            .populate("hotelDetails.hotelId", "name slug location.city starCategory images")
-            .populate("packageDetails.packageId", "title slug startingPrice duration image")
-            .populate("transportDetails.transportId", "title vehicleType category brand")
+            .populate("hotelDetails.hotelId", "name slug location.city starCategory images rooms")
+            .populate("packageDetails.packageId", "title slug startingPrice duration image priceSlabs")
+            .populate("transportDetails.transportId", "title slug vehicleType category brand pricing")
             .sort({ createdAt: -1 });
 
         return res.status(200).json({
@@ -721,9 +824,9 @@ export const getAllEnquiriesAdmin = async (req, res) => {
 
         const [enquiries, total] = await Promise.all([
             Enquiry.find(query)
-                .populate("hotelDetails.hotelId", "name location.city starCategory")
-                .populate("packageDetails.packageId", "title duration packageType")
-                .populate("transportDetails.transportId", "title category vehicleType")
+                .populate("hotelDetails.hotelId", "name slug location.city starCategory rooms")
+                .populate("packageDetails.packageId", "title slug startingPrice duration packageType")
+                .populate("transportDetails.transportId", "title slug category vehicleType brand pricing")
                 .populate("user", "name email phoneNumber")
                 .sort({ createdAt: -1 })
                 .skip(skip)
