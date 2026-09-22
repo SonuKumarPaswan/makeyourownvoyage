@@ -6,7 +6,6 @@ const enquirySchema = new mongoose.Schema(
         enquiryCode: {
             type: String,
             unique: true,
-            index: true,
         },
 
         // Category / Form Type
@@ -93,8 +92,27 @@ const enquirySchema = new mongoose.Schema(
                     returnDate: { type: Date },
                     travelClass: {
                         type: String,
-                        enum: ["Economy", "Premium Economy", "Business", "First Class"],
                         default: "Economy",
+                        set: (val) => {
+                            if (!val) return "Economy";
+                            const s = String(val).toLowerCase().trim();
+                            if (s.includes("prem")) return "Premium Economy";
+                            if (s.includes("busi")) return "Business";
+                            if (s.includes("first")) return "First Class";
+                            return "Economy";
+                        },
+                        enum: [
+                            "Economy",
+                            "Premium Economy",
+                            "Business",
+                            "First Class",
+                            "economy",
+                            "premium economy",
+                            "premium_economy",
+                            "business",
+                            "first class",
+                            "first_class",
+                        ],
                     },
                     passengers: {
                         adults: { type: Number, default: 1, min: 1 },
@@ -158,14 +176,34 @@ const enquirySchema = new mongoose.Schema(
                     },
                     category: {
                         type: String,
-                        enum: ["Cab", "Bus", "Bike", "Traveller", "Other"],
                         default: "Cab",
+                        set: (val) => {
+                            if (!val) return "Cab";
+                            const s = String(val).toLowerCase().trim();
+                            if (s.includes("bus")) return "Bus";
+                            if (s.includes("bike")) return "Bike";
+                            if (s.includes("travel")) return "Traveller";
+                            if (s.includes("cab") || s.includes("car") || s.includes("taxi")) return "Cab";
+                            return "Other";
+                        },
+                        enum: ["Cab", "Bus", "Bike", "Traveller", "Other", "cab", "bus", "bike", "traveller", "other", "car", "taxi"],
                     },
                     vehicleType: { type: String, default: "" },
                     pickupLocation: { type: String, default: "" },
                     dropLocation: { type: String, default: "" },
                     serviceType: {
                         type: String,
+                        default: "Outstation One-Way",
+                        set: (val) => {
+                            if (!val) return "Outstation One-Way";
+                            const s = String(val).toLowerCase().trim();
+                            if (s.includes("round")) return "Outstation Round-Trip";
+                            if (s.includes("airport")) return "Airport Transfer";
+                            if (s.includes("hour")) return "Hourly City Rental";
+                            if (s.includes("day") || s.includes("daily") || s.includes("rental")) return "Daily Rental";
+                            if (s.includes("outstation")) return "Outstation One-Way";
+                            return "Other";
+                        },
                         enum: [
                             "Outstation One-Way",
                             "Outstation Round-Trip",
@@ -173,8 +211,12 @@ const enquirySchema = new mongoose.Schema(
                             "Hourly City Rental",
                             "Daily Rental",
                             "Other",
+                            "outstation",
+                            "rental",
+                            "transfer",
+                            "round_trip",
+                            "one_way",
                         ],
-                        default: "Outstation One-Way",
                     },
                     pickupDate: { type: Date },
                     pickupTime: { type: String, default: "" },
@@ -241,7 +283,6 @@ enquirySchema.pre("save", function (next) {
 });
 
 // Production Indexes for High-Frequency Queries
-enquirySchema.index({ enquiryCode: 1 }, { unique: true });
 enquirySchema.index({ customerEmail: 1, createdAt: -1 });
 enquirySchema.index({ customerPhone: 1, createdAt: -1 });
 enquirySchema.index({ enquiryType: 1, status: 1, createdAt: -1 });

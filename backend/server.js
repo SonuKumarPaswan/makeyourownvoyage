@@ -1,4 +1,9 @@
 import "dotenv/config";
+import { syncLogoAssets } from "./src/utils/emailTemplates.js";
+
+// Ensure brand emblem logo exists in backend/src/assets before app routes initialize
+syncLogoAssets();
+
 import connectDB from "./src/config/db.js";
 import app from "./src/app.js";
 

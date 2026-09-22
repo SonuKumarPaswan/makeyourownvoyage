@@ -5,25 +5,61 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure the brand logo exists in backend/src/assets/logo.png
+const candidateLogos = [
+    "C:/Users/iammo/.gemini/antigravity-ide/brain/99f0dc41-4809-4a85-8b62-619d8838db87/.user_uploaded/media_1790062882905.jpg",
+    "C:/Users/iammo/.gemini/antigravity-ide/brain/99f0dc41-4809-4a85-8b62-619d8838db87/.tempmediaStorage/media_1790063032637.jpg",
+];
+
+export const syncLogoAssets = () => {
+    try {
+        const assetsDir = path.resolve(__dirname, "../assets");
+        const logoPng = path.join(assetsDir, "logo.png");
+        const logoJpg = path.join(assetsDir, "logo.jpg");
+
+        if (!fs.existsSync(assetsDir)) {
+            fs.mkdirSync(assetsDir, { recursive: true });
+        }
+
+        if (!fs.existsSync(logoPng) || fs.statSync(logoPng).size === 0) {
+            for (const candidate of candidateLogos) {
+                if (fs.existsSync(candidate)) {
+                    fs.copyFileSync(candidate, logoPng);
+                    fs.copyFileSync(candidate, logoJpg);
+                    console.log(`[Assets] Logo saved successfully to: ${logoPng}`);
+                    break;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn("[Assets] Could not auto-sync logo file:", err.message);
+    }
+};
+
 export const getLogoAttachment = () => {
-    const assetsDir = path.resolve(__dirname, "../assets");
-    const logoDest = path.join(assetsDir, "logo.png");
+    try {
+        const assetsDir = path.resolve(__dirname, "../assets");
+        const logoPng = path.join(assetsDir, "logo.png");
+        const logoJpg = path.join(assetsDir, "logo.jpg");
 
-    if (!fs.existsSync(assetsDir)) {
-        fs.mkdirSync(assetsDir, { recursive: true });
+        syncLogoAssets();
+
+        let targetFile = null;
+        if (fs.existsSync(logoPng) && fs.statSync(logoPng).size > 0) {
+            targetFile = logoPng;
+        } else if (fs.existsSync(logoJpg) && fs.statSync(logoJpg).size > 0) {
+            targetFile = logoJpg;
+        }
+
+        if (targetFile) {
+            return {
+                filename: "make-your-own-voyage-logo.png",
+                path: targetFile,
+                cid: "brand-logo", // Referenced in HTML as cid:brand-logo
+            };
+        }
+    } catch (err) {
+        console.warn("[Email Templates] Logo attachment error:", err.message);
     }
-
-
-
-    if (fs.existsSync(logoDest)) {
-        return {
-            filename: "make-your-own-voyage-logo.png",
-            path: logoDest,
-            cid: "brand-logo", // Referenced in HTML as cid:brand-logo
-        };
-    }
-
     return null;
 };
 
@@ -526,9 +562,15 @@ export const enquiryConfirmationEmailTemplate = ({
 
                     <!-- Brand Header with Logo -->
                     <tr>
-                        <td align="center" style="padding: 35px 25px 20px 25px; background-color: #070e1c;">
-                            <img src="cid:brand-logo" alt="Make Your Own Voyage" width="170" style="display: block; width: 170px; max-width: 100%; height: auto;" />
-                            <p style="margin: 10px 0 0 0; font-size: 11px; letter-spacing: 2.5px; color: #c89d3c; text-transform: uppercase; font-weight: 700;">
+                        <td align="center" style="padding: 35px 25px 20px 25px; background: linear-gradient(180deg, #040914 0%, #070e1c 100%);">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding: 4px; border-radius: 50%; background: linear-gradient(135deg, #d4af37 0%, #0284c7 50%, #d4af37 100%); box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);">
+                                        <img src="cid:brand-logo" alt="Make Your Own Voyage" width="150" height="150" style="display: block; width: 150px; height: 150px; border-radius: 50%; border: 2px solid #070e1c; object-fit: cover;" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin: 14px 0 0 0; font-size: 11px; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; font-weight: 800;">
                                 EXPLORE • EXPERIENCE • EXTRAORDINARY
                             </p>
                         </td>
@@ -537,14 +579,14 @@ export const enquiryConfirmationEmailTemplate = ({
                     <!-- Badge & Hero Title -->
                     <tr>
                         <td align="center" style="padding: 25px 30px 15px 30px;">
-                            <div style="display: inline-block; padding: 6px 16px; background-color: ${currentTheme.badgeBg}; border: 1px solid ${currentTheme.badgeColor}; border-radius: 50px; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: ${currentTheme.badgeColor}; text-transform: uppercase; margin-bottom: 18px;">
+                            <div style="display: inline-block; padding: 6px 18px; background-color: ${currentTheme.badgeBg}; border: 1.5px solid ${currentTheme.badgeColor}; border-radius: 50px; font-size: 12px; font-weight: 800; letter-spacing: 1px; color: ${currentTheme.badgeColor}; text-transform: uppercase; margin-bottom: 18px;">
                                 ${currentTheme.badgeText}
                             </div>
                             <h1 style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 26px; line-height: 34px; color: #ffffff; font-weight: 700;">
                                 Thank You For Your Enquiry!
                             </h1>
                             <p style="margin: 12px 0 0 0; font-size: 15px; line-height: 24px; color: #94a3b8;">
-                                We have received your request and our travel specialists will contact you shortly with the best personalized options and pricing.
+                                We have successfully received your travel request. Review your submitted details below:
                             </p>
                         </td>
                     </tr>
@@ -552,13 +594,13 @@ export const enquiryConfirmationEmailTemplate = ({
                     <!-- Reference Code Box -->
                     <tr>
                         <td style="padding: 10px 30px;">
-                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: rgba(200, 157, 60, 0.08); border: 1px dashed rgba(200, 157, 60, 0.4); border-radius: 10px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: rgba(212, 175, 55, 0.1); border: 1.5px dashed rgba(212, 175, 55, 0.5); border-radius: 12px;">
                                 <tr>
-                                    <td align="center" style="padding: 16px 20px;">
-                                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #c89d3c; font-weight: 700; margin-bottom: 4px;">
+                                    <td align="center" style="padding: 18px 20px;">
+                                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #fbbf24; font-weight: 800; margin-bottom: 6px;">
                                             YOUR ENQUIRY REFERENCE CODE
                                         </div>
-                                        <div style="font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 2px; font-family: monospace;">
+                                        <div style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 2.5px; font-family: monospace;">
                                             ${enquiryCode}
                                         </div>
                                     </td>
@@ -569,43 +611,63 @@ export const enquiryConfirmationEmailTemplate = ({
 
                     <!-- Enquiry Details Table Card -->
                     <tr>
-                        <td style="padding: 20px 30px;">
+                        <td style="padding: 20px 30px 10px 30px;">
                             <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #0e182e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; overflow: hidden;">
                                 <tr>
-                                    <td colspan="2" style="padding: 14px 16px; background-color: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px; font-weight: 700; color: #e2e8f0; letter-spacing: 0.5px; text-transform: uppercase;">
+                                    <td colspan="2" style="padding: 14px 18px; background-color: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px; font-weight: 700; color: #e2e8f0; letter-spacing: 0.5px; text-transform: uppercase;">
                                         📋 Enquiry Details Summary
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); width: 38%;">
+                                    <td style="padding: 12px 18px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); width: 38%;">
                                         Customer Name
                                     </td>
-                                    <td style="padding: 10px 16px; font-size: 14px; color: #ffffff; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                    <td style="padding: 12px 18px; font-size: 14px; color: #ffffff; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         ${customerName}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                    <td style="padding: 12px 18px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         Contact Email
                                     </td>
-                                    <td style="padding: 10px 16px; font-size: 14px; color: #cbd5e1; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                    <td style="padding: 12px 18px; font-size: 14px; color: #cbd5e1; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
                                         ${customerEmail}
                                     </td>
                                 </tr>
                                 ${detailsRowsHtml}
-                                ${
-                                    specialRequests
-                                        ? `
+                                ${specialRequests
+            ? `
                                 <tr>
-                                    <td style="padding: 10px 16px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        Special Requests
+                                    <td style="padding: 12px 18px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        Special Requests / Notes
                                     </td>
-                                    <td style="padding: 10px 16px; font-size: 14px; color: #f1f5f9; font-style: italic;">
+                                    <td style="padding: 12px 18px; font-size: 14px; color: #f1f5f9; font-style: italic;">
                                         "${specialRequests}"
                                     </td>
                                 </tr>`
-                                        : ""
-                                }
+            : ""
+        }
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Reassuring English Contact Assurance Banner -->
+                    <tr>
+                        <td style="padding: 15px 30px 15px 30px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.16) 0%, rgba(2, 132, 199, 0.16) 100%); border: 1.5px solid #d4af37; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);">
+                                <tr>
+                                    <td style="padding: 22px 24px; text-align: center;">
+                                        <div style="font-size: 11px; letter-spacing: 2px; color: #fbbf24; text-transform: uppercase; font-weight: 800; margin-bottom: 6px;">
+                                            ✦ PRIORITY CONCIERGE ASSISTANCE ✦
+                                        </div>
+                                        <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 21px; line-height: 28px; color: #ffffff; font-weight: 700; margin-bottom: 8px;">
+                                            We Will Contact You Shortly!
+                                        </div>
+                                        <p style="margin: 0; font-size: 14px; line-height: 23px; color: #f1f5f9;">
+                                            Thank you for reaching out to <strong>Make Your Own Voyage</strong>. Our dedicated travel specialist is currently reviewing your enquiry details and checking live inventory to arrange the best personalized options and negotiated rates. We will contact you shortly via phone call, WhatsApp, or email to assist you with the booking.
+                                        </p>
+                                    </td>
+                                </tr>
                             </table>
                         </td>
                     </tr>

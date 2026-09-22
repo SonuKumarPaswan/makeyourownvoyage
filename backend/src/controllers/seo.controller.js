@@ -110,13 +110,17 @@ export const getPageSeoMetadata = async (req, res) => {
         };
 
         if (type === "package") {
-            const pkg = await Package.findOne({ slug, isActive: true }).lean();
+            const pkg = await Package.findOne({ slug, isActive: true })
+                .populate("destination", "name")
+                .lean();
             if (!pkg) return res.status(404).json({ success: false, message: "Package not found" });
 
+            const destName = pkg.destination?.name || pkg.region || "Incredible Destinations";
+            const priceText = pkg.startingPrice ? `₹${Number(pkg.startingPrice).toLocaleString("en-IN")}` : "Best Rates";
             metadata.title = `${pkg.title} | Make Your Own Voyage`;
-            metadata.description = pkg.highlights?.[0] || `Book custom trip to ${pkg.destination} starting from ₹${pkg.basePricePerAdult}.`;
+            metadata.description = `Book custom ${pkg.duration || "tour"} to ${destName} starting from ${priceText}. Includes verified stays and personalized itinerary.`;
             metadata.canonicalUrl = `${SITE_URL}/packages/${pkg.slug}`;
-            metadata.ogImage = pkg.thumbnail || metadata.ogImage;
+            metadata.ogImage = pkg.image || metadata.ogImage;
 
             metadata.schemaJsonLd = {
                 "@context": "https://schema.org",
@@ -126,8 +130,8 @@ export const getPageSeoMetadata = async (req, res) => {
                 touristType: "Leisure",
                 offers: {
                     "@type": "Offer",
-                    price: pkg.basePricePerAdult,
-                    priceCurrency: "INR",
+                    price: pkg.startingPrice || 0,
+                    priceCurrency: pkg.currency || "INR",
                     availability: "https://schema.org/InStock",
                 },
             };
@@ -135,10 +139,17 @@ export const getPageSeoMetadata = async (req, res) => {
             const hotel = await Hotel.findOne({ slug, status: "active" }).lean();
             if (!hotel) return res.status(404).json({ success: false, message: "Hotel not found" });
 
-            metadata.title = `${hotel.name}, ${hotel.city} | Make Your Own Voyage`;
-            metadata.description = hotel.description?.slice(0, 160) || `Experience luxury stay at ${hotel.name} in ${hotel.city}.`;
+            const city = hotel.location?.city
+                ? hotel.location.city.charAt(0).toUpperCase() + hotel.location.city.slice(1)
+                : "";
+            metadata.title = city ? `${hotel.name}, ${city} | Make Your Own Voyage` : `${hotel.name} | Make Your Own Voyage`;
+            metadata.description = hotel.description?.slice(0, 160) || `Experience luxury stay at ${hotel.name}${city ? ` in ${city}` : ""}.`;
             metadata.canonicalUrl = `${SITE_URL}/hotels/${hotel.slug}`;
-            metadata.ogImage = hotel.images?.[0] || metadata.ogImage;
+            
+            const firstImg = Array.isArray(hotel.images) && hotel.images.length > 0
+                ? (typeof hotel.images[0] === "string" ? hotel.images[0] : hotel.images[0]?.url)
+                : null;
+            metadata.ogImage = firstImg || metadata.ogImage;
 
             metadata.schemaJsonLd = {
                 "@context": "https://schema.org",
@@ -146,8 +157,9 @@ export const getPageSeoMetadata = async (req, res) => {
                 name: hotel.name,
                 address: {
                     "@type": "PostalAddress",
-                    addressLocality: hotel.city,
-                    addressCountry: "IN",
+                    addressLocality: hotel.location?.city || "",
+                    addressRegion: hotel.location?.state || "",
+                    addressCountry: hotel.location?.country || "IN",
                 },
             };
         } else if (type === "destination") {
@@ -155,9 +167,12 @@ export const getPageSeoMetadata = async (req, res) => {
             if (!dest) return res.status(404).json({ success: false, message: "Destination not found" });
 
             metadata.title = `Explore ${dest.name} Tourism | Custom Voyage Guide`;
-            metadata.description = dest.description?.slice(0, 160) || `Plan your custom voyage to ${dest.name}.`;
+            metadata.description = dest.shortDescription || dest.description?.slice(0, 160) || `Plan your custom voyage to ${dest.name}.`;
             metadata.canonicalUrl = `${SITE_URL}/destination/${dest.slug}`;
-            metadata.ogImage = dest.image || metadata.ogImage;
+            const firstDestImg = Array.isArray(dest.images) && dest.images.length > 0
+                ? (typeof dest.images[0] === "string" ? dest.images[0] : dest.images[0]?.url)
+                : null;
+            metadata.ogImage = firstDestImg || metadata.ogImage;
         }
 
         return res.status(200).json({
