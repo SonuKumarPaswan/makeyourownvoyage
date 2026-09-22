@@ -1,5 +1,5 @@
 export const generateSlug = (text = "") =>
-  text
+  String(text || "")
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, "")

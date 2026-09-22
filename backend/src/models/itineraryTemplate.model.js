@@ -51,7 +51,9 @@ const TemplateActivitySchema = new mongoose.Schema(
             trim: true,
         },
     },
-    { _id: true }
+    {
+        _id: true
+    }
 );
 
 const TemplateDaySchema = new mongoose.Schema(
@@ -71,7 +73,9 @@ const TemplateDaySchema = new mongoose.Schema(
         },
         activities: [TemplateActivitySchema],
     },
-    { _id: true }
+    {
+        _id: true
+    }
 );
 
 const ItineraryTemplateSchema = new mongoose.Schema(
@@ -82,9 +86,10 @@ const ItineraryTemplateSchema = new mongoose.Schema(
             trim: true,
         },
         destination: {
-            type: String,
-            required: [true, 'Destination is required'],
-            trim: true,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Destination",
+            required: true,
+            index: true,
         },
         days: {
             type: Number,
@@ -100,7 +105,9 @@ const ItineraryTemplateSchema = new mongoose.Schema(
         },
         daysPlan: [TemplateDaySchema],
     },
-    { timestamps: true }
+    {
+        timestamps: true
+    }
 );
 
 const ItineraryTemplate = mongoose.model('ItineraryTemplate', ItineraryTemplateSchema);

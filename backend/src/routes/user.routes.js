@@ -3,13 +3,14 @@ import {
     registerUser,
     loginUser,
     logoutUser,
+    getMe,
     getAllUsers,
     getUserById,
     updateUser,
 } from "../controllers/user.controller.js";
 import { validate } from "../middleware/validate.js";
 import { verifyAdmin } from "../middleware/role.js";
-import { isLoggedIn } from "../middleware/user.js";
+import { requireAuth, verifySelfOrAdmin } from "../middleware/user.js";
 import {
     registerSchema,
     loginSchema,
@@ -18,14 +19,19 @@ import {
 
 const router = express.Router();
 
-
-
 router.post("/register", validate(registerSchema), registerUser);
 router.post("/login", validate(loginSchema), loginUser);
-router.post("/logout", isLoggedIn, logoutUser);
+router.post("/logout", logoutUser);
 
+// User profile lookup (requires authentication)
+router.get("/me", requireAuth, getMe);
+
+// Admin user management (Admin protected)
+router.get("/", verifyAdmin, getAllUsers);
 router.get("/get-all", verifyAdmin, getAllUsers);
-router.get("/:id", isLoggedIn, getUserById);
-router.put("/:id", validate(updateUserSchema), isLoggedIn, updateUser);
+
+// Single user management (requires authentication & self-ownership or admin)
+router.get("/:id", requireAuth, verifySelfOrAdmin, getUserById);
+router.put("/:id", requireAuth, verifySelfOrAdmin, validate(updateUserSchema), updateUser);
 
 export default router;

@@ -77,7 +77,9 @@ const roomSchema = new mongoose.Schema(
             },
         },
     },
-    { _id: true }
+    {
+        _id: true
+    }
 );
 
 // Main Hotel Schema
@@ -105,6 +107,12 @@ const hotelSchema = new mongoose.Schema(
             min: 1,
             max: 5,
             default: 3
+        },
+        destination: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Destination",
+            required: true,
+            index: true,
         },
 
         location: {
@@ -331,6 +339,12 @@ const hotelSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
+// Production Indexes for Public & Admin Searches
+hotelSchema.index({ "location.city": 1, status: 1 });
+hotelSchema.index({ destination: 1, status: 1 });
+hotelSchema.index({ starCategory: 1, status: 1 });
+hotelSchema.index({ isFeatured: 1, status: 1 });
 
 const Hotel = mongoose.model("Hotel", hotelSchema);
 export default Hotel;

@@ -25,9 +25,10 @@ const ActivityMasterSchema = new mongoose.Schema(
             required: true,
         },
         destination: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Destination",
             required: true,
-            trim: true,
+            index: true,
         },
         approxDuration: {
             type: String,
@@ -43,7 +44,9 @@ const ActivityMasterSchema = new mongoose.Schema(
             default: '',
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true
+    }
 );
 
 const ActivityMaster = mongoose.model('ActivityMaster', ActivityMasterSchema);
