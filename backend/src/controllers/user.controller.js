@@ -166,14 +166,14 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-// GET /me - User profile lookup (optional auth or query/body fallback)
+// GET /me - User profile lookup (authenticated session)
 export const getMe = async (req, res) => {
     try {
-        const userId = req.user?.id || req.query.id || req.query.userId || req.body?.userId;
+        const userId = req.user?.id;
         if (!userId) {
-            return res.status(200).json({
-                success: true,
-                message: "No user session or ID provided.",
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required.",
                 user: null,
             });
         }

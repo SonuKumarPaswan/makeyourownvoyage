@@ -263,7 +263,12 @@ export const submitFlightEnquiry = async (req, res) => {
         const returnDate = req.body.returnDate || fData.returnDate;
         const rawTripType = req.body.tripType || fData.tripType || (returnDate ? "round_trip" : "one_way");
         const tripType = String(rawTripType).toLowerCase().includes("round") ? "round_trip" : "one_way";
-        const travelClass = req.body.travelClass || fData.travelClass || "Economy";
+        const rawTravelClass = String(req.body.travelClass || fData.travelClass || "Economy").toLowerCase().trim();
+        let travelClass = "Economy";
+        if (rawTravelClass.includes("prem")) travelClass = "Premium Economy";
+        else if (rawTravelClass.includes("busi")) travelClass = "Business";
+        else if (rawTravelClass.includes("first")) travelClass = "First Class";
+        else travelClass = "Economy";
         const city = req.body.city || fData.city || "";
         const specialRequests = req.body.specialRequests || fData.specialRequests || "";
 
@@ -393,8 +398,8 @@ export const submitPackageEnquiry = async (req, res) => {
         const specialRequests = req.body.specialRequests || pData.specialRequests || "";
 
         const rawTravelers = req.body.travelers || pData.travelers || {};
-        const adults = Number(rawTravelers.adults || req.body.travelersCount || pData.travelersCount) || 1;
-        const children = Number(rawTravelers.children) || 0;
+        const adults = Number(rawTravelers.adults || req.body.adults || pData.adults || req.body.travelersCount || pData.travelersCount) || 1;
+        const children = Number(rawTravelers.children || req.body.children || pData.children) || 0;
 
         let resolvedTitle = rawPackageTitle || "";
         let validPkgId = null;
@@ -572,11 +577,26 @@ export const submitTransportEnquiry = async (req, res) => {
             tData.transportSlug ||
             req.body.slug ||
             tData.slug;
-        const category = req.body.category || tData.category || tData.vehicleCategory || "Cab";
+        const rawCategory = String(req.body.category || tData.category || tData.vehicleCategory || "Cab").toLowerCase().trim();
+        let category = "Cab";
+        if (rawCategory.includes("bus")) category = "Bus";
+        else if (rawCategory.includes("bike")) category = "Bike";
+        else if (rawCategory.includes("travel")) category = "Traveller";
+        else if (rawCategory.includes("cab") || rawCategory.includes("car") || rawCategory.includes("taxi")) category = "Cab";
+        else category = "Other";
+
         const vehicleType = req.body.vehicleType || tData.vehicleType || tData.vehicleModel || "";
         const pickupLocation = req.body.pickupLocation || tData.pickupLocation || "";
         const dropLocation = req.body.dropLocation || tData.dropLocation || "";
-        const serviceType = req.body.serviceType || tData.serviceType || "Outstation One-Way";
+
+        const rawService = String(req.body.serviceType || tData.serviceType || "Outstation One-Way").toLowerCase().trim();
+        let serviceType = "Outstation One-Way";
+        if (rawService.includes("round")) serviceType = "Outstation Round-Trip";
+        else if (rawService.includes("airport")) serviceType = "Airport Transfer";
+        else if (rawService.includes("hour")) serviceType = "Hourly City Rental";
+        else if (rawService.includes("day") || rawService.includes("rental")) serviceType = "Daily Rental";
+        else if (rawService.includes("outstation")) serviceType = "Outstation One-Way";
+        else serviceType = "Other";
         const pickupDate = req.body.pickupDate || tData.pickupDate || tData.pickupDateTime;
         const pickupTime = req.body.pickupTime || tData.pickupTime || "";
         const returnDate = req.body.returnDate || tData.returnDate;
@@ -756,23 +776,31 @@ export const submitCustomEnquiry = async (req, res) => {
     }
 };
 
-// 6. GET /api/enquiries/my-enquiries - Customer inquiry tracking (No login required - lookup by ?email= or ?phone=)
+// 6. GET /api/enquiries/my-enquiries - Secure customer inquiry tracking
 export const getMyEnquiries = async (req, res) => {
     try {
-        const { email, phone } = req.query;
+        const { email, phone, enquiryCode } = req.query;
         const optionalUserId = getOptionalUserId(req);
 
         const filter = {};
-        if (email) {
-            filter.customerEmail = email.trim().toLowerCase();
-        } else if (phone) {
-            filter.customerPhone = phone.trim();
-        } else if (optionalUserId) {
+
+        // 1. Authenticated User: Retrieve user's linked enquiries
+        if (optionalUserId) {
             filter.user = optionalUserId;
+        } else if (enquiryCode && String(enquiryCode).trim()) {
+            // 2. Guest Verification: Require unique secret Enquiry Code + optional email/phone match
+            filter.enquiryCode = String(enquiryCode).trim().toUpperCase();
+            if (email) {
+                filter.customerEmail = email.trim().toLowerCase();
+            }
+            if (phone) {
+                filter.customerPhone = phone.trim();
+            }
         } else {
+            // Block unauthenticated enumeration with just an email or phone number
             return res.status(400).json({
                 success: false,
-                message: "Please provide your email or phone (e.g. ?email=you@example.com or ?phone=9876543210) to view your enquiries.",
+                message: "To track your enquiry, please provide your unique Enquiry Code (e.g. ?enquiryCode=ENQ-HTL-1234) or log in to your account.",
             });
         }
 

@@ -10,6 +10,7 @@ import {
 } from "../controllers/user.controller.js";
 import { validate } from "../middleware/validate.js";
 import { verifyAdmin } from "../middleware/role.js";
+import { requireAuth, verifySelfOrAdmin } from "../middleware/user.js";
 import {
     registerSchema,
     loginSchema,
@@ -22,15 +23,15 @@ router.post("/register", validate(registerSchema), registerUser);
 router.post("/login", validate(loginSchema), loginUser);
 router.post("/logout", logoutUser);
 
-// User profile lookup (no login required)
-router.get("/me", getMe);
+// User profile lookup (requires authentication)
+router.get("/me", requireAuth, getMe);
 
 // Admin user management (Admin protected)
 router.get("/", verifyAdmin, getAllUsers);
 router.get("/get-all", verifyAdmin, getAllUsers);
 
-// Single user management (no login required)
-router.get("/:id", getUserById);
-router.put("/:id", validate(updateUserSchema), updateUser);
+// Single user management (requires authentication & self-ownership or admin)
+router.get("/:id", requireAuth, verifySelfOrAdmin, getUserById);
+router.put("/:id", requireAuth, verifySelfOrAdmin, validate(updateUserSchema), updateUser);
 
 export default router;

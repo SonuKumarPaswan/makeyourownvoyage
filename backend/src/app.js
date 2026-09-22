@@ -28,6 +28,7 @@ import searchRoutes from "./routes/search.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import collectionRoutes from "./routes/collection.routes.js";
 import seoRoutes from "./routes/seo.routes.js";
+import { sendEmail, getTransporter } from "./utils/sendEmail.js";
 
 const app = express();
 
@@ -58,7 +59,11 @@ app.use(
             if (!origin || allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
-            return callback(null, true); // Permissive in dev, or specify allowedOrigins
+            // In non-production environments, allow development testing
+            if (process.env.NODE_ENV !== "production") {
+                return callback(null, true);
+            }
+            return callback(new Error(`CORS blocked for origin: ${origin}`), false);
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

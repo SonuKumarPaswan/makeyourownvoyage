@@ -1,22 +1,30 @@
-import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-});
+let cloudinary = null;
+try {
+    const c = await import("cloudinary");
+    cloudinary = c.v2 || c.default?.v2 || c.default || c;
+    if (cloudinary && cloudinary.config) {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
+        });
+    }
+} catch {
+    console.warn("[Cloudinary] 'cloudinary' package is not yet installed in node_modules. Run 'npm i' to activate cloud media storage.");
+}
 
 /**
  * Check if Cloudinary credentials are configured
  */
 export const isCloudinaryConfigured = () => {
     return Boolean(
+        cloudinary &&
         process.env.CLOUDINARY_CLOUD_NAME &&
         process.env.CLOUDINARY_API_KEY &&
         process.env.CLOUDINARY_API_SECRET
