@@ -10,11 +10,18 @@ import Testimonials from "@/components/home/Testimonials";
 import TravelBlog from "@/components/home/TravelBlog";
 import FAQ from "@/components/home/FAQ";
 import CTASection from "@/components/home/CTASection";
+import { getHomepageFeed } from "@/lib/api/homepage-feed";
 
-export default function HomePage() {
+
+
+export default async function HomePage() {
+
+  const feed = await getHomepageFeed()
+ 
+
   return (
     <>
-      <Hero />
+      <Hero data={feed.data.seasonalSection.collections} />
       <TravelSearch />
       <PopularDestinations />
       <FeaturedPackages />
