@@ -11,6 +11,23 @@ const detectCurrentSeason = () => {
     return "winter"; // Dec, Jan, Feb, Mar
 };
 
+// Helper: Safely parse array of ObjectIds from JSON string, single ID string, or comma-separated IDs
+const safeParseIds = (input) => {
+    if (!input) return [];
+    if (Array.isArray(input)) return input.filter(Boolean);
+    if (typeof input === "string") {
+        const trimmed = input.trim();
+        if (!trimmed || trimmed === "[]") return [];
+        try {
+            const parsed = JSON.parse(trimmed);
+            return Array.isArray(parsed) ? parsed.filter(Boolean) : [parsed];
+        } catch {
+            return trimmed.split(",").map((s) => s.trim().replace(/^["'\[\]]+|["'\[\]]+$/g, "")).filter(Boolean);
+        }
+    }
+    return [input];
+};
+
 // 1. PUBLIC: Homepage Feed (Weekend + Current Season)
 export const getHomepageFeed = async (req, res) => {
     try {
@@ -92,17 +109,15 @@ export const getHomepageFeed = async (req, res) => {
 // 2. ADMIN: Create Collection (with Cloudinary Buffer Stream)
 export const createCollection = async (req, res) => {
     try {
-        const {
-            title,
-            subtitle,
-            collectionType,
-            seasonTag,
-            badgeText,
-            exploreLink,
-            displayOrder,
-            validFrom,
-            validTill,
-        } = req.body;
+        const title = req.body.title ? String(req.body.title).trim() : "";
+        const subtitle = req.body.subtitle ? String(req.body.subtitle).trim() : "";
+        const collectionType = req.body.collectionType ? String(req.body.collectionType).trim() : "";
+        const seasonTag = req.body.seasonTag ? String(req.body.seasonTag).trim() : "all_season";
+        const badgeText = req.body.badgeText ? String(req.body.badgeText).trim() : "";
+        const exploreLink = req.body.exploreLink ? String(req.body.exploreLink).trim() : "";
+        const displayOrder = Number(req.body.displayOrder) || 0;
+        const validFrom = req.body.validFrom;
+        const validTill = req.body.validTill;
 
         if (!title || !collectionType) {
             return res.status(400).json({
@@ -115,17 +130,17 @@ export const createCollection = async (req, res) => {
         let mobileImageUrl = req.body.mobileImageUrl;
 
         // Files buffer upload to Cloudinary
-        if (req.files?.desktopImage?.[0]) {
+        if (req.files?.desktopImage?.[0] && req.files.desktopImage[0].size > 0) {
             const uploadRes = await uploadBufferToCloudinary(
-                req.files.desktopImage[0].buffer,
+                req.files.desktopImage[0],
                 "collections/desktop"
             );
             desktopImageUrl = uploadRes.secure_url;
         }
 
-        if (req.files?.mobileImage?.[0]) {
+        if (req.files?.mobileImage?.[0] && req.files.mobileImage[0].size > 0) {
             const uploadRes = await uploadBufferToCloudinary(
-                req.files.mobileImage[0].buffer,
+                req.files.mobileImage[0],
                 "collections/mobile"
             );
             mobileImageUrl = uploadRes.secure_url;
@@ -145,19 +160,8 @@ export const createCollection = async (req, res) => {
 
         const slug = `${cleanSlug}-${Date.now().toString().slice(-4)}`;
 
-        let parsedPackages = [];
-        if (req.body.featuredPackages) {
-            parsedPackages = typeof req.body.featuredPackages === "string"
-                ? JSON.parse(req.body.featuredPackages)
-                : req.body.featuredPackages;
-        }
-
-        let parsedDestinations = [];
-        if (req.body.featuredDestinations) {
-            parsedDestinations = typeof req.body.featuredDestinations === "string"
-                ? JSON.parse(req.body.featuredDestinations)
-                : req.body.featuredDestinations;
-        }
+        const parsedPackages = safeParseIds(req.body.featuredPackages);
+        const parsedDestinations = safeParseIds(req.body.featuredDestinations);
 
         const newCollection = await Collection.create({
             title,
@@ -196,6 +200,14 @@ export const createCollection = async (req, res) => {
 export const getAllCollectionsAdmin = async (req, res) => {
     try {
         const collections = await Collection.find()
+            .populate({
+                path: "featuredPackages",
+                select: "title slug duration basePricePerAdult thumbnail destination",
+            })
+            .populate({
+                path: "featuredDestinations",
+                select: "name slug image state city",
+            })
             .sort({ displayOrder: 1, createdAt: -1 })
             .lean();
 
@@ -211,24 +223,27 @@ export const updateCollection = async (req, res) => {
         const { id } = req.params;
         const updatePayload = { ...req.body };
 
-        if (req.files?.desktopImage?.[0]) {
+        if (req.files?.desktopImage?.[0] && req.files.desktopImage[0].size > 0) {
             const uploadRes = await uploadBufferToCloudinary(
-                req.files.desktopImage[0].buffer,
+                req.files.desktopImage[0],
                 "collections/desktop"
             );
             updatePayload["bannerImage.desktop"] = uploadRes.secure_url;
         }
 
-        if (req.files?.mobileImage?.[0]) {
+        if (req.files?.mobileImage?.[0] && req.files.mobileImage[0].size > 0) {
             const uploadRes = await uploadBufferToCloudinary(
-                req.files.mobileImage[0].buffer,
+                req.files.mobileImage[0],
                 "collections/mobile"
             );
             updatePayload["bannerImage.mobile"] = uploadRes.secure_url;
         }
 
-        if (updatePayload.featuredPackages && typeof updatePayload.featuredPackages === "string") {
-            updatePayload.featuredPackages = JSON.parse(updatePayload.featuredPackages);
+        if (updatePayload.featuredPackages !== undefined) {
+            updatePayload.featuredPackages = safeParseIds(updatePayload.featuredPackages);
+        }
+        if (updatePayload.featuredDestinations !== undefined) {
+            updatePayload.featuredDestinations = safeParseIds(updatePayload.featuredDestinations);
         }
 
         const updated = await Collection.findByIdAndUpdate(id, updatePayload, { new: true });

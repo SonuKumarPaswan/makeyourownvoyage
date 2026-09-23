@@ -28,7 +28,7 @@ import searchRoutes from "./routes/search.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import collectionRoutes from "./routes/collection.routes.js";
 import seoRoutes from "./routes/seo.routes.js";
-import { sendEmail, getTransporter } from "./utils/sendEmail.js";
+
 
 const app = express();
 
@@ -41,9 +41,9 @@ app.use(compressionMiddleware);
 app.use(morganMiddleware);
 
 // Standard Body Parsers
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Dynamic CORS configuration
 const allowedOrigins = [
@@ -102,7 +102,6 @@ app.use("/api/itinerary-templates", templateRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/states", stateRoutes);
 app.use("/api/destinations", destinationRoutes);
-app.use("/api/faqs", faqRoutes);
 app.use("/api/faq", faqRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/collections", collectionRoutes);
