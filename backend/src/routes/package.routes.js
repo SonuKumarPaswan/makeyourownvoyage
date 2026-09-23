@@ -18,7 +18,6 @@ const packageUpload = upload.fields([
 ]);
 
 // Admin Package management routes
-router.post('/', verifyAdmin, packageUpload, createPackage);
 router.post('/create', verifyAdmin, packageUpload, createPackage);
 router.put('/:id', verifyAdmin, packageUpload, updatePackage);
 router.delete('/:id', verifyAdmin, deletePackage);
