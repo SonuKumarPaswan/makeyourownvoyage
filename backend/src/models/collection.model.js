@@ -24,12 +24,14 @@ const collectionSchema = new mongoose.Schema(
             enum: ["weekend", "seasonal", "curated_theme"],
             required: true,
             default: "seasonal",
+            trim: true,
             index: true,
         },
         seasonTag: {
             type: String,
             enum: ["all_season", "summer", "monsoon", "autumn", "winter"],
             default: "all_season",
+            trim: true,
             index: true,
         },
         badgeText: {

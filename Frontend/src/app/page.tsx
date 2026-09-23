@@ -12,7 +12,16 @@ import Testimonials from "@/components/home/Testimonials";
 import TravelBlog from "@/components/home/TravelBlog";
 import FAQ from "@/components/home/FAQ";
 import CTASection from "@/components/home/CTASection";
+import { getHomepageFeed } from "@/lib/api/homepage-feed";
 
+
+
+export default async function HomePage() {
+
+  const feed = await getHomepageFeed()
+ 
+
+<<<<<<< HEAD
 export const metadata: Metadata = {
   title: "Make Your Own Voyage | Flights, Hotels & Holiday Packages",
 
@@ -72,6 +81,11 @@ export default function HomePage() {
     <>
       <Hero />
 
+=======
+  return (
+    <>
+      <Hero data={feed.data.seasonalSection.collections} />
+>>>>>>> 22afc7bef053999edc7ea6975a87df713b1a8e2c
       <TravelSearch />
 
       <PopularDestinations />

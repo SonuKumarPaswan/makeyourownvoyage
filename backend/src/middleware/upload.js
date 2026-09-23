@@ -39,7 +39,7 @@ if (multerModule) {
         storage,
         fileFilter,
         limits: {
-            fileSize: 10 * 1024 * 1024, // 10MB per file
+            fileSize: 25 * 1024 * 1024, // 25MB per file
             files: 20, // max 20 files per request
         },
     });

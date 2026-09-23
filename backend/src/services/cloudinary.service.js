@@ -45,8 +45,17 @@ export const uploadToCloudinary = async (file, folder = "makeyourownvoyage", cus
         );
     }
 
-    // Extract buffer if file is a multer file object
-    const target = file && file.buffer ? file.buffer : file;
+    // Extract buffer safely: handles raw Buffer, Multer file object ({ buffer }), ArrayBuffer, or string
+    let target = file;
+    if (Buffer.isBuffer(file)) {
+        target = file;
+    } else if (file && Buffer.isBuffer(file.buffer)) {
+        target = file.buffer;
+    } else if (file && file.buffer instanceof ArrayBuffer) {
+        target = Buffer.from(file.buffer);
+    } else if (file instanceof ArrayBuffer) {
+        target = Buffer.from(file);
+    }
 
     const uploadOptions = {
         folder: folder || "makeyourownvoyage",
