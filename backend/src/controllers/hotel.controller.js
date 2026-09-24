@@ -64,21 +64,6 @@ export const addHotel = async (req, res) => {
       }
     }
 
-    // Validate required fields
-    if (!hotelData.name || !hotelData.name.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Hotel name is required",
-      });
-    }
-
-    if (!hotelData.destination) {
-      return res.status(400).json({
-        success: false,
-        message: "Destination is required",
-      });
-    }
-
     const resolvedDestId = await resolveDestinationId(hotelData.destination);
     if (!resolvedDestId) {
       return res.status(400).json({

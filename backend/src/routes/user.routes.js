@@ -15,6 +15,7 @@ import {
     registerSchema,
     loginSchema,
     updateUserSchema,
+    idParamSchema,
 } from "../validations/user.validation.js";
 
 const router = express.Router();
@@ -31,7 +32,14 @@ router.get("/", verifyAdmin, getAllUsers);
 router.get("/get-all", verifyAdmin, getAllUsers);
 
 // Single user management (requires authentication & self-ownership or admin)
-router.get("/:id", requireAuth, verifySelfOrAdmin, getUserById);
-router.put("/:id", requireAuth, verifySelfOrAdmin, validate(updateUserSchema), updateUser);
+router.get("/:id", requireAuth, verifySelfOrAdmin, validate(idParamSchema, "params"), getUserById);
+router.put(
+    "/:id",
+    requireAuth,
+    verifySelfOrAdmin,
+    validate(idParamSchema, "params"),
+    validate(updateUserSchema, "body"),
+    updateUser
+);
 
 export default router;

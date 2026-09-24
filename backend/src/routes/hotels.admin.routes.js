@@ -8,15 +8,20 @@ import {
     updateHotel,
     deleteHotel,
 } from "../controllers/hotel.controller.js";
+import { validate } from "../middleware/validate.js";
+import {
+    createHotelSchema,
+    hotelIdParamSchema,
+} from "../validations/hotel.validation.js";
 
 const router = express.Router();
 
-router.post("/", verifyAdmin, upload.array("images", 20), addHotel);
-router.post("/create", verifyAdmin, upload.array("images", 20), addHotel);
+router.post("/", verifyAdmin, upload.array("images", 20), validate(createHotelSchema), addHotel);
+router.post("/create", verifyAdmin, upload.array("images", 20), validate(createHotelSchema), addHotel);
 router.get("/", verifyAdmin, getAllHotelsAdmin);
 router.get("/get-all", verifyAdmin, getAllHotelsAdmin);
-router.get("/:id", verifyAdmin, getHotelByIdAdmin);
-router.put("/:id", verifyAdmin, upload.array("images", 20), updateHotel);
-router.delete("/:id", verifyAdmin, deleteHotel);
+router.get("/:id", verifyAdmin, validate(hotelIdParamSchema, "params"), getHotelByIdAdmin);
+router.put("/:id", verifyAdmin, validate(hotelIdParamSchema, "params"), upload.array("images", 20), updateHotel);
+router.delete("/:id", verifyAdmin, validate(hotelIdParamSchema, "params"), deleteHotel);
 
 export default router;
