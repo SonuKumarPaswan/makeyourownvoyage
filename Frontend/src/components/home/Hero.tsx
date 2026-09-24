@@ -1,12 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
-
-const Hero = () => {
-  return (
-    <section className="relative min-h-[650px] overflow-hidden">
-      {/* ================= BACKGROUND ================= */}
-=======
 import type { Collection } from "@/types/homepage-feed";
 
 interface HeroProps {
@@ -24,7 +17,6 @@ const Hero = ({ data }: HeroProps) => {
     <section className="relative min-h-[680px] overflow-hidden">
 
       {/* Background Image */}
->>>>>>> 3eec433e52788d4c2f23d4a81fd536ed2af9263b
       <div className="absolute inset-0">
         {/* Desktop */}
         <Image
@@ -48,7 +40,6 @@ const Hero = ({ data }: HeroProps) => {
       </div>
 
       {/* Overlay */}
-<<<<<<< HEAD
       <div className="absolute inset-0 bg-black/35" />
 
       {/* ================= CONTENT ================= */}
@@ -60,23 +51,6 @@ const Hero = ({ data }: HeroProps) => {
             <div className="mb-6">
               <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold tracking-wide text-white backdrop-blur-md">
                 Explore the World
-=======
-      <div className="absolute inset-0 bg-black/5" />
-
-      {/* Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-black/5 to-transparent" />
-
-      {/* Content */}
-      <div className="relative z-10 flex min-h-[680px] items-center py-16 lg:py-24">
-        <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
-
-            {/* Left Side: Collection Details */}
-            <div className="text-white lg:col-span-7">
-              {/* Badge */}
-              <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold">
-                ✦ {hero.badgeText}
->>>>>>> 3eec433e52788d4c2f23d4a81fd536ed2af9263b
               </span>
 
               {/* Collection Title */}
@@ -90,46 +64,6 @@ const Hero = ({ data }: HeroProps) => {
               </p>
             </div>
 
-<<<<<<< HEAD
-            {/* H1 */}
-            <h1 className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-7xl">
-              Explore the World with
-              <br />
-              Make Your Own Voyage
-            </h1>
-
-            {/* Description */}
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
-              Book flights, hotels, and holiday packages with Make Your Own
-              Voyage. Discover domestic and international destinations and
-              create unforgettable travel experiences.
-            </p>
-
-            {/* CTA */}
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link
-                href="/packages"
-                className="rounded-lg bg-primary px-6 py-3.5 font-semibold text-white transition hover:bg-primary-hover"
-              >
-                Explore Holiday Packages
-              </Link>
-
-              <Link
-                href="/flights"
-                className="rounded-lg border border-white/60 bg-white/10 px-6 py-3.5 font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-black"
-              >
-                Search Flights
-              </Link>
-            </div>
-
-            {/* Trust Info */}
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-white/80">
-              <span>✓ Customizable Trips</span>
-              <span>✓ Domestic & International Travel</span>
-              <span>✓ Travel Assistance</span>
-            </div>
-
-=======
             {/* Right Side: Featured Package & CTA */}
             <div className="w-full text-white lg:col-span-5 lg:ml-auto lg:max-w-lg">
               {/* Featured Package */}
@@ -182,18 +116,13 @@ const Hero = ({ data }: HeroProps) => {
               </div>
             </div>
 
->>>>>>> 3eec433e52788d4c2f23d4a81fd536ed2af9263b
           </div>
         </div>
       </div>
 
       {/* Bottom Gradient */}
-<<<<<<< HEAD
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/50 to-transparent" />
-=======
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/5 to-transparent" />
 
->>>>>>> 3eec433e52788d4c2f23d4a81fd536ed2af9263b
     </section>
   );
 };

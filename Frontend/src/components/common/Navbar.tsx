@@ -2,12 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-<<<<<<< HEAD
-import Image from "next/image";
-=======
 import NavbarSearch from "./NavbarSearch";
+import Image from "next/image";
 
->>>>>>> 3eec433e52788d4c2f23d4a81fd536ed2af9263b
 
 const navLinks = [
   {
