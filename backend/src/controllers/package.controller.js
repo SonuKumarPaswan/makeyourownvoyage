@@ -100,20 +100,6 @@ export const createPackage = async (req, res) => {
             }
         }
 
-        if (!restPackageData.title || !restPackageData.title.trim()) {
-            return res.status(400).json({
-                success: false,
-                message: "Package title is required",
-            });
-        }
-
-        if (!destination) {
-            return res.status(400).json({
-                success: false,
-                message: "Destination is required",
-            });
-        }
-
         const resolvedDestId = await resolveDestinationId(destination);
         if (!resolvedDestId) {
             return res.status(400).json({

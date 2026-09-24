@@ -1,16 +1,20 @@
-export const validate = (schema) => (req, res, next) => {
-  const { error, value } = schema.validate(req.body, {
-    abortEarly: false
+// src/middleware/validate.js
+export const validate = (schema, source = "body") => (req, res, next) => {
+  const dataToValidate = req[source] || {}; // Safe fallback
+  const { error, value } = schema.validate(dataToValidate, {
+    abortEarly: false,
+    stripUnknown: true,
   });
 
   if (error) {
     const errorMessages = error.details.map((detail) => detail.message);
     return res.status(400).json({
       success: false,
-      errors: errorMessages
+      message: error.details[0]?.message || "Validation failed",
+      errors: errorMessages,
     });
   }
-  
-  req.body = value;
+
+  req[source] = value;
   next();
 };

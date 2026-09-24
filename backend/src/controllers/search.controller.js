@@ -14,32 +14,6 @@ const escapeRegex = (string) => {
 export const globalSearch = async (req, res) => {
     try {
         const { q, type = "all", limit = 6 } = req.query;
-
-        if (!q || !String(q).trim()) {
-            return res.status(200).json({
-                success: true,
-                query: "",
-                totalMatches: 0,
-                counts: {
-                    destinations: 0,
-                    packages: 0,
-                    hotels: 0,
-                    transports: 0,
-                    states: 0,
-                    activities: 0,
-                },
-                results: {
-                    destinations: [],
-                    packages: [],
-                    hotels: [],
-                    transports: [],
-                    states: [],
-                    activities: [],
-                },
-                combined: [],
-            });
-        }
-
         const cleanQuery = String(q).trim();
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 6), 50);
@@ -280,15 +254,6 @@ export const globalSearch = async (req, res) => {
 export const searchSuggestions = async (req, res) => {
     try {
         const { q, limit = 8 } = req.query;
-
-        if (!q || !String(q).trim()) {
-            return res.status(200).json({
-                success: true,
-                query: "",
-                suggestions: [],
-            });
-        }
-
         const cleanQuery = String(q).trim();
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 8), 20);

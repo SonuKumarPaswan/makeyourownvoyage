@@ -32,13 +32,6 @@ export const submitHotelEnquiry = async (req, res) => {
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
 
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
-
         const hData = req.body.hotelDetails || {};
 
         // Intelligent fallback: If client posted package payload to /hotel
@@ -249,13 +242,6 @@ export const submitFlightEnquiry = async (req, res) => {
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
 
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
-
         const fData = req.body.flightDetails || {};
         const fromCity = req.body.fromCity || fData.fromCity;
         const toCity = req.body.toCity || fData.toCity;
@@ -276,13 +262,6 @@ export const submitFlightEnquiry = async (req, res) => {
         const adults = Number(rawPassengers.adults || req.body.adults || fData.adults) || 1;
         const children = Number(rawPassengers.children || req.body.children || fData.children) || 0;
         const infants = Number(rawPassengers.infants || req.body.infants || fData.infants) || 0;
-
-        if (!fromCity || !toCity || !departureDate) {
-            return res.status(400).json({
-                success: false,
-                message: "Departure city, destination city, and departure date are required for flight inquiry.",
-            });
-        }
 
         const enquiry = await Enquiry.create({
             enquiryType: "flight",
@@ -357,13 +336,6 @@ export const submitPackageEnquiry = async (req, res) => {
         const cName = req.body.customerName || req.body.name;
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
-
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
 
         const pData = req.body.packageDetails || {};
 
@@ -547,13 +519,6 @@ export const submitTransportEnquiry = async (req, res) => {
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
 
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
-
         const tData = req.body.transportDetails || {};
 
         // Intelligent fallback: If client mistakenly posted hotel/package/flight payload to /transport
@@ -731,13 +696,6 @@ export const submitCustomEnquiry = async (req, res) => {
         const subject = req.body.subject || req.body.tripType || "General Travel Inquiry";
         const city = req.body.city || "";
 
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
-
         const enquiry = await Enquiry.create({
             enquiryType: "custom",
             user: getOptionalUserId(req),
@@ -883,13 +841,6 @@ export const getEnquiryByIdAdmin = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid inquiry ID format",
-            });
-        }
-
         const enquiry = await Enquiry.findById(id)
             .populate("hotelDetails.hotelId")
             .populate("packageDetails.packageId")
@@ -921,13 +872,6 @@ export const updateEnquiryAdmin = async (req, res) => {
     try {
         const { id } = req.params;
         const { status, quotedPrice, adminNote } = req.body;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid inquiry ID format",
-            });
-        }
 
         const updates = {};
         if (status) updates.status = status;
@@ -975,13 +919,6 @@ export const updateEnquiryAdmin = async (req, res) => {
 export const deleteEnquiryAdmin = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid inquiry ID format",
-            });
-        }
 
         const deleted = await Enquiry.findByIdAndDelete(id);
         if (!deleted) {

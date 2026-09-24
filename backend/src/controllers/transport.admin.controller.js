@@ -61,20 +61,6 @@ export const addTransport = async (req, res) => {
             }
         }
 
-        if (!data.title || !data.title.trim()) {
-            return res.status(400).json({
-                success: false,
-                message: "Transport title is required",
-            });
-        }
-
-        if (!data.category) {
-            return res.status(400).json({
-                success: false,
-                message: "Transport category is required",
-            });
-        }
-
         if (data.availableCities) {
             data.availableCities = sanitizeCities(data.availableCities);
         }
