@@ -2,7 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+<<<<<<< HEAD
 import Image from "next/image";
+=======
+import NavbarSearch from "./NavbarSearch";
+
+>>>>>>> 3eec433e52788d4c2f23d4a81fd536ed2af9263b
 
 const navLinks = [
   {
@@ -38,6 +43,11 @@ const Navbar = () => {
     <header className="sticky top-0 z-99 border-b border-border bg-white/95 shadow-sm backdrop-blur-md">
       <nav className="mx-auto max-w-7xl px-6 lg:px-4">
         <div className="flex h-20 items-center justify-between">
+          {/* Mobile Always-Visible Search Bar */}
+          <div className="pb-3 lg:hidden">
+            <NavbarSearch />
+          </div>
+
           {/* Logo */}
           <Link
             href="/"
@@ -73,6 +83,11 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden items-center gap-3 lg:flex">
+            {/* Global Search Bar */}
+            <div className="hidden md:block">
+              <NavbarSearch />
+            </div>
+
             <Link
               href="/contact"
               className="px-3 py-2 text-sm font-semibold text-heading transition hover:text-primary"

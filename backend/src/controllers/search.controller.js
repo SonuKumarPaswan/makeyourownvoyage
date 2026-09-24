@@ -4,6 +4,7 @@ import Hotel from "../models/hotel.model.js";
 import Transport from "../models/transport.model.js";
 import State from "../models/state.model.js";
 import ActivityMaster from "../models/activityMaster.model.js";
+import { formatSearchResults } from "../utils/searchFormatter.js";
 
 // Helper to sanitize regex input to prevent ReDoS
 const escapeRegex = (string) => {
@@ -14,32 +15,6 @@ const escapeRegex = (string) => {
 export const globalSearch = async (req, res) => {
     try {
         const { q, type = "all", limit = 6 } = req.query;
-
-        if (!q || !String(q).trim()) {
-            return res.status(200).json({
-                success: true,
-                query: "",
-                totalMatches: 0,
-                counts: {
-                    destinations: 0,
-                    packages: 0,
-                    hotels: 0,
-                    transports: 0,
-                    states: 0,
-                    activities: 0,
-                },
-                results: {
-                    destinations: [],
-                    packages: [],
-                    hotels: [],
-                    transports: [],
-                    states: [],
-                    activities: [],
-                },
-                combined: [],
-            });
-        }
-
         const cleanQuery = String(q).trim();
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 6), 50);
@@ -152,119 +127,22 @@ export const globalSearch = async (req, res) => {
             resultMap[key] = rawResults[index] || [];
         });
 
-        // Format and standardize results for frontend consumption
-        const formattedDestinations = (resultMap.destinations || []).map((d) => ({
-            id: d._id,
-            title: d.name,
-            slug: d.slug,
-            subtitle: Array.isArray(d.type) ? d.type.join(", ") : d.shortDescription || "Destination",
-            image: d.images?.[0]?.url || "",
-            url: `/destinations/${d.slug}`,
-            type: "destination",
-        }));
-
-        const formattedPackages = (resultMap.packages || []).map((p) => ({
-            id: p._id,
-            title: p.title,
-            slug: p.slug,
-            subtitle: p.duration || `${p.days || 3} Days / ${p.nights || 2} Nights`,
-            region: p.region,
-            packageType: p.packageType,
-            price: p.startingPrice || 0,
-            image: p.image || "",
-            url: `/packages/${p.slug}`,
-            type: "package",
-        }));
-
-        const formattedHotels = (resultMap.hotels || []).map((h) => {
-            const firstRoomPrice = h.rooms?.[0]?.pricing?.finalPrice || h.rooms?.[0]?.pricing?.basePrice || 0;
-            const hotelImg = h.images?.[0]?.url || h.rooms?.[0]?.images?.[0] || "";
-            return {
-                id: h._id,
-                title: h.name,
-                slug: h.slug,
-                subtitle: `${h.location?.city ? h.location.city.charAt(0).toUpperCase() + h.location.city.slice(1) : ""}${h.location?.state ? `, ${h.location.state}` : ""}`,
-                city: h.location?.city || "",
-                state: h.location?.state || "",
-                starCategory: h.starCategory || 3,
-                price: firstRoomPrice,
-                image: hotelImg,
-                url: `/hotels/${h.slug}`,
-                type: "hotel",
-            };
-        });
-
-        const formattedTransports = (resultMap.transports || []).map((t) => {
-            let startingPrice = 0;
-            if (t.category === "Bike") startingPrice = t.pricing?.dailyRentalPrice || 0;
-            else if (t.category === "Bus") startingPrice = t.pricing?.seatTicketPrice || 0;
-            else startingPrice = t.pricing?.basePrice || t.pricing?.perKmRate || 0;
-
-            return {
-                id: t._id,
-                title: t.title,
-                slug: t.slug,
-                subtitle: `${t.category} • ${t.vehicleType || ""}`,
-                category: t.category,
-                price: startingPrice,
-                seating: t.capacity?.seating || 4,
-                image: t.images?.[0]?.url || "",
-                url: `/transports/${t.slug}`,
-                type: "transport",
-            };
-        });
-
-        const formattedStates = (resultMap.states || []).map((s) => ({
-            id: s._id,
-            title: s.name,
-            slug: s.slug,
-            subtitle: "State / Region",
-            image: s.image?.url || "",
-            url: `/states/${s.slug}`,
-            type: "state",
-        }));
-
-        const formattedActivities = (resultMap.activities || []).map((a) => ({
-            id: a._id,
-            title: a.title,
-            subtitle: `${a.type ? a.type.toUpperCase() : "ACTIVITY"} • ${a.approxDuration || ""}`,
-            destination: a.destination?.name || "",
-            image: a.image || "",
-            type: "activity",
-        }));
-
-        // Flatten top matches for unified list
-        const combined = [
-            ...formattedDestinations,
-            ...formattedPackages,
-            ...formattedHotels,
-            ...formattedTransports,
-            ...formattedStates,
-            ...formattedActivities,
-        ];
-
-        const totalMatches = combined.length;
+        // Format and standardize results using searchFormatter utility
+        const { results, combined } = formatSearchResults(resultMap);
 
         return res.status(200).json({
             success: true,
             query: cleanQuery,
-            totalMatches,
+            totalMatches: combined.length,
             counts: {
-                destinations: formattedDestinations.length,
-                packages: formattedPackages.length,
-                hotels: formattedHotels.length,
-                transports: formattedTransports.length,
-                states: formattedStates.length,
-                activities: formattedActivities.length,
+                destinations: results.destinations.length,
+                packages: results.packages.length,
+                hotels: results.hotels.length,
+                transports: results.transports.length,
+                states: results.states.length,
+                activities: results.activities.length,
             },
-            results: {
-                destinations: formattedDestinations,
-                packages: formattedPackages,
-                hotels: formattedHotels,
-                transports: formattedTransports,
-                states: formattedStates,
-                activities: formattedActivities,
-            },
+            results,
             combined,
         });
     } catch (error) {
@@ -280,15 +158,6 @@ export const globalSearch = async (req, res) => {
 export const searchSuggestions = async (req, res) => {
     try {
         const { q, limit = 8 } = req.query;
-
-        if (!q || !String(q).trim()) {
-            return res.status(200).json({
-                success: true,
-                query: "",
-                suggestions: [],
-            });
-        }
-
         const cleanQuery = String(q).trim();
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 8), 20);

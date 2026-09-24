@@ -13,25 +13,42 @@ import {
     deleteEnquiryAdmin,
 } from "../controllers/enquiry.controller.js";
 import { verifyAdmin } from "../middleware/role.js";
+import { validate } from "../middleware/validate.js";
+import {
+    hotelEnquirySchema,
+    flightEnquirySchema,
+    packageEnquirySchema,
+    transportEnquirySchema,
+    customEnquirySchema,
+    updateEnquiryStatusSchema,
+    enquiryIdParamSchema,
+    trackEnquiryQuerySchema,
+} from "../validations/enquiry.validation.js";
 
 const router = express.Router();
 
-// 1. PUBLIC CATEGORY-SPECIFIC & UNIVERSAL FORM SUBMISSIONS (No login required)
+// 1. PUBLIC CATEGORY-SPECIFIC FORM SUBMISSIONS
 router.post("/", submitUniversalEnquiry);
-router.post("/hotel", submitHotelEnquiry);
-router.post("/flight", submitFlightEnquiry);
-router.post("/package", submitPackageEnquiry);
-router.post("/transport", submitTransportEnquiry);
-router.post("/custom", submitCustomEnquiry);
-router.post("/contact", submitCustomEnquiry);
+router.post("/hotel", validate(hotelEnquirySchema), submitHotelEnquiry);
+router.post("/flight", validate(flightEnquirySchema), submitFlightEnquiry);
+router.post("/package", validate(packageEnquirySchema), submitPackageEnquiry);
+router.post("/transport", validate(transportEnquirySchema), submitTransportEnquiry);
+router.post("/custom", validate(customEnquirySchema), submitCustomEnquiry);
+router.post("/contact", validate(customEnquirySchema), submitCustomEnquiry);
 
-// 2. USER INQUIRY TRACKING (No login required - lookup by ?email=... or ?phone=...)
-router.get("/my-enquiries", getMyEnquiries);
+// 2. USER INQUIRY TRACKING
+router.get("/my-enquiries", validate(trackEnquiryQuerySchema, "query"), getMyEnquiries);
 
-// 3. ADMIN CRM & LEAD MANAGEMENT (Admin protected)
+// 3. ADMIN CRM & LEAD MANAGEMENT
 router.get("/admin/all", verifyAdmin, getAllEnquiriesAdmin);
-router.get("/admin/:id", verifyAdmin, getEnquiryByIdAdmin);
-router.patch("/admin/:id", verifyAdmin, updateEnquiryAdmin);
-router.delete("/admin/:id", verifyAdmin, deleteEnquiryAdmin);
+router.get("/admin/:id", verifyAdmin, validate(enquiryIdParamSchema, "params"), getEnquiryByIdAdmin);
+router.patch(
+    "/admin/:id",
+    verifyAdmin,
+    validate(enquiryIdParamSchema, "params"),
+    validate(updateEnquiryStatusSchema, "body"),
+    updateEnquiryAdmin
+);
+router.delete("/admin/:id", verifyAdmin, validate(enquiryIdParamSchema, "params"), deleteEnquiryAdmin);
 
 export default router;

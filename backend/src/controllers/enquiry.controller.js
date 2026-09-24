@@ -4,7 +4,13 @@ import Enquiry from "../models/enquiry.model.js";
 import Hotel from "../models/hotel.model.js";
 import Package from "../models/package.model.js";
 import Transport from "../models/transport.model.js";
-import { sendEnquiryConfirmationEmail } from "../utils/sendEmail.js";
+import {
+    sendHotelConfirmation,
+    sendFlightConfirmation,
+    sendPackageConfirmation,
+    sendTransportConfirmation,
+    sendCustomConfirmation,
+} from "../services/enquiryEmail.service.js";
 
 // Helper to optionally associate user if a token is present, without requiring login
 const getOptionalUserId = (req) => {
@@ -31,13 +37,6 @@ export const submitHotelEnquiry = async (req, res) => {
         const cName = req.body.customerName || req.body.name;
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
-
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
 
         const hData = req.body.hotelDetails || {};
 
@@ -176,57 +175,18 @@ export const submitHotelEnquiry = async (req, res) => {
             },
         });
 
-        // Trigger branded colorful confirmation email with logo
-        sendEnquiryConfirmationEmail({
-            customerName: enquiry.customerName,
-            customerEmail: enquiry.customerEmail,
-            enquiryCode: enquiry.enquiryCode,
-            enquiryType: "hotel",
-            specialRequests: enquiry.specialRequests,
-            detailsSummary: [
-                {
-                    label: "Hotel / Property",
-                    value: `${enquiry.hotelDetails.hotelName}${starRating ? ` (${starRating})` : ""}`,
-                },
-                ...(resolvedLocation ? [{ label: "Location / City", value: resolvedLocation }] : []),
-                ...(resolvedHotelSlug
-                    ? [
-                          {
-                              label: "Hotel Page & Slug",
-                              value: `<a href="${hotelPageUrl}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">/hotels/${resolvedHotelSlug}</a>`,
-                          },
-                      ]
-                    : []),
-                { label: "Room Type Booked", value: enquiry.hotelDetails.roomType || "Standard Room" },
-                { label: "Rooms Count", value: `${enquiry.hotelDetails.roomsCount} Room(s)` },
-                {
-                    label: "Check-in Date",
-                    value: enquiry.hotelDetails.checkInDate
-                        ? new Date(enquiry.hotelDetails.checkInDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })
-                        : "To be decided",
-                },
-                {
-                    label: "Check-out Date",
-                    value: enquiry.hotelDetails.checkOutDate
-                        ? new Date(enquiry.hotelDetails.checkOutDate).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })
-                        : "To be decided",
-                },
-                ...(stayDuration ? [{ label: "Stay Duration", value: stayDuration }] : []),
-                {
-                    label: "Guests Split",
-                    value: `${enquiry.hotelDetails.guests.adults} Adult(s)${enquiry.hotelDetails.guests.children ? `, ${enquiry.hotelDetails.guests.children} Child(ren)` : ""}`,
-                },
-                { label: "Meal Plan", value: enquiry.hotelDetails.mealPlan || "As per hotel policy" },
-                ...(resolvedPricePerNight > 0
-                    ? [
-                          { label: "Rate per Night", value: `₹${resolvedPricePerNight.toLocaleString("en-IN")}` },
-                          ...(resolvedTotalEstimatedPrice > 0
-                              ? [{ label: "Estimated Total Price", value: `₹${resolvedTotalEstimatedPrice.toLocaleString("en-IN")} (${totalRooms} Room(s) × ${nightsCount} Night(s))` }]
-                              : []),
-                      ]
-                    : []),
-            ],
-        }).catch((err) => console.error("[Hotel Enquiry Email Error]:", err.message));
+        // Trigger branded colorful confirmation email via enquiryEmail service
+        sendHotelConfirmation(enquiry, {
+            starRating,
+            resolvedLocation,
+            resolvedHotelSlug,
+            hotelPageUrl,
+            stayDuration,
+            resolvedPricePerNight,
+            resolvedTotalEstimatedPrice,
+            totalRooms,
+            nightsCount,
+        });
 
         return res.status(201).json({
             success: true,
@@ -249,13 +209,6 @@ export const submitFlightEnquiry = async (req, res) => {
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
 
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
-
         const fData = req.body.flightDetails || {};
         const fromCity = req.body.fromCity || fData.fromCity;
         const toCity = req.body.toCity || fData.toCity;
@@ -276,13 +229,6 @@ export const submitFlightEnquiry = async (req, res) => {
         const adults = Number(rawPassengers.adults || req.body.adults || fData.adults) || 1;
         const children = Number(rawPassengers.children || req.body.children || fData.children) || 0;
         const infants = Number(rawPassengers.infants || req.body.infants || fData.infants) || 0;
-
-        if (!fromCity || !toCity || !departureDate) {
-            return res.status(400).json({
-                success: false,
-                message: "Departure city, destination city, and departure date are required for flight inquiry.",
-            });
-        }
 
         const enquiry = await Enquiry.create({
             enquiryType: "flight",
@@ -307,35 +253,8 @@ export const submitFlightEnquiry = async (req, res) => {
             },
         });
 
-        // Trigger branded colorful confirmation email with logo
-        sendEnquiryConfirmationEmail({
-            customerName: enquiry.customerName,
-            customerEmail: enquiry.customerEmail,
-            enquiryCode: enquiry.enquiryCode,
-            enquiryType: "flight",
-            specialRequests: enquiry.specialRequests,
-            detailsSummary: [
-                { label: "Flight Route", value: `${enquiry.flightDetails.fromCity} ➔ ${enquiry.flightDetails.toCity}` },
-                { label: "Trip Mode", value: enquiry.flightDetails.tripType === "round_trip" ? "Round Trip" : "One Way" },
-                {
-                    label: "Departure Date",
-                    value: enquiry.flightDetails.departureDate
-                        ? new Date(enquiry.flightDetails.departureDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        : "",
-                },
-                {
-                    label: "Return Date",
-                    value: enquiry.flightDetails.returnDate
-                        ? new Date(enquiry.flightDetails.returnDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        : "N/A (One Way)",
-                },
-                { label: "Cabin Class", value: enquiry.flightDetails.travelClass },
-                {
-                    label: "Passengers",
-                    value: `${enquiry.flightDetails.passengers.adults} Adults${enquiry.flightDetails.passengers.children ? `, ${enquiry.flightDetails.passengers.children} Children` : ""}${enquiry.flightDetails.passengers.infants ? `, ${enquiry.flightDetails.passengers.infants} Infants` : ""}`,
-                },
-            ],
-        }).catch((err) => console.error("[Flight Enquiry Email Error]:", err.message));
+        // Trigger branded confirmation email via enquiryEmail service
+        sendFlightConfirmation(enquiry);
 
         return res.status(201).json({
             success: true,
@@ -357,13 +276,6 @@ export const submitPackageEnquiry = async (req, res) => {
         const cName = req.body.customerName || req.body.name;
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
-
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
 
         const pData = req.body.packageDetails || {};
 
@@ -483,48 +395,15 @@ export const submitPackageEnquiry = async (req, res) => {
             },
         });
 
-        // Trigger branded colorful confirmation email with logo
-        sendEnquiryConfirmationEmail({
-            customerName: enquiry.customerName,
-            customerEmail: enquiry.customerEmail,
-            enquiryCode: enquiry.enquiryCode,
-            enquiryType: enquiryCategory,
-            specialRequests: enquiry.specialRequests,
-            detailsSummary: [
-                { label: "Tour Package", value: enquiry.packageDetails.packageTitle || "Customized Travel Itinerary" },
-                ...(resolvedPkgSlug
-                    ? [
-                          {
-                              label: "Package Page & Slug",
-                              value: `<a href="${packagePageUrl}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">/packages/${resolvedPkgSlug}</a>`,
-                          },
-                      ]
-                    : []),
-                ...(pkgDoc?.destination?.name
-                    ? [{ label: "Destination", value: `${pkgDoc.destination.name}${pkgDoc.destination.state ? `, ${pkgDoc.destination.state}` : ""}` }]
-                    : []),
-                { label: "Trip Category", value: (enquiry.packageDetails.packageCategory || "holiday").toUpperCase() },
-                {
-                    label: "Tentative Date",
-                    value: enquiry.packageDetails.travelDate
-                        ? new Date(enquiry.packageDetails.travelDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        : "Flexible Dates",
-                },
-                { label: "Duration", value: `${enquiry.packageDetails.durationDays} Days` },
-                {
-                    label: "Travelers",
-                    value: `${enquiry.packageDetails.travelers.adults} Adults${enquiry.packageDetails.travelers.children ? `, ${enquiry.packageDetails.travelers.children} Children` : ""}`,
-                },
-                ...(resolvedPricePerPerson > 0
-                    ? [
-                          { label: "Price per Person", value: `₹${resolvedPricePerPerson.toLocaleString("en-IN")}` },
-                          ...(resolvedTotalEstimatedPrice > 0
-                              ? [{ label: "Estimated Package Total", value: `₹${resolvedTotalEstimatedPrice.toLocaleString("en-IN")} (${totalTravelers} Traveler${totalTravelers > 1 ? "s" : ""})` }]
-                              : []),
-                      ]
-                    : []),
-            ],
-        }).catch((err) => console.error("[Package Enquiry Email Error]:", err.message));
+        // Trigger branded confirmation email via enquiryEmail service
+        sendPackageConfirmation(enquiry, {
+            packagePageUrl,
+            resolvedPkgSlug,
+            pkgDoc,
+            resolvedPricePerPerson,
+            resolvedTotalEstimatedPrice,
+            totalTravelers,
+        });
 
         return res.status(201).json({
             success: true,
@@ -546,13 +425,6 @@ export const submitTransportEnquiry = async (req, res) => {
         const cName = req.body.customerName || req.body.name;
         const cEmail = req.body.customerEmail || req.body.email;
         const cPhone = req.body.customerPhone || req.body.phoneNumber || req.body.phone;
-
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
 
         const tData = req.body.transportDetails || {};
 
@@ -675,37 +547,12 @@ export const submitTransportEnquiry = async (req, res) => {
             },
         });
 
-        // Trigger branded colorful confirmation email with logo
-        sendEnquiryConfirmationEmail({
-            customerName: enquiry.customerName,
-            customerEmail: enquiry.customerEmail,
-            enquiryCode: enquiry.enquiryCode,
-            enquiryType: "transport",
-            specialRequests: enquiry.specialRequests,
-            detailsSummary: [
-                { label: "Category", value: enquiry.transportDetails.category },
-                { label: "Vehicle Model", value: enquiry.transportDetails.vehicleType || "Selected Category Fleet" },
-                ...(resolvedVehicleSlug
-                    ? [
-                          {
-                              label: "Vehicle Details Link",
-                              value: `<a href="${transportPageUrl}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">/transport/${resolvedVehicleSlug}</a>`,
-                          },
-                      ]
-                    : []),
-                { label: "Service Type", value: enquiry.transportDetails.serviceType },
-                { label: "Pickup City / Location", value: enquiry.transportDetails.pickupLocation || "As agreed" },
-                { label: "Drop Destination", value: enquiry.transportDetails.dropLocation || "As agreed / Local Rental" },
-                {
-                    label: "Pickup Schedule",
-                    value: `${enquiry.transportDetails.pickupDate ? new Date(enquiry.transportDetails.pickupDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD"} ${enquiry.transportDetails.pickupTime || ""}`.trim(),
-                },
-                { label: "Passengers", value: `${enquiry.transportDetails.passengersCount} Person(s)` },
-                ...(resolvedEstimatedPrice > 0
-                    ? [{ label: "Estimated Rental / Fare", value: `₹${resolvedEstimatedPrice.toLocaleString("en-IN")}` }]
-                    : []),
-            ],
-        }).catch((err) => console.error("[Transport Enquiry Email Error]:", err.message));
+        // Trigger branded confirmation email via enquiryEmail service
+        sendTransportConfirmation(enquiry, {
+            transportPageUrl,
+            resolvedVehicleSlug,
+            resolvedEstimatedPrice,
+        });
 
         return res.status(201).json({
             success: true,
@@ -731,13 +578,6 @@ export const submitCustomEnquiry = async (req, res) => {
         const subject = req.body.subject || req.body.tripType || "General Travel Inquiry";
         const city = req.body.city || "";
 
-        if (!cName || !cEmail || !cPhone) {
-            return res.status(400).json({
-                success: false,
-                message: "Customer name, email, and phone number are required.",
-            });
-        }
-
         const enquiry = await Enquiry.create({
             enquiryType: "custom",
             user: getOptionalUserId(req),
@@ -748,19 +588,8 @@ export const submitCustomEnquiry = async (req, res) => {
             specialRequests: message ? String(message).trim() : (subject ? String(subject).trim() : ""),
         });
 
-        // Trigger branded colorful confirmation email with logo
-        sendEnquiryConfirmationEmail({
-            customerName: enquiry.customerName,
-            customerEmail: enquiry.customerEmail,
-            enquiryCode: enquiry.enquiryCode,
-            enquiryType: "custom",
-            specialRequests: enquiry.specialRequests,
-            detailsSummary: [
-                { label: "Inquiry Nature", value: subject || "Custom Voyage / General Inquiry" },
-                ...(city ? [{ label: "Customer City / Origin", value: city }] : []),
-                { label: "Message / Request", value: enquiry.specialRequests || "Requested travel consultation" },
-            ],
-        }).catch((err) => console.error("[Custom Enquiry Email Error]:", err.message));
+        // Trigger branded confirmation email via enquiryEmail service
+        sendCustomConfirmation(enquiry, { subject, city });
 
         return res.status(201).json({
             success: true,
@@ -883,13 +712,6 @@ export const getEnquiryByIdAdmin = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid inquiry ID format",
-            });
-        }
-
         const enquiry = await Enquiry.findById(id)
             .populate("hotelDetails.hotelId")
             .populate("packageDetails.packageId")
@@ -921,13 +743,6 @@ export const updateEnquiryAdmin = async (req, res) => {
     try {
         const { id } = req.params;
         const { status, quotedPrice, adminNote } = req.body;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid inquiry ID format",
-            });
-        }
 
         const updates = {};
         if (status) updates.status = status;
@@ -975,13 +790,6 @@ export const updateEnquiryAdmin = async (req, res) => {
 export const deleteEnquiryAdmin = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid inquiry ID format",
-            });
-        }
 
         const deleted = await Enquiry.findByIdAndDelete(id);
         if (!deleted) {
