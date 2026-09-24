@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "baseUrl": "./Frontend",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "Frontend/next-env.d.ts",
+    "Frontend/**/*.ts",
+    "Frontend/**/*.tsx"
+  ],
+  "exclude": ["node_modules", "Frontend/node_modules", "backend"]
+}

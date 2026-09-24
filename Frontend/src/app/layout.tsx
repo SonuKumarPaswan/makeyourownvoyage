@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
+import SmoothScroll from "@/components/common/SmoothScroll";
 
 const siteUrl = "https://www.makeyourownvoyage.com";
 
@@ -100,9 +101,11 @@ export default function RootLayout({
   return (
     <html lang="en-IN">
       <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <SmoothScroll>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </SmoothScroll>
       </body>
     </html>
   );

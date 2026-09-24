@@ -1,299 +1,152 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "./BrandLogo";
+import { Mail, Phone, MapPin, Sparkles, Send } from "lucide-react";
 
-const Footer = () => {
+export const Footer: React.FC = () => {
   return (
-    <footer className="bg-heading text-white">
-      {/* Main Footer */}
-      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
-        <div className="grid gap-10 lg:grid-cols-12">
-          {/* Brand */}
-          <div className="lg:col-span-4">
-            <Link href="/" className="inline-flex items-center gap-3">
-              
-                <Image
-                  src="/logo.png"
-                  alt="Make Your Own Voyage"
-                  width={130}
-                  height={50}
-                  priority
-                  className="h-14 w-auto object-contain rounded-full"
-                />
-             
-
-              <div>
-                <p className="text-lg font-bold leading-tight">Make Your Own</p>
-                <p className="text-sm font-semibold text-secondary text-center">-------Voyage-------</p>
-              </div>
-            </Link>
-
-            <p className="mt-5 max-w-sm text-sm leading-7 text-white/65">
-              Your trusted travel partner for flights, hotels, cabs and
-              unforgettable holiday packages. Plan your journey your way.
+    <footer className="bg-[#071324] text-white border-t-2 border-[#d4af37]/30">
+      {/* Main Footer Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
+          {/* Col 1: Brand & Tagline */}
+          <div className="lg:col-span-4 space-y-4">
+            <BrandLogo />
+            <p className="text-xs sm:text-sm text-gray-300 font-light leading-relaxed max-w-sm pt-2">
+              Make Your Own Voyage is India's premier bespoke luxury travel and MICE concierge. Crafting extraordinary journeys with zero compromise on comfort.
             </p>
 
-            {/* Social Links */}
-            <div className="mt-6 flex gap-3">
-              <SocialLink href="#" label="Facebook">
-                f
-              </SocialLink>
-
-              <SocialLink href="#" label="Instagram">
-                ◎
-              </SocialLink>
-
-              <SocialLink href="#" label="Twitter">
-                𝕏
-              </SocialLink>
-
-              <SocialLink href="#" label="LinkedIn">
-                in
-              </SocialLink>
+            <div className="pt-2">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#d4af37] block mb-2">
+                Certified Travel Partner
+              </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-[#d4af37]/30 bg-[#0a192f] text-gray-300 text-xs">
+                <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" /> 100% Verified Inventory & Chauffeurs
+              </div>
             </div>
           </div>
 
-          {/* Company */}
+          {/* Col 2: Destinations & States */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
-              Company
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 pb-2 border-b border-[#d4af37]/30">
+              Voyage Catalog
             </h3>
-
-            <ul className="mt-5 space-y-3">
-              <FooterLink href="/">Home</FooterLink>
-              <FooterLink href="/about">About Us</FooterLink>
-              <FooterLink href="/contact">Contact Us</FooterLink>
-              <FooterLink href="/blog">Travel Blog</FooterLink>
-              <FooterLink href="/destinations">Destinations</FooterLink>
+            <ul className="space-y-2.5 text-xs text-gray-300">
+              <li>
+                <Link href="/packages" className="hover:text-[#d4af37] transition-colors">
+                  Holiday Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/states" className="hover:text-[#d4af37] transition-colors">
+                  States & Regions
+                </Link>
+              </li>
+              <li>
+                <Link href="/destinations" className="hover:text-[#d4af37] transition-colors">
+                  Top Destinations
+                </Link>
+              </li>
+              <li>
+                <Link href="/hotels" className="hover:text-[#d4af37] transition-colors">
+                  Hotels & Resorts
+                </Link>
+              </li>
+              <li>
+                <Link href="/packages?type=weekend" className="hover:text-[#d4af37] transition-colors">
+                  Weekend Escapes
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Services */}
-          <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
-              Services
+          {/* Col 3: Transport & Fleet */}
+          <div className="lg:col-span-3">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 pb-2 border-b border-[#d4af37]/30">
+              Fleet & Mobility
             </h3>
-
-            <ul className="mt-5 space-y-3">
-              <FooterLink href="/flights">Flights</FooterLink>
-              <FooterLink href="/hotels">Hotels</FooterLink>
-              <FooterLink href="/cabs">Cabs</FooterLink>
-              <FooterLink href="/packages">Tour Packages</FooterLink>
-              <FooterLink href="/packages">Holiday Packages</FooterLink>
+            <ul className="space-y-2.5 text-xs text-gray-300">
+              <li>
+                <Link href="/services/transport/cabs" className="hover:text-[#d4af37] transition-colors">
+                  Outstation & Airport Cabs
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/transport/bikes" className="hover:text-[#d4af37] transition-colors">
+                  Royal Enfield & Bike Rentals
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/transport/buses" className="hover:text-[#d4af37] transition-colors">
+                  Luxury Volvo & Sleeper Buses
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/transport/traveller" className="hover:text-[#d4af37] transition-colors">
+                  12-26 Seater Tempo Travellers
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="hover:text-[#d4af37] transition-colors">
+                  Corporate MICE Logistics
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Support */}
-          <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
-              Support
+          {/* Col 4: Concierge Contact */}
+          <div className="lg:col-span-3">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 pb-2 border-b border-[#d4af37]/30">
+              Concierge Desk
             </h3>
+            <div className="space-y-3 text-xs text-gray-300">
+              <div className="flex items-start gap-2.5">
+                <MapPin className="w-4 h-4 text-[#d4af37] shrink-0 mt-0.5" />
+                <span>Voyage Corporate Towers, Connaught Place, New Delhi, India</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-[#d4af37] shrink-0" />
+                <span>+91 98765 43210 / +91 11 2345 6789</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-[#d4af37] shrink-0" />
+                <span>concierge@makeyourownvoyage.com</span>
+              </div>
+            </div>
 
-            <ul className="mt-5 space-y-3">
-              <FooterLink href="/faq">FAQs</FooterLink>
-              <FooterLink href="/contact">Help Center</FooterLink>
-              <FooterLink href="/terms">Terms & Conditions</FooterLink>
-              <FooterLink href="/privacy">Privacy Policy</FooterLink>
-              <FooterLink href="/cancellation">Cancellation Policy</FooterLink>
-            </ul>
-          </div>
-
-          {/* Newsletter */}
-          <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
-              Stay Updated
-            </h3>
-
-            <p className="mt-5 text-sm leading-6 text-white/60">
-              Get travel deals, offers and destination inspiration in your
-              inbox.
-            </p>
-
-            <form className="mt-4">
-              <div className="flex overflow-hidden rounded-xl border border-white/10 bg-white/5">
+            {/* Newsletter Input */}
+            <div className="mt-5">
+              <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold block mb-2">
+                Exclusive Travel Privileges:
+              </span>
+              <div className="flex">
                 <input
                   type="email"
-                  placeholder="Your email"
-                  className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-white outline-none placeholder:text-white/40"
+                  placeholder="Enter your email"
+                  className="bg-[#0a192f] border border-gray-700 px-3 py-2 text-xs text-white focus:outline-none placeholder-gray-500 w-full"
                 />
-
                 <button
-                  type="submit"
-                  aria-label="Subscribe"
-                  className="flex w-12 shrink-0 items-center justify-center bg-primary text-white transition hover:bg-primary-hover"
+                  type="button"
+                  className="bg-[#d4af37] text-[#0a192f] px-3 font-bold border border-[#d4af37] hover:bg-white transition-colors"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m5 12 14-7-4 14-3-6-7-1Z"
-                    />
-                  </svg>
+                  <Send className="w-3.5 h-3.5" />
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div className="mt-12 grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-3">
-          <ContactItem
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 21s7-5.5 7-12a7 7 0 1 0-14 0c0 6.5 7 12 7 12Z"
-                />
-                <circle cx="12" cy="9" r="2.5" />
-              </svg>
-            }
-            title="Our Location"
-            value="India"
-          />
-
-          <ContactItem
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 4h16v16H4z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m4 6 8 6 8-6"
-                />
-              </svg>
-            }
-            title="Email Us"
-            value="support@makeyourownvoyage.com"
-          />
-
-          <ContactItem
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1C10.7 20 4 13.3 4 5a1 1 0 0 1 1-1Z"
-                />
-              </svg>
-            }
-            title="Call Us"
-            value="+91 00000 00000"
-          />
-        </div>
-      </div>
-
-      {/* Bottom Footer */}
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 text-center sm:flex-row sm:text-left lg:px-8">
-          <p className="text-sm text-white/50">
-            © {new Date().getFullYear()} Make Your Own Voyage. All rights
-            reserved.
-          </p>
-
-          <p className="text-sm text-white/50">
-            Made for travelers, by travelers ✈️
-          </p>
+        {/* Bottom Copyright Strip */}
+        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+          <p>© {new Date().getFullYear()} MAKE YOUR OWN VOYAGE. All rights reserved.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact Concierge</Link>
+          </div>
         </div>
       </div>
     </footer>
-  );
-};
-
-/* Footer Link */
-const FooterLink = ({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) => {
-  return (
-    <li>
-      <Link
-        href={href}
-        className="text-sm text-white/60 transition hover:text-white"
-      >
-        {children}
-      </Link>
-    </li>
-  );
-};
-
-/* Social Link */
-const SocialLink = ({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}) => {
-  return (
-    <a
-      href={href}
-      aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-bold text-white/70 transition hover:border-primary hover:bg-primary hover:text-white"
-    >
-      {children}
-    </a>
-  );
-};
-
-/* Contact Item */
-const ContactItem = ({
-  icon,
-  title,
-  value,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-}) => {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-secondary">
-        {icon}
-      </div>
-
-      <div>
-        <p className="text-xs text-white/40">{title}</p>
-        <p className="mt-0.5 text-sm font-medium text-white/75">{value}</p>
-      </div>
-    </div>
   );
 };
 

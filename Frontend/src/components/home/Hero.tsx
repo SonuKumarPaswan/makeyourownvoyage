@@ -36,6 +36,7 @@ const Hero = ({ data }: HeroProps = {}) => {
           src={mobileImage}
           alt={hero?.title || "Travel destination - Make Your Own Voyage"}
           fill
+          priority
           sizes="(max-width: 767px) 100vw, 0px"
           className="object-cover md:hidden"
         />
