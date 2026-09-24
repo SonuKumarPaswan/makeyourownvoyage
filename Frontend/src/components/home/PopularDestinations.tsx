@@ -32,7 +32,7 @@ const packages = [
     duration: "6 Days / 5 Nights",
     price: "₹21,999",
     image:
-      "https://images.unsplash.com/photo-1595815771614-ade9d1f0a2f2?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=1200&auto=format&fit=crop",
     slug: "kashmir-paradise",
   },
   {

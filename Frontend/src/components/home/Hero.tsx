@@ -24,7 +24,7 @@ const Hero = ({ data }: HeroProps) => {
           alt={hero.title}
           fill
           priority
-          sizes="100vw"
+          sizes="(min-width: 768px) 100vw, 0px"
           className="hidden object-cover md:block"
         />
 
@@ -33,7 +33,7 @@ const Hero = ({ data }: HeroProps) => {
           src={hero.bannerImage.mobile}
           alt={hero.title}
           fill
-          sizes="100vw"
+          sizes="(max-width: 767px) 100vw, 0px"
           className="object-cover md:hidden"
         />
       </div>
