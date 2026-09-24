@@ -32,7 +32,7 @@ const TravelSearch = () => {
   ];
 
   return (
-    <section className="relative z-20 -mt-24 px-4 sm:px-6 lg:px-8">
+    <section className="relative z-20 -mt-34 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
           {/* Tabs */}

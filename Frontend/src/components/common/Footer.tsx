@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const Footer = () => {
   return (
@@ -10,17 +11,20 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-xl">
-                ✈️
-              </div>
+              
+                <Image
+                  src="/logo.png"
+                  alt="Make Your Own Voyage"
+                  width={130}
+                  height={50}
+                  priority
+                  className="h-14 w-auto object-contain rounded-full"
+                />
+             
 
               <div>
-                <p className="text-lg font-bold leading-tight">
-                  Make Your Own
-                </p>
-                <p className="text-sm font-semibold text-secondary">
-                  Voyage
-                </p>
+                <p className="text-lg font-bold leading-tight">Make Your Own</p>
+                <p className="text-sm font-semibold text-secondary text-center">-------Voyage-------</p>
               </div>
             </Link>
 
@@ -90,9 +94,7 @@ const Footer = () => {
               <FooterLink href="/contact">Help Center</FooterLink>
               <FooterLink href="/terms">Terms & Conditions</FooterLink>
               <FooterLink href="/privacy">Privacy Policy</FooterLink>
-              <FooterLink href="/cancellation">
-                Cancellation Policy
-              </FooterLink>
+              <FooterLink href="/cancellation">Cancellation Policy</FooterLink>
             </ul>
           </div>
 
@@ -289,9 +291,7 @@ const ContactItem = ({
 
       <div>
         <p className="text-xs text-white/40">{title}</p>
-        <p className="mt-0.5 text-sm font-medium text-white/75">
-          {value}
-        </p>
+        <p className="mt-0.5 text-sm font-medium text-white/75">{value}</p>
       </div>
     </div>
   );
