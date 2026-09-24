@@ -1,4 +1,4 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 
 import Hero from "@/components/home/Hero";
 import TravelSearch from "@/components/home/TravelSearch";
@@ -12,16 +12,7 @@ import Testimonials from "@/components/home/Testimonials";
 import TravelBlog from "@/components/home/TravelBlog";
 import FAQ from "@/components/home/FAQ";
 import CTASection from "@/components/home/CTASection";
-import { getHomepageFeed } from "@/lib/api/homepage-feed";
 
-
-
-export default async function HomePage() {
-
-  const feed = await getHomepageFeed()
- 
-
-<<<<<<< HEAD
 export const metadata: Metadata = {
   title: "Make Your Own Voyage | Flights, Hotels & Holiday Packages",
 
@@ -47,11 +38,14 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "Make Your Own Voyage | Flights, Hotels & Holiday Packages",
+
     description:
       "Book flights, hotels and holiday packages with Make Your Own Voyage. Explore destinations and plan your next journey.",
+
     url: "https://www.makeyourownvoyage.com/",
     siteName: "Make Your Own Voyage",
     type: "website",
+
     images: [
       {
         url: "https://www.makeyourownvoyage.com/og-image.jpg",
@@ -65,8 +59,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Make Your Own Voyage | Flights, Hotels & Holiday Packages",
+
     description:
       "Book flights, hotels and holiday packages with Make Your Own Voyage.",
+
     images: ["https://www.makeyourownvoyage.com/og-image.jpg"],
   },
 
@@ -76,16 +72,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+ 
+
   return (
     <>
       <Hero />
 
-=======
-  return (
-    <>
-      <Hero data={feed.data.seasonalSection.collections} />
->>>>>>> 22afc7bef053999edc7ea6975a87df713b1a8e2c
       <TravelSearch />
 
       <PopularDestinations />

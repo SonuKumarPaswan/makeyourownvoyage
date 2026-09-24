@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const navLinks = [
   {
@@ -34,32 +35,27 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-white/95 shadow-sm backdrop-blur-md">
-      <nav className="mx-auto max-w-7xl px-6 lg:px-8">
+    <header className="sticky top-0 z-99 border-b border-border bg-white/95 shadow-sm backdrop-blur-md">
+      <nav className="mx-auto max-w-7xl px-6 lg:px-4">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3"
+            className="flex items-center"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-xl text-white shadow-sm">
-              ✈️
-            </div>
-
-            <div className="hidden sm:block">
-              <p className="text-lg font-bold leading-tight text-heading">
-                Make Your Own
-              </p>
-
-              <p className="text-sm font-semibold leading-tight text-primary">
-                Voyage
-              </p>
-            </div>
-
-            <span className="text-lg font-bold text-heading sm:hidden">
-              MYO<span className="text-primary">V</span>
-            </span>
+            <Image
+              src="/logo.png"
+              alt="Make Your Own Voyage"
+              width={130}
+              height={50}
+              priority
+              className="h-14 w-auto object-contain rounded-full"
+            />
+              <div className="pl-3">
+                <p className="text-lg font-bold leading-tight">Make Your Own</p>
+                <p className="text-sm font-semibold text-secondary text-center">-------Voyage-------</p>
+              </div>
           </Link>
 
           {/* Desktop Navigation */}
