@@ -1,5 +1,5 @@
 import React from "react";
-import { LoaderCircle, Plane } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 export default function Loading() {
   return (
@@ -13,7 +13,7 @@ export default function Loading() {
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* Logo / Icon */}
         <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg">
-          <Plane className="h-9 w-9 rotate-[-10deg] text-white" />
+          <MaterialIcon name="flight" size={36} className="text-white -rotate-12" />
 
           {/* Spinner */}
           <div className="absolute inset-0 rounded-2xl border-2 border-white/20" />
@@ -32,7 +32,7 @@ export default function Loading() {
 
         {/* Loader */}
         <div className="mt-6 flex items-center gap-3">
-          <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
+          <MaterialIcon name="progress_activity" size={24} className="animate-spin text-primary" />
 
           <span className="text-sm font-medium text-muted">
             Loading

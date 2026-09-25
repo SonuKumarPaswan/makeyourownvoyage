@@ -2,7 +2,7 @@
 export interface SearchSuggestion {
     title: string;
     slug: string;
-    type: "destination" | "package" | "hotel" | "transport";
+    type: "destination" | "state" | "package" | "hotel" | "transport" | "activity";
     url: string;
     subtitle: string;
     image?: string;

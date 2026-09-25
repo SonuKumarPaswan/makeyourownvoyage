@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
 import TravelSearch from "@/components/home/TravelSearch";
+import TravelStyles from "@/components/home/TravelStyles";
 import PopularDestinations from "@/components/home/PopularDestinations";
 import FeaturedPackages from "@/components/home/FeaturedPackages";
+import TourExperiences from "@/components/home/TourExperiences";
 import FlightDeals from "@/components/home/FlightDeals";
 import HotelDeals from "@/components/home/HotelDeals";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -71,22 +73,63 @@ export const metadata: Metadata = {
   },
 };
 
+import { getHomepageFeed } from "@/lib/api/homepage-feed";
+import { getPackages } from "@/lib/api/packages.api";
+import { getDestinations } from "@/lib/api/destinations.api";
+import { getStates } from "@/lib/api/states.api";
+import { hotelsApi } from "@/lib/api/hotels.api";
+import type { Collection } from "@/types/homepage-feed";
+
 export default async function HomePage() {
- 
+  let feedData = null;
+  let packagesData = null;
+  let destinationsData = null;
+  let statesData = null;
+  let hotelsData = null;
+
+  try {
+    const [feedRes, pkgRes, destRes, statesRes, hotelRes] = await Promise.all([
+      getHomepageFeed().catch(() => null),
+      getPackages({ limit: 12 }).catch(() => null),
+      getDestinations({ limit: 12 }).catch(() => null),
+      getStates().catch(() => null),
+      hotelsApi.getAllHotels({ limit: 10 }).catch(() => null),
+    ]);
+    feedData = feedRes;
+    packagesData = Array.isArray(pkgRes?.data) ? pkgRes.data : [];
+    destinationsData = Array.isArray(destRes?.data) ? destRes.data : [];
+    statesData = Array.isArray(statesRes?.data) ? statesRes.data : [];
+    hotelsData = Array.isArray((hotelRes as any)?.data?.hotels)
+      ? (hotelRes as any).data.hotels
+      : Array.isArray((hotelRes as any)?.hotels)
+      ? (hotelRes as any).hotels
+      : Array.isArray((hotelRes as any)?.data)
+      ? (hotelRes as any).data
+      : [];
+  } catch (error) {
+    console.error("Failed to fetch backend homepage data:", error);
+  }
 
   return (
     <>
-      <Hero />
+      <Hero initialFeed={feedData} initialPackages={packagesData} />
 
       <TravelSearch />
 
-      <PopularDestinations />
+      <TravelStyles />
+
+      <PopularDestinations
+        initialDestinations={destinationsData}
+        initialStates={statesData}
+      />
 
       <FeaturedPackages />
 
-      <FlightDeals />
+      <HotelDeals initialHotels={hotelsData} />
 
-      <HotelDeals />
+      <FlightDeals />
+      <TourExperiences />
+
 
       <WhyChooseUs />
 
