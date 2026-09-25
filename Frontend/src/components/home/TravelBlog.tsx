@@ -11,8 +11,7 @@ const blogs = [
     category: "Travel Guide",
     date: "Sep 15, 2026",
     readTime: "6 min read",
-    image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=1200&auto=format&fit=crop",
+    gradient: "from-amber-900 via-orange-950 to-slate-900",
     slug: "best-places-to-visit-in-india-2026",
   },
   {
@@ -23,8 +22,7 @@ const blogs = [
     category: "Destination Guide",
     date: "Sep 10, 2026",
     readTime: "5 min read",
-    image:
-      "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1200&auto=format&fit=crop",
+    gradient: "from-teal-900 via-emerald-950 to-slate-900",
     slug: "complete-goa-travel-guide",
   },
   {
@@ -35,28 +33,28 @@ const blogs = [
     category: "Travel Tips",
     date: "Sep 05, 2026",
     readTime: "4 min read",
-    image:
-      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1200&auto=format&fit=crop",
+    gradient: "from-indigo-950 via-slate-900 to-slate-950",
     slug: "budget-friendly-vacation-tips",
   },
 ];
 
 const TravelBlog = () => {
   return (
-    <section className="bg-white py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="bg-background py-14 sm:py-20 border-t border-border/40">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
-              Travel Inspiration
-            </p>
+            <div className="flex items-center gap-2 text-xs font-normal text-muted">
+              <span className="text-primary text-sm leading-none">✦</span>
+              <span>Travel Inspiration</span>
+            </div>
 
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="mt-4 text-3xl sm:text-4xl font-normal leading-[1.15] text-heading font-serif tracking-tight">
               Travel Stories & Tips
             </h2>
 
-            <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted font-normal">
               Get travel inspiration, destination guides and useful tips to
               make your next journey even better.
             </p>
@@ -64,9 +62,9 @@ const TravelBlog = () => {
 
           <Link
             href="/blog"
-            className="inline-flex shrink-0 items-center gap-2 font-semibold text-primary transition hover:text-primary-hover"
+            className="inline-flex shrink-0 items-center gap-2 font-medium text-primary transition hover:text-primary-hover"
           >
-            View All Articles
+            <span>View All Articles</span>
             <span>→</span>
           </Link>
         </div>
@@ -78,22 +76,19 @@ const TravelBlog = () => {
               key={blog.id}
               className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              {/* Image */}
+              {/* Image / Gradient Banner */}
               <Link href={`/blog/${blog.slug}`}>
-                <div className="relative h-56 overflow-hidden">
-                  <Image
-                    src={blog.image}
-                    alt={blog.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition duration-500 group-hover:scale-105"
-                  />
+                <div className={`relative h-48 overflow-hidden bg-gradient-to-br ${blog.gradient} flex items-center justify-center p-6 text-center`}>
+                  <div>
+                    <span className="text-3xl text-[#d4af37]/60 block mb-1 font-serif">✦</span>
+                    <span className="text-white/80 text-xs font-normal">{blog.category}</span>
+                  </div>
 
                   {/* Image Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
                   {/* Category */}
-                  <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-primary shadow-sm">
+                  <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-primary shadow-sm">
                     {blog.category}
                   </span>
                 </div>

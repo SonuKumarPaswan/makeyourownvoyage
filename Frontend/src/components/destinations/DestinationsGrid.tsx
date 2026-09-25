@@ -37,11 +37,10 @@ export default function DestinationsGrid({
             <Link
               key={cat.value}
               href={cat.value === "all" ? "/destinations" : `/destinations?type=${cat.value}`}
-              className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all border ${
-                activeType === cat.value
+              className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all border ${activeType === cat.value
                   ? "bg-[#d4af37] text-[#0a192f] border-[#d4af37] shadow-sm"
                   : "bg-white text-slate-700 border-[#e8e3d9] hover:border-[#d4af37] hover:text-[#d4af37]"
-              }`}
+                }`}
             >
               {cat.label}
             </Link>

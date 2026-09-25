@@ -179,7 +179,7 @@ export const Navbar: React.FC = () => {
                   <div key={link.href} className="relative group/services py-5">
                     <Link
                       href={link.href}
-                      className={`relative group px-3 py-2 text-xs uppercase tracking-widest font-semibold transition-colors duration-200 bg-transparent flex items-center gap-1 ${
+                      className={`relative group px-3.5 py-2 text-sm font-medium transition-colors duration-200 bg-transparent flex items-center gap-1 ${
                         isActive
                           ? "text-[#d4af37]"
                           : "text-gray-200"
@@ -190,7 +190,7 @@ export const Navbar: React.FC = () => {
 
                       {/* Underline Stick */}
                       <span
-                        className={`absolute bottom-0 left-0 h-[2.5px] w-full bg-[#d4af37] transition-transform duration-300 ease-out origin-right group-hover:origin-left ${
+                        className={`absolute bottom-0 left-0 h-[2px] w-full bg-[#d4af37] transition-transform duration-300 ease-out origin-right group-hover:origin-left ${
                           isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                         }`}
                       />
@@ -217,10 +217,10 @@ export const Navbar: React.FC = () => {
 
                                 {/* Text content */}
                                 <div className="flex flex-col min-w-0 flex-1">
-                                  <span className="text-[13px] font-bold text-[#0a192f] group-hover/item:text-black transition-colors leading-tight">
+                                  <span className="text-[13px] font-medium text-[#0a192f] group-hover/item:text-black transition-colors leading-tight">
                                     {item.title}
                                   </span>
-                                  <span className="text-[11px] text-slate-500 group-hover/item:text-black/80 font-medium truncate leading-snug mt-0.5 transition-colors">
+                                  <span className="text-[11px] text-slate-500 group-hover/item:text-black/80 font-normal truncate leading-snug mt-0.5 transition-colors">
                                     {item.description}
                                   </span>
                                 </div>
@@ -238,7 +238,7 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative group px-3 py-2 text-xs uppercase tracking-widest font-semibold transition-colors duration-200 bg-transparent ${
+                  className={`relative group px-3.5 py-2 text-sm font-medium transition-colors duration-200 bg-transparent ${
                     isActive
                       ? "text-[#d4af37]"
                       : "text-gray-200"
@@ -248,7 +248,7 @@ export const Navbar: React.FC = () => {
 
                   {/* Underline Stick: Enters from Left on hover, Exits to Right on unhover */}
                   <span
-                    className={`absolute bottom-0 left-0 h-[2.5px] w-full bg-[#d4af37] transition-transform duration-300 ease-out origin-right group-hover:origin-left ${
+                    className={`absolute bottom-0 left-0 h-[2px] w-full bg-[#d4af37] transition-transform duration-300 ease-out origin-right group-hover:origin-left ${
                       isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     }`}
                   />
@@ -268,9 +268,9 @@ export const Navbar: React.FC = () => {
               <Button
                 variant="primary"
                 size="sm"
-                className="group uppercase tracking-widest text-[11px] font-bold py-2.5 px-4 flex items-center gap-1.5 shadow-md overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                className="group text-xs font-medium py-2.5 px-4 flex items-center gap-1.5 shadow-md overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
               >
-                <FlipText text="Explore Trips" className="text-black" flippedClassName="text-black font-black" />
+                <FlipText text="Explore Trips" className="text-black" flippedClassName="text-black" />
                 <MaterialIcon name="arrow_forward" size={16} className="transition-transform duration-300 group-hover:translate-x-1 text-black" />
               </Button>
             </Link>
@@ -311,7 +311,7 @@ export const Navbar: React.FC = () => {
                         <Link
                           href={link.href}
                           onClick={() => setIsOpen(false)}
-                          className={`group text-xs font-bold uppercase tracking-wider ${
+                          className={`group text-sm font-medium ${
                             isActive ? "text-[#d4af37]" : "text-gray-200"
                           }`}
                         >
@@ -340,7 +340,7 @@ export const Navbar: React.FC = () => {
                                 key={item.title}
                                 href={item.href}
                                 onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-300 hover:text-[#d4af37]"
+                                className="flex items-center gap-2.5 px-3 py-2 text-xs font-normal text-gray-300 hover:text-[#d4af37]"
                               >
                                 <MaterialIcon name={item.iconName} className="text-[#d4af37]" size={16} />
                                 <span>{item.title}</span>
@@ -358,7 +358,7 @@ export const Navbar: React.FC = () => {
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`group px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-l-2 bg-transparent ${
+                    className={`group px-4 py-2.5 text-sm font-medium transition-colors border-l-2 bg-transparent ${
                       isActive
                         ? "border-[#d4af37] text-[#d4af37]"
                         : "border-transparent text-gray-200"
@@ -375,10 +375,10 @@ export const Navbar: React.FC = () => {
                 <Button
                   variant="primary"
                   size="md"
-                  className="group w-full uppercase tracking-widest text-xs font-bold py-3 flex items-center justify-center gap-2 overflow-hidden"
+                  className="group w-full text-xs font-medium py-3 flex items-center justify-center gap-2 overflow-hidden"
                 >
                   <MaterialIcon name="travel_explore" size={16} className="text-black" />
-                  <FlipText text="Explore Tour Packages" className="text-black" flippedClassName="text-black font-black" />
+                  <FlipText text="Explore Tour Packages" className="text-black" flippedClassName="text-black" />
                 </Button>
               </Link>
             </div>

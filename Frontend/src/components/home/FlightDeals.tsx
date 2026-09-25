@@ -89,15 +89,16 @@ const FlightDeals = () => {
         {/* Header */}
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
-              Fly More, Spend Less
-            </p>
+            <div className="flex items-center gap-2 text-xs font-normal text-muted">
+              <span className="text-primary text-sm leading-none">✦</span>
+              <span>Fly More, Spend Less</span>
+            </div>
 
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+            <h2 className="mt-4 text-3xl sm:text-4xl font-normal leading-[1.15] text-heading font-serif tracking-tight">
               Best Flight Deals
             </h2>
 
-            <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted font-normal">
               Find attractive flight fares on popular routes and plan your
               next journey with ease.
             </p>

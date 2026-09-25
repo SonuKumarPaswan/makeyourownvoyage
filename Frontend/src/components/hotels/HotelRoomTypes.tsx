@@ -20,47 +20,47 @@ export const HotelRoomTypes: React.FC<HotelRoomTypesProps> = ({
     hotel.rooms && hotel.rooms.length > 0
       ? hotel.rooms
       : [
-          {
-            _id: "room-deluxe-1",
-            roomType: "Deluxe Valley View Room",
-            description: "Spacious private balcony overlooking serene pine valley with premium wooden interiors.",
-            images: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"],
-            bedType: "King Size Bed",
-            bedCount: 1,
-            occupancy: { adults: 2, children: 1, maxGuests: 3 },
-            roomSize: { value: 340, unit: "sqft" },
-            amenities: ["Free High-Speed WiFi", "Electric Kettle", "Room Heater", "Balcony View", "LED TV"],
-            mealPlan: ["Breakfast Included", "Free Welcome Drink"],
-            pricing: {
-              basePrice: 4200,
-              taxPercentage: 18,
-              taxAmount: 756,
-              finalPrice: 4956,
-              currency: "INR",
-            },
-            availability: { totalRooms: 8, availableRooms: 4 },
+        {
+          _id: "room-deluxe-1",
+          roomType: "Deluxe Valley View Room",
+          description: "Spacious private balcony overlooking serene pine valley with premium wooden interiors.",
+          images: ["https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"],
+          bedType: "King Size Bed",
+          bedCount: 1,
+          occupancy: { adults: 2, children: 1, maxGuests: 3 },
+          roomSize: { value: 340, unit: "sqft" },
+          amenities: ["Free High-Speed WiFi", "Electric Kettle", "Room Heater", "Balcony View", "LED TV"],
+          mealPlan: ["Breakfast Included", "Free Welcome Drink"],
+          pricing: {
+            basePrice: 4200,
+            taxPercentage: 18,
+            taxAmount: 756,
+            finalPrice: 4956,
+            currency: "INR",
           },
-          {
-            _id: "room-suite-2",
-            roomType: "Executive Presidential Suite",
-            description: "Luxury master bedroom with dedicated living salon, jacuzzi bathtub, and panoramic glass facade.",
-            images: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"],
-            bedType: "Super King Bed",
-            bedCount: 1,
-            occupancy: { adults: 3, children: 2, maxGuests: 4 },
-            roomSize: { value: 580, unit: "sqft" },
-            amenities: ["Jacuzzi Bathtub", "24/7 Butler Service", "Espresso Machine", "Mini Bar", "Complimentary Wine"],
-            mealPlan: ["Breakfast & Dinner (MAP Plan)", "Complimentary Airport Transfer"],
-            pricing: {
-              basePrice: 8500,
-              taxPercentage: 18,
-              taxAmount: 1530,
-              finalPrice: 10030,
-              currency: "INR",
-            },
-            availability: { totalRooms: 4, availableRooms: 2 },
+          availability: { totalRooms: 8, availableRooms: 4 },
+        },
+        {
+          _id: "room-suite-2",
+          roomType: "Executive Presidential Suite",
+          description: "Luxury master bedroom with dedicated living salon, jacuzzi bathtub, and panoramic glass facade.",
+          images: ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"],
+          bedType: "Super King Bed",
+          bedCount: 1,
+          occupancy: { adults: 3, children: 2, maxGuests: 4 },
+          roomSize: { value: 580, unit: "sqft" },
+          amenities: ["Jacuzzi Bathtub", "24/7 Butler Service", "Espresso Machine", "Mini Bar", "Complimentary Wine"],
+          mealPlan: ["Breakfast & Dinner (MAP Plan)", "Complimentary Airport Transfer"],
+          pricing: {
+            basePrice: 8500,
+            taxPercentage: 18,
+            taxAmount: 1530,
+            finalPrice: 10030,
+            currency: "INR",
           },
-        ];
+          availability: { totalRooms: 4, availableRooms: 2 },
+        },
+      ];
 
   return (
     <section className="bg-white py-12 px-4 sm:px-6 lg:px-8 border-b border-gray-200">

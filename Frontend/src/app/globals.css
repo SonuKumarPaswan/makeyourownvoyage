@@ -75,6 +75,13 @@
   --color-info: #0284c7;
   --color-info-light: #f0f9ff;
   /* ================================
+     EDITORIAL & LUXURY TYPOGRAPHY
+  ================================= */
+  --font-serif: var(--font-serif), "Playfair Display", Didot, "Bodoni MT", Georgia, serif;
+  --font-sans: var(--font-sans), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-serif);
+
+  /* ================================
      ZERO RADIUS DESIGN SYSTEM (SHARP CORNERS)
   ================================= */
   --radius-xs: 0px;
@@ -124,12 +131,26 @@ td,
   border-radius: 0px !important;
 }
 
-/* Exception for the circular brand logo emblem */
+/* Exception for the circular brand logo emblem & custom curved UI elements */
 .brand-logo-circle,
 .brand-logo-circle img,
-.brand-logo-circle * {
+.brand-logo-circle *,
+.dest-circle-btn,
+.dest-circle-btn * {
   border-radius: 9999px !important;
 }
+
+.dest-card-rounded,
+.dest-card-rounded img,
+.dest-card-rounded * {
+  border-radius: 1.75rem !important;
+}
+
+.tour-card-rounded,
+.tour-card-rounded img {
+  border-radius: 1.25rem !important;
+}
+
 
 :root {
   accent-color: #d4af37;
@@ -268,4 +289,54 @@ html {
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'liga';
+}
+
+/* ========================================================
+   GLOBAL EDITORIAL FONT & NORMAL CASING APPLICATION
+======================================================== */
+h1, h2, h3, h4,
+h1 *, h2 *, h3 *, h4 *,
+.font-serif,
+.font-serif *,
+.font-heading,
+.font-editorial,
+.editorial-title {
+  font-family: var(--font-serif), "Playfair Display", Didot, "Bodoni MT", Georgia, serif !important;
+  font-weight: 400;
+  text-transform: none;
+}
+
+body,
+p,
+a,
+button,
+input,
+select,
+textarea,
+.font-sans {
+  font-family: var(--font-sans), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ========================================================
+   SEAMLESS INFINITE MARQUEE (RIGHT TO LEFT)
+======================================================== */
+@keyframes marquee-scroll-rtl {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-scroll-rtl 28s linear infinite;
+}
+
+.pause-on-hover:hover .animate-marquee-rtl,
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
 }
