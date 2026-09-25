@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, MapPin, Calendar, Users, Star, Sparkles } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { Button } from "@/components/ui/Button";
 
 interface HotelsHeroProps {
@@ -41,7 +41,7 @@ export const HotelsHero: React.FC<HotelsHeroProps> = ({
         {/* Header Badge & Title */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 border border-[#d4af37]/40 bg-[#0a192f]/80 text-[#d4af37] text-xs font-semibold uppercase tracking-widest mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
+            <MaterialIcon name="auto_awesome" size={14} />
             Make Your Own Voyage • Luxury Stays & Resorts
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase">
@@ -58,7 +58,7 @@ export const HotelsHero: React.FC<HotelsHeroProps> = ({
             {/* City / Destination Input */}
             <div className="bg-[#0a192f] border border-gray-700 p-3 flex flex-col justify-center">
               <label className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold flex items-center gap-1.5 mb-1">
-                <MapPin className="w-3.5 h-3.5 text-[#d4af37]" /> City or Hotel Name
+                <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" /> City or Hotel Name
               </label>
               <input
                 type="text"
@@ -72,7 +72,7 @@ export const HotelsHero: React.FC<HotelsHeroProps> = ({
             {/* Check-in Date */}
             <div className="bg-[#0a192f] border border-gray-700 p-3 flex flex-col justify-center">
               <label className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold flex items-center gap-1.5 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-[#d4af37]" /> Check-In Date
+                <MaterialIcon name="calendar_month" size={14} className="text-[#d4af37]" /> Check-In Date
               </label>
               <input
                 type="date"
@@ -84,7 +84,7 @@ export const HotelsHero: React.FC<HotelsHeroProps> = ({
             {/* Guests / Rooms */}
             <div className="bg-[#0a192f] border border-gray-700 p-3 flex flex-col justify-center">
               <label className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold flex items-center gap-1.5 mb-1">
-                <Users className="w-3.5 h-3.5 text-[#d4af37]" /> Guests & Rooms
+                <MaterialIcon name="group" size={14} className="text-[#d4af37]" /> Guests & Rooms
               </label>
               <select className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer">
                 <option value="2-1" className="bg-[#0a192f] text-white">2 Adults • 1 Room</option>
@@ -101,7 +101,7 @@ export const HotelsHero: React.FC<HotelsHeroProps> = ({
                 size="lg"
                 className="w-full h-full flex items-center justify-center gap-2 text-sm uppercase tracking-widest font-bold"
               >
-                <Search className="w-4 h-4" />
+                <MaterialIcon name="search" size={16} />
                 Find Stays
               </Button>
             </div>

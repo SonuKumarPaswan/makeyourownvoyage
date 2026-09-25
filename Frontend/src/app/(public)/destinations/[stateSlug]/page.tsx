@@ -5,9 +5,8 @@ import { notFound } from "next/navigation";
 import { getStateBySlug } from "@/lib/api/states.api";
 import { getDestinations, getDestinationBySlug } from "@/lib/api/destinations.api";
 import { redirect } from "next/navigation";
-import type { State } from "@/types/state";
 import type { Destination } from "@/types/destination";
-import { MapPin, ArrowRight, Compass } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface Props {
   params: Promise<{ stateSlug: string }>;
@@ -68,7 +67,7 @@ export default async function StateDestinationsPage({ params }: Props) {
                     <p className="mt-1 text-xs text-slate-500 line-clamp-2">{dest.shortDescription || dest.description}</p>
                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-100 text-xs text-[#d4af37] font-bold">
                       <span>Explore Destination</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <MaterialIcon name="arrow_forward" size={14} />
                     </div>
                   </div>
                 </Link>

@@ -15,7 +15,7 @@ const escapeRegex = (string) => {
 export const globalSearch = async (req, res) => {
     try {
         const { q, type = "all", limit = 6 } = req.query;
-        const cleanQuery = String(q).trim();
+        const cleanQuery = String(q || "").trim();
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 6), 50);
 
@@ -28,23 +28,39 @@ export const globalSearch = async (req, res) => {
         // 1. Destinations
         if (shouldSearchAll || searchType === "destinations" || searchType === "destination") {
             tasks.destinations = Destination.find({
-                isPublished: true,
+                isPublished: { $ne: false },
                 $or: [
                     { name: regex },
                     { shortDescription: regex },
+                    { country: regex },
                     { type: regex },
                     { "attractions.name": regex },
                 ],
             })
-                .select("name slug shortDescription type images")
+                .populate("state", "name slug")
+                .select("name slug shortDescription type images country state")
                 .limit(maxLimit)
                 .lean();
         }
 
-        // 2. Packages
+        // 2. States
+        if (shouldSearchAll || searchType === "states" || searchType === "state") {
+            tasks.states = State.find({
+                isPublished: { $ne: false },
+                $or: [
+                    { name: regex },
+                    { description: regex },
+                ],
+            })
+                .select("name slug description image")
+                .limit(maxLimit)
+                .lean();
+        }
+
+        // 3. Packages
         if (shouldSearchAll || searchType === "packages" || searchType === "package") {
             tasks.packages = Package.find({
-                isActive: true,
+                isActive: { $ne: false },
                 $or: [
                     { title: regex },
                     { region: regex },
@@ -57,10 +73,10 @@ export const globalSearch = async (req, res) => {
                 .lean();
         }
 
-        // 3. Hotels
+        // 4. Hotels
         if (shouldSearchAll || searchType === "hotels" || searchType === "hotel") {
             tasks.hotels = Hotel.find({
-                status: "active",
+                status: { $ne: "inactive" },
                 $or: [
                     { name: regex },
                     { "location.city": regex },
@@ -74,10 +90,10 @@ export const globalSearch = async (req, res) => {
                 .lean();
         }
 
-        // 4. Transport (Cabs, Bikes, Travellers, Buses)
+        // 5. Transport (Cabs, Bikes, Travellers, Buses)
         if (shouldSearchAll || searchType === "transports" || searchType === "transport" || searchType === "cabs") {
             tasks.transports = Transport.find({
-                status: "active",
+                status: { $ne: "inactive" },
                 $or: [
                     { title: regex },
                     { brand: regex },
@@ -88,17 +104,6 @@ export const globalSearch = async (req, res) => {
                 ],
             })
                 .select("title slug category vehicleType brand modelName capacity pricing images availableCities")
-                .limit(maxLimit)
-                .lean();
-        }
-
-        // 5. States
-        if (shouldSearchAll || searchType === "states" || searchType === "state") {
-            tasks.states = State.find({
-                isPublished: true,
-                name: regex,
-            })
-                .select("name slug description image")
                 .limit(maxLimit)
                 .lean();
         }
@@ -135,12 +140,12 @@ export const globalSearch = async (req, res) => {
             query: cleanQuery,
             totalMatches: combined.length,
             counts: {
-                destinations: results.destinations.length,
-                packages: results.packages.length,
-                hotels: results.hotels.length,
-                transports: results.transports.length,
-                states: results.states.length,
-                activities: results.activities.length,
+                destinations: results.destinations?.length || 0,
+                states: results.states?.length || 0,
+                packages: results.packages?.length || 0,
+                hotels: results.hotels?.length || 0,
+                transports: results.transports?.length || 0,
+                activities: results.activities?.length || 0,
             },
             results,
             combined,
@@ -158,25 +163,65 @@ export const globalSearch = async (req, res) => {
 export const searchSuggestions = async (req, res) => {
     try {
         const { q, limit = 8 } = req.query;
-        const cleanQuery = String(q).trim();
+        const cleanQuery = String(q || "").trim();
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
-        const maxLimit = Math.min(Math.max(1, Number(limit) || 8), 20);
+        const maxLimit = Math.min(Math.max(1, Number(limit) || 8), 25);
 
-        // Fetch small projections in parallel
-        const [destinations, packages, hotels, transports] = await Promise.all([
-            Destination.find({ isPublished: true, name: regex })
-                .select("name slug images")
-                .limit(3)
+        // Fetch small projections in parallel across all core entities
+        const [destinations, states, packages, hotels, transports] = await Promise.all([
+            Destination.find({
+                isPublished: { $ne: false },
+                $or: [
+                    { name: regex },
+                    { shortDescription: regex },
+                    { country: regex },
+                    { "attractions.name": regex },
+                ],
+            })
+                .populate("state", "name slug")
+                .select("name slug shortDescription type images state")
+                .limit(4)
                 .lean(),
-            Package.find({ isActive: true, title: regex })
-                .select("title slug startingPrice image")
-                .limit(3)
+            State.find({
+                isPublished: { $ne: false },
+                $or: [
+                    { name: regex },
+                    { description: regex },
+                ],
+            })
+                .select("name slug image")
+                .limit(4)
                 .lean(),
-            Hotel.find({ status: "active", name: regex })
+            Package.find({
+                isActive: { $ne: false },
+                $or: [
+                    { title: regex },
+                    { region: regex },
+                    { packageType: regex },
+                ],
+            })
+                .select("title slug startingPrice image region")
+                .limit(4)
+                .lean(),
+            Hotel.find({
+                status: { $ne: "inactive" },
+                $or: [
+                    { name: regex },
+                    { "location.city": regex },
+                    { "location.state": regex },
+                ],
+            })
                 .select("name slug location.city images")
                 .limit(3)
                 .lean(),
-            Transport.find({ status: "active", $or: [{ title: regex }, { brand: regex }] })
+            Transport.find({
+                status: { $ne: "inactive" },
+                $or: [
+                    { title: regex },
+                    { brand: regex },
+                    { availableCities: regex },
+                ],
+            })
                 .select("title slug category images")
                 .limit(2)
                 .lean(),
@@ -188,15 +233,23 @@ export const searchSuggestions = async (req, res) => {
                 slug: d.slug,
                 type: "destination",
                 url: `/destinations/${d.slug}`,
-                subtitle: "Destination",
+                subtitle: d.state?.name ? `Destination in ${d.state.name}` : (d.shortDescription || "Top Destination"),
                 image: d.images?.[0]?.url || "",
+            })),
+            ...states.map((s) => ({
+                title: s.name,
+                slug: s.slug,
+                type: "state",
+                url: `/states/${s.slug}`,
+                subtitle: "State / Region Catalog",
+                image: s.image?.url || "",
             })),
             ...packages.map((p) => ({
                 title: p.title,
                 slug: p.slug,
                 type: "package",
                 url: `/packages/${p.slug}`,
-                subtitle: `Tour Package • ₹${p.startingPrice || 0}`,
+                subtitle: `Tour Package • ₹${(p.startingPrice || 0).toLocaleString("en-IN")}`,
                 image: p.image || "",
             })),
             ...hotels.map((h) => ({
@@ -211,8 +264,8 @@ export const searchSuggestions = async (req, res) => {
                 title: t.title,
                 slug: t.slug,
                 type: "transport",
-                url: `/transports/${t.slug}`,
-                subtitle: `${t.category} Rental`,
+                url: `/services/transport/cabs`,
+                subtitle: `${t.category || "Vehicle"} Rental`,
                 image: t.images?.[0]?.url || "",
             })),
         ].slice(0, maxLimit);

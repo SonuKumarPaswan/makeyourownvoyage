@@ -1,5 +1,5 @@
 import React from "react";
-import { Car, Bike, Bus, Users, Sparkles } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { TransportCategory } from "@/types/transport";
 
 interface TransportHeroProps {
@@ -13,18 +13,18 @@ export default function TransportHero({
   title,
   subtitle,
 }: TransportHeroProps) {
-  const getIcon = () => {
+  const getIconName = () => {
     switch (category) {
       case "Cab":
-        return <Car className="h-4 w-4" />;
+        return "directions_car";
       case "Bike":
-        return <Bike className="h-4 w-4" />;
+        return "two_wheeler";
       case "Bus":
-        return <Bus className="h-4 w-4" />;
+        return "directions_bus";
       case "Traveller":
-        return <Users className="h-4 w-4" />;
+        return "groups";
       default:
-        return <Car className="h-4 w-4" />;
+        return "directions_car";
     }
   };
 
@@ -33,7 +33,7 @@ export default function TransportHero({
       <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
         <span className="inline-flex items-center gap-2 border border-[#d4af37]/40 bg-[#d4af37]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#d4af37]">
-          {getIcon()} Verified Fleet Services
+          <MaterialIcon name={getIconName()} size={16} /> Verified Fleet Services
         </span>
         <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-5xl text-white">
           {title.split(" ").slice(0, -2).join(" ")}{" "}

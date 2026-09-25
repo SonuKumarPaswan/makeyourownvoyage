@@ -4,27 +4,17 @@ import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  Search,
-  MapPin,
-  Star,
-  Compass,
-  Building2,
-  Car,
-  Sparkles,
-  ArrowRight,
-  Filter,
-  SlidersHorizontal,
-} from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { GlobalSearchResponse, SearchResultItem } from "@/types/search";
 import { Button } from "@/components/ui/Button";
 
 const CATEGORIES = [
-  { id: "all", label: "All Results", icon: Sparkles },
-  { id: "packages", label: "Packages", icon: Compass },
-  { id: "hotels", label: "Hotels & Stays", icon: Building2 },
-  { id: "destinations", label: "Destinations", icon: MapPin },
-  { id: "transports", label: "Cabs & Transport", icon: Car },
+  { id: "all", label: "All Results", iconName: "travel_explore" },
+  { id: "destinations", label: "Destinations", iconName: "location_on" },
+  { id: "states", label: "States & Regions", iconName: "map" },
+  { id: "packages", label: "Packages", iconName: "luggage" },
+  { id: "hotels", label: "Hotels & Stays", iconName: "hotel" },
+  { id: "transports", label: "Cabs & Transport", iconName: "local_taxi" },
 ];
 
 function SearchContent() {
@@ -61,7 +51,7 @@ function SearchContent() {
       setIsLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/search?q=${encodeURIComponent(query.trim())}&type=${activeCategory}`
+          `/api/search?q=${encodeURIComponent(query.trim())}&type=${activeCategory}`
         );
         const data = await res.json();
         if (data.success) {
@@ -99,12 +89,14 @@ function SearchContent() {
     let items: SearchResultItem[] = [];
     if (activeCategory === "all") {
       items = searchData.combined || [];
+    } else if (activeCategory === "destinations") {
+      items = searchData.results?.destinations || [];
+    } else if (activeCategory === "states") {
+      items = searchData.results?.states || [];
     } else if (activeCategory === "packages") {
       items = searchData.results?.packages || [];
     } else if (activeCategory === "hotels") {
       items = searchData.results?.hotels || [];
-    } else if (activeCategory === "destinations") {
-      items = searchData.results?.destinations || [];
     } else if (activeCategory === "transports") {
       items = searchData.results?.transports || [];
     }
@@ -130,7 +122,7 @@ function SearchContent() {
         <div className="bg-[#0a192f] border-2 border-[#d4af37] p-6 mb-8 text-white shadow-xl">
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#d4af37]" />
+              <MaterialIcon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-[#d4af37]" size={18} />
               <input
                 type="text"
                 value={searchInput}
@@ -163,7 +155,7 @@ function SearchContent() {
 
               {/* Sorting Filter */}
               <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-[#d4af37]" />
+                <MaterialIcon name="tune" className="text-[#d4af37]" size={16} />
                 <span className="text-gray-400 font-semibold uppercase text-[10px]">Sort by:</span>
                 <select
                   value={sortBy}
@@ -183,7 +175,6 @@ function SearchContent() {
         {/* Category Pills Filters */}
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
             const count =
               searchData?.counts?.[cat.id as keyof typeof searchData.counts] ?? null;
 
@@ -200,7 +191,11 @@ function SearchContent() {
                     : "bg-white text-gray-700 border-gray-300 hover:border-[#0a192f]"
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#d4af37]" : "text-gray-500"}`} />
+                <MaterialIcon
+                  name={cat.iconName}
+                  className={isActive ? "text-[#d4af37]" : "text-gray-500"}
+                  size={16}
+                />
                 <span>{cat.label}</span>
                 {count !== null && count > 0 && (
                   <span
@@ -280,7 +275,7 @@ function SearchContent() {
 
                     {item.destination && (
                       <p className="text-xs font-medium text-gray-600 flex items-center gap-1 mb-3">
-                        <MapPin className="w-3.5 h-3.5 text-[#d4af37]" />
+                        <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" />
                         {item.destination}
                       </p>
                     )}
@@ -295,12 +290,12 @@ function SearchContent() {
                         </p>
                       </div>
                     ) : (
-                      <span className="text-xs font-medium text-gray-500">Explore Catalog</span>
+                       <span className="text-xs font-medium text-gray-500">Explore Catalog</span>
                     )}
 
                     <div className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-[#0a192f] group-hover:text-[#d4af37]">
                       <span>View</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <MaterialIcon name="arrow_forward" size={14} />
                     </div>
                   </div>
                 </div>
@@ -313,7 +308,7 @@ function SearchContent() {
         {!isLoading && (!query || displayItems.length === 0) && (
           <div className="border-2 border-dashed border-gray-300 bg-white p-12 text-center">
             <div className="w-16 h-16 bg-[#0a192f] text-[#d4af37] mx-auto flex items-center justify-center mb-4 border border-[#d4af37]/30">
-              <Search className="w-8 h-8" />
+              <MaterialIcon name="search" size={32} />
             </div>
             <h3 className="text-lg font-bold uppercase tracking-wide text-[#0a192f] mb-1">
               {query ? `No results found for "${query}"` : "Search Across All Voyages"}

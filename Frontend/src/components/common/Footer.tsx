@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import BrandLogo from "./BrandLogo";
-import { Mail, Phone, MapPin, Sparkles, Send } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 export const Footer: React.FC = () => {
   return (
@@ -21,7 +21,7 @@ export const Footer: React.FC = () => {
                 Certified Travel Partner
               </span>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-[#d4af37]/30 bg-[#0a192f] text-gray-300 text-xs">
-                <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" /> 100% Verified Inventory & Chauffeurs
+                <MaterialIcon name="auto_awesome" size={14} className="text-[#d4af37]" /> 100% Verified Inventory & Chauffeurs
               </div>
             </div>
           </div>
@@ -101,15 +101,15 @@ export const Footer: React.FC = () => {
             </h3>
             <div className="space-y-3 text-xs text-gray-300">
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#d4af37] shrink-0 mt-0.5" />
+                <MaterialIcon name="location_on" size={16} className="text-[#d4af37] shrink-0 mt-0.5" />
                 <span>Voyage Corporate Towers, Connaught Place, New Delhi, India</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#d4af37] shrink-0" />
+                <MaterialIcon name="call" size={16} className="text-[#d4af37] shrink-0" />
                 <span>+91 98765 43210 / +91 11 2345 6789</span>
               </div>
               <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#d4af37] shrink-0" />
+                <MaterialIcon name="mail" size={16} className="text-[#d4af37] shrink-0" />
                 <span>concierge@makeyourownvoyage.com</span>
               </div>
             </div>
@@ -127,9 +127,9 @@ export const Footer: React.FC = () => {
                 />
                 <button
                   type="button"
-                  className="bg-[#d4af37] text-[#0a192f] px-3 font-bold border border-[#d4af37] hover:bg-white transition-colors"
+                  className="bg-[#d4af37] text-[#0a192f] px-3 font-bold border border-[#d4af37] hover:bg-white transition-colors flex items-center justify-center"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <MaterialIcon name="send" size={14} />
                 </button>
               </div>
             </div>

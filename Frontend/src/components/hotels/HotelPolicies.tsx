@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Clock, ShieldCheck, Check, AlertCircle, FileText, X } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { Hotel } from "@/types/hotel";
 
 interface HotelPoliciesProps {
@@ -25,7 +25,7 @@ export const HotelPolicies: React.FC<HotelPoliciesProps> = ({ hotel }) => {
           {/* Check-In / Check-Out */}
           <div className="border border-gray-200 p-6 bg-[#f8f9fa]">
             <div className="flex items-center gap-2 text-[#0a192f] font-bold text-sm uppercase tracking-wider mb-4">
-              <Clock className="w-4 h-4 text-[#d4af37]" /> Timings
+              <MaterialIcon name="schedule" size={16} className="text-[#d4af37]" /> Timings
             </div>
             <div className="space-y-3 text-xs">
               <div className="flex justify-between py-1 border-b border-gray-200">
@@ -46,38 +46,38 @@ export const HotelPolicies: React.FC<HotelPoliciesProps> = ({ hotel }) => {
           {/* Guest Rules */}
           <div className="border border-gray-200 p-6 bg-[#f8f9fa]">
             <div className="flex items-center gap-2 text-[#0a192f] font-bold text-sm uppercase tracking-wider mb-4">
-              <ShieldCheck className="w-4 h-4 text-[#d4af37]" /> Guest Guidelines
+              <MaterialIcon name="verified_user" size={16} className="text-[#d4af37]" /> Guest Guidelines
             </div>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2 text-gray-700">
                 {hotel.policies?.couplesAllowed ?? true ? (
-                  <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  <MaterialIcon name="check" size={16} className="text-green-600 shrink-0" />
                 ) : (
-                  <X className="w-4 h-4 text-red-500 shrink-0" />
+                  <MaterialIcon name="close" size={16} className="text-red-500 shrink-0" />
                 )}
                 <span>Couples & Unmarried Guests Welcome</span>
               </div>
               <div className="flex items-center gap-2 text-gray-700">
                 {hotel.policies?.localIdsAccepted ?? true ? (
-                  <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  <MaterialIcon name="check" size={16} className="text-green-600 shrink-0" />
                 ) : (
-                  <X className="w-4 h-4 text-red-500 shrink-0" />
+                  <MaterialIcon name="close" size={16} className="text-red-500 shrink-0" />
                 )}
                 <span>Local IDs Accepted with Valid Gov. Photo ID</span>
               </div>
               <div className="flex items-center gap-2 text-gray-700">
                 {hotel.policies?.petsAllowed ? (
-                  <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  <MaterialIcon name="check" size={16} className="text-green-600 shrink-0" />
                 ) : (
-                  <X className="w-4 h-4 text-gray-400 shrink-0" />
+                  <MaterialIcon name="close" size={16} className="text-gray-400 shrink-0" />
                 )}
                 <span>{hotel.policies?.petsAllowed ? "Pets are allowed" : "Pets are not allowed"}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-700">
                 {hotel.policies?.childrenAllowed ?? true ? (
-                  <Check className="w-4 h-4 text-green-600 shrink-0" />
+                  <MaterialIcon name="check" size={16} className="text-green-600 shrink-0" />
                 ) : (
-                  <X className="w-4 h-4 text-gray-400 shrink-0" />
+                  <MaterialIcon name="close" size={16} className="text-gray-400 shrink-0" />
                 )}
                 <span>Children & Families Allowed</span>
               </div>
@@ -87,7 +87,7 @@ export const HotelPolicies: React.FC<HotelPoliciesProps> = ({ hotel }) => {
           {/* Cancellation Policy */}
           <div className="border border-gray-200 p-6 bg-[#f8f9fa]">
             <div className="flex items-center gap-2 text-[#0a192f] font-bold text-sm uppercase tracking-wider mb-4">
-              <FileText className="w-4 h-4 text-[#d4af37]" /> Cancellation Policy
+              <MaterialIcon name="description" size={16} className="text-[#d4af37]" /> Cancellation Policy
             </div>
             <div className="text-xs text-gray-600 leading-relaxed">
               <span className="font-bold text-green-700 block mb-1">

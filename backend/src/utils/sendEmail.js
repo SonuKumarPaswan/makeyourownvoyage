@@ -29,6 +29,9 @@ export const getTransporter = () => {
                     // Prevent SSL handshake failures with custom domain / cPanel certs
                     rejectUnauthorized: false,
                 },
+                connectionTimeout: 10000, // 10s timeout
+                greetingTimeout: 10000,
+                socketTimeout: 15000,
             });
             console.log(`[Email Service] Configured custom SMTP (${smtpHost}:${smtpPort}, secure=${smtpSecure})`);
         } else {
@@ -38,6 +41,9 @@ export const getTransporter = () => {
                     user: emailUser,
                     pass: emailPass,
                 },
+                connectionTimeout: 10000,
+                greetingTimeout: 10000,
+                socketTimeout: 15000,
             });
             console.log(`[Email Service] Configured Gmail SMTP fallback`);
         }
@@ -144,7 +150,10 @@ export const sendEnquiryConfirmationEmail = async ({
         console.log(`[Email Service] Enquiry confirmation email successfully sent to: ${customerEmail} (${enquiryCode})`);
         return { success: true, messageId: result.messageId };
     } catch (error) {
-        console.error(`[Email Service] Failed to send enquiry email to ${customerEmail}:`, error.message);
+        console.error(`[Email Service] ❌ Failed to send enquiry email to ${customerEmail}:`, error.message, error.code ? `(Code: ${error.code})` : "");
+        if (error.code === "ETIMEDOUT" || error.code === "ECONNREFUSED") {
+            console.error(`[Email Service Tip] SMTP host ${process.env.SMTP_HOST}:${process.env.SMTP_PORT} is not responding. Check if Cloudflare proxy is enabled on mail subdomain, or try port 587 with SMTP_SECURE=false, or use Gmail App Password.`);
+        }
         return { success: false, error: error.message };
     }
 };

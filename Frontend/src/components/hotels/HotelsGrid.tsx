@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Check, Wifi, Sparkles, Coffee, ShieldCheck, ArrowRight } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { Hotel } from "@/types/hotel";
 import { Button } from "@/components/ui/Button";
 
@@ -124,13 +124,13 @@ export const HotelsGrid: React.FC<HotelsGridProps> = ({
                     {/* Star Rating Badge */}
                     <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/75 px-2 py-1 border border-white/20">
                       {[...Array(hotel.starCategory || 4)].map((_, i) => (
-                        <Star key={i} className="w-3 h-3 fill-[#d4af37] text-[#d4af37]" />
+                        <MaterialIcon key={i} name="star" size={12} fill className="text-[#d4af37]" />
                       ))}
                     </div>
 
                     {/* Bottom City Tag */}
                     <div className="absolute bottom-3 left-3 text-white flex items-center gap-1.5 text-xs font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-[#d4af37]" />
+                      <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" />
                       <span>
                         {hotel.location?.area ? `${hotel.location.area}, ` : ""}
                         {hotel.location?.city || "India"}
@@ -171,16 +171,16 @@ export const HotelsGrid: React.FC<HotelsGridProps> = ({
                       {/* Inclusions / Badges */}
                       <div className="grid grid-cols-2 gap-1.5 text-[11px] text-gray-700 mb-4 pb-4 border-b border-gray-100">
                         <div className="flex items-center gap-1">
-                          <Check className="w-3 h-3 text-green-600" /> Free Cancellation
+                          <MaterialIcon name="check" size={12} className="text-green-600" /> Free Cancellation
                         </div>
                         <div className="flex items-center gap-1">
-                          <Coffee className="w-3 h-3 text-[#d4af37]" /> Breakfast Option
+                          <MaterialIcon name="coffee" size={12} className="text-[#d4af37]" /> Breakfast Option
                         </div>
                         <div className="flex items-center gap-1">
-                          <Wifi className="w-3 h-3 text-blue-600" /> High-Speed WiFi
+                          <MaterialIcon name="wifi" size={12} className="text-[#d4af37]" /> High-Speed WiFi
                         </div>
                         <div className="flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-[#0a192f]" /> Couple Friendly
+                          <MaterialIcon name="verified_user" size={12} className="text-[#0a192f]" /> Couple Friendly
                         </div>
                       </div>
                     </div>
@@ -220,7 +220,7 @@ export const HotelsGrid: React.FC<HotelsGridProps> = ({
                           className="w-full flex items-center justify-center gap-2 text-xs uppercase tracking-widest font-bold"
                         >
                           View Rooms & Rates
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <MaterialIcon name="arrow_forward" size={14} />
                         </Button>
                       </Link>
                     </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Users } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { PriceSlab } from "@/types/package";
 
 interface PackagePriceSlabsProps {
@@ -16,7 +16,7 @@ export default function PackagePriceSlabs({ priceSlabs }: PackagePriceSlabsProps
           <h3 className="text-lg font-bold text-[#0a192f]">Tiered Group Pricing (B2B Slabs)</h3>
           <p className="text-xs text-slate-500">Volume rates based on headcount</p>
         </div>
-        <Users className="h-5 w-5 text-[#d4af37]" />
+        <MaterialIcon name="groups" size={20} className="text-[#d4af37]" />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">

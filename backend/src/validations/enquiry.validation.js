@@ -54,9 +54,9 @@ export const flightEnquirySchema = Joi.object({
     tripType: Joi.string()
         .valid("one-way", "one_way", "round-trip", "round_trip", "multi-city", "multi_city")
         .default("one_way"),
-    fromCity: Joi.string().trim().min(2).required(),
-    toCity: Joi.string().trim().min(2).required(),
-    departureDate: Joi.date().iso().required(),
+    fromCity: Joi.string().trim().min(2).optional(),
+    toCity: Joi.string().trim().min(2).optional(),
+    departureDate: Joi.date().iso().optional(),
     returnDate: Joi.date().iso().allow(null, "").optional(),
     passengers: Joi.object({
         adults: Joi.number().integer().min(1).default(1),

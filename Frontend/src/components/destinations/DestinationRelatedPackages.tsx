@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { PhoneCall, ArrowRight } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { Package } from "@/types/package";
 
 interface DestinationRelatedPackagesProps {
@@ -34,7 +34,7 @@ export default function DestinationRelatedPackages({
             href={`/enquiry?destination=${encodeURIComponent(destName)}`}
             className="mt-4 inline-flex items-center gap-2 bg-gradient-gold px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0a192f]"
           >
-            <PhoneCall className="h-3.5 w-3.5" /> Plan Custom Trip to {destName}
+            <MaterialIcon name="call" size={14} /> Plan Custom Trip to {destName}
           </Link>
         </div>
       ) : (
@@ -63,7 +63,7 @@ export default function DestinationRelatedPackages({
                     ₹{pkg.startingPrice?.toLocaleString("en-IN")} / person
                   </span>
                   <span className="font-bold text-[#d4af37] flex items-center gap-1">
-                    Details <ArrowRight className="h-3.5 w-3.5" />
+                    Details <MaterialIcon name="arrow_forward" size={14} />
                   </span>
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Plane, Train, Car } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface DestinationHowToReachProps {
   destName: string;
@@ -26,7 +26,7 @@ export default function DestinationHowToReach({
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="border border-sky-100 bg-sky-50/40 p-5">
           <div className="flex items-center gap-2 text-sky-800 font-bold text-sm">
-            <Plane className="h-4 w-4 text-sky-600" /> By Air
+            <MaterialIcon name="flight" size={16} className="text-sky-600" /> By Air
           </div>
           <p className="mt-2 text-xs text-slate-600 leading-relaxed">
             {howToReach.byAir || "Nearest domestic/international airport connectivity."}
@@ -35,7 +35,7 @@ export default function DestinationHowToReach({
 
         <div className="border border-amber-100 bg-amber-50/40 p-5">
           <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-            <Train className="h-4 w-4 text-amber-600" /> By Train
+            <MaterialIcon name="train" size={16} className="text-amber-600" /> By Train
           </div>
           <p className="mt-2 text-xs text-slate-600 leading-relaxed">
             {howToReach.byTrain || "Nearest major railway station with express train connections."}
@@ -44,7 +44,7 @@ export default function DestinationHowToReach({
 
         <div className="border border-emerald-100 bg-emerald-50/40 p-5">
           <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
-            <Car className="h-4 w-4 text-emerald-600" /> By Road
+            <MaterialIcon name="directions_car" size={16} className="text-emerald-600" /> By Road
           </div>
           <p className="mt-2 text-xs text-slate-600 leading-relaxed">
             {howToReach.byRoad || "Scenic national highway road network and state Volvo buses."}

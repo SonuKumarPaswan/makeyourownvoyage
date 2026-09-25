@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Compass } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface PackagesHeroProps {
   title?: string;
@@ -17,7 +17,7 @@ export default function PackagesHero({
       <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
         <span className="inline-flex items-center gap-2 border border-[#d4af37]/40 bg-[#d4af37]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#d4af37]">
-          <Sparkles className="h-3.5 w-3.5" /> {badge}
+          <MaterialIcon name="auto_awesome" size={14} /> {badge}
         </span>
         <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-white">
           {title.split(" ").slice(0, -2).join(" ")}{" "}

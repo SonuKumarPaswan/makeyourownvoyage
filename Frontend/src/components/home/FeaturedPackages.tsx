@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MapPin, Star, ArrowRight, Sparkles, Clock, CheckCircle2 } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 const featuredPackages = [
   {
@@ -82,7 +82,7 @@ export const FeaturedPackages: React.FC = () => {
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#0a192f] text-[#d4af37] text-xs font-bold uppercase tracking-widest mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
+              <MaterialIcon name="auto_awesome" size={14} />
               Handpicked Luxury
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-tight text-[#0a192f]">
@@ -101,7 +101,7 @@ export const FeaturedPackages: React.FC = () => {
               aria-label="Previous"
               className="p-3 border border-gray-300 bg-white text-[#0a192f] hover:border-[#d4af37] hover:bg-[#0a192f] hover:text-[#d4af37] transition-all"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <MaterialIcon name="chevron_left" size={20} />
             </button>
             <button
               type="button"
@@ -109,7 +109,7 @@ export const FeaturedPackages: React.FC = () => {
               aria-label="Next"
               className="p-3 border border-gray-300 bg-white text-[#0a192f] hover:border-[#d4af37] hover:bg-[#0a192f] hover:text-[#d4af37] transition-all"
             >
-              <ChevronRight className="w-5 h-5" />
+              <MaterialIcon name="chevron_right" size={20} />
             </button>
           </div>
         </div>
@@ -143,7 +143,7 @@ export const FeaturedPackages: React.FC = () => {
                 </div>
 
                 <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white text-xs font-medium">
-                  <Clock className="w-3.5 h-3.5 text-[#d4af37]" />
+                  <MaterialIcon name="schedule" size={14} className="text-[#d4af37]" />
                   <span>{pkg.duration}</span>
                 </div>
               </Link>
@@ -153,11 +153,11 @@ export const FeaturedPackages: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                     <span className="flex items-center gap-1 font-medium text-gray-600">
-                      <MapPin className="w-3.5 h-3.5 text-[#d4af37]" />
+                      <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" />
                       {pkg.location}
                     </span>
                     <div className="flex items-center gap-1 bg-[#0a192f] text-[#d4af37] text-[10px] font-bold px-1.5 py-0.5">
-                      <Star className="w-3 h-3 fill-[#d4af37]" />
+                      <MaterialIcon name="star" size={12} fill className="text-[#d4af37]" />
                       {pkg.rating} ({pkg.reviews})
                     </div>
                   </div>
@@ -168,11 +168,11 @@ export const FeaturedPackages: React.FC = () => {
 
                   <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-4 pb-3 border-b border-gray-100">
                     <span className="flex items-center gap-1 text-green-700 font-medium">
-                      <CheckCircle2 className="w-3 h-3" /> Stays Included
+                      <MaterialIcon name="check_circle" size={12} /> Stays Included
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1 text-green-700 font-medium">
-                      <CheckCircle2 className="w-3 h-3" /> Sightseeing Cabs
+                      <MaterialIcon name="check_circle" size={12} /> Sightseeing Cabs
                     </span>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ export const FeaturedPackages: React.FC = () => {
                     className="inline-flex items-center gap-1.5 bg-[#d4af37] text-[#0a192f] hover:bg-[#c49f27] px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
                   >
                     <span>View Details</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <MaterialIcon name="arrow_forward" size={14} />
                   </Link>
                 </div>
               </div>
@@ -208,7 +208,7 @@ export const FeaturedPackages: React.FC = () => {
             className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#0a192f] hover:text-[#d4af37] transition-colors"
           >
             <span>Explore All 500+ Tour Packages</span>
-            <ArrowRight className="w-4 h-4 text-[#d4af37]" />
+            <MaterialIcon name="arrow_forward" size={16} className="text-[#d4af37]" />
           </Link>
         </div>
       </div>

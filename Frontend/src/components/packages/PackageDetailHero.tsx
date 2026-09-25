@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, MapPin, Sparkles } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { Package } from "@/types/package";
 
 interface PackageDetailHeroProps {
@@ -29,11 +29,11 @@ export default function PackageDetailHero({ pkg }: PackageDetailHeroProps) {
             {pkg.packageType}
           </span>
           <span className="inline-flex items-center gap-1 border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-            <MapPin className="h-3.5 w-3.5 text-[#d4af37]" />
+            <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" />
             {destinationName}
           </span>
           <span className="inline-flex items-center gap-1 border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-            <Clock className="h-3.5 w-3.5 text-[#d4af37]" />
+            <MaterialIcon name="schedule" size={14} className="text-[#d4af37]" />
             {pkg.duration || `${pkg.days} Days / ${pkg.nights} Nights`}
           </span>
         </div>

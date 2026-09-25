@@ -50,11 +50,11 @@ export interface TransportEnquiryData {
 export interface FlightEnquiryData {
   fromCity: string;
   toCity: string;
-  tripType: "one_way" | "round_trip";
+  tripType?: "one_way" | "round_trip" | string;
   departureDate: string;
   returnDate?: string;
-  travelClass?: "Economy" | "Premium Economy" | "Business" | "First Class";
-  passengers: { adults: number; children: number; infants: number };
+  travelClass?: "Economy" | "Premium Economy" | "Business" | "First Class" | string;
+  passengers?: { adults?: number; children?: number; infants?: number };
 }
 
 export interface BaseEnquiryPayload {

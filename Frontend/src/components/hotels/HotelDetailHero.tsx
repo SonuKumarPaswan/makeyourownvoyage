@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Star, MapPin, Phone, Mail, Share2, Heart, Sparkles, Building2 } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { Hotel } from "@/types/hotel";
 import { Button } from "@/components/ui/Button";
 
@@ -38,7 +38,7 @@ export const HotelDetailHero: React.FC<HotelDetailHeroProps> = ({
               </span>
               <div className="flex items-center gap-0.5">
                 {[...Array(hotel.starCategory || 5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-[#d4af37] text-[#d4af37]" />
+                  <MaterialIcon key={i} name="star" size={14} fill className="text-[#d4af37]" />
                 ))}
               </div>
             </div>
@@ -46,7 +46,7 @@ export const HotelDetailHero: React.FC<HotelDetailHeroProps> = ({
               {hotel.name}
             </h1>
             <p className="mt-1 flex items-center gap-1.5 text-xs sm:text-sm text-gray-300 font-light">
-              <MapPin className="w-4 h-4 text-[#d4af37]" />
+              <MaterialIcon name="location_on" size={16} className="text-[#d4af37]" />
               {hotel.location?.address || `${hotel.location?.area || ""}, ${hotel.location?.city || "India"}`}
             </p>
           </div>

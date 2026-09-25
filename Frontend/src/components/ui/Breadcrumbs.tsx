@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { cn } from "@/lib/utils";
 
 export interface BreadcrumbItem {
@@ -20,7 +20,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
       className={cn("flex items-center space-x-2 text-xs font-semibold text-[#d4af37]", className)}
     >
       <Link href="/" className="flex items-center gap-1 hover:text-white transition-colors">
-        <Home className="h-3.5 w-3.5" />
+        <MaterialIcon name="home" size={14} />
         <span>Home</span>
       </Link>
 
@@ -29,7 +29,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
 
         return (
           <React.Fragment key={idx}>
-            <ChevronRight className="h-3 w-3 text-slate-400 shrink-0" />
+            <MaterialIcon name="chevron_right" size={14} className="text-slate-400 shrink-0" />
             {isLast || !item.href ? (
               <span className="text-white truncate max-w-[200px]">{item.label}</span>
             ) : (

@@ -7,7 +7,7 @@ import { getDestinations } from "@/lib/api/destinations.api";
 import type { State } from "@/types/state";
 import type { Destination } from "@/types/destination";
 import StateDetailHero from "@/components/states/StateDetailHero";
-import { ArrowRight } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface Props {
   params: Promise<{ stateSlug: string }>;
@@ -50,7 +50,7 @@ export default async function StateDetailPage({ params }: Props) {
               href="/packages"
               className="mt-4 inline-flex items-center gap-1.5 bg-gradient-gold px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0a192f]"
             >
-              Browse All Packages <ArrowRight className="h-3.5 w-3.5" />
+              Browse All Packages <MaterialIcon name="arrow_forward" size={14} />
             </Link>
           </div>
         ) : (
@@ -85,7 +85,7 @@ export default async function StateDetailPage({ params }: Props) {
                       {dest.attractions?.length || 0} Attractions
                     </span>
                     <span className="flex items-center gap-1 font-bold text-[#d4af37]">
-                      View Guide <ArrowRight className="h-3.5 w-3.5" />
+                      View Guide <MaterialIcon name="arrow_forward" size={14} />
                     </span>
                   </div>
                 </div>

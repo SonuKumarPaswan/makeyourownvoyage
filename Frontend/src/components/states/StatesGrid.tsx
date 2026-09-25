@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, MapPin } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { State } from "@/types/state";
 
 interface StatesGridProps {
@@ -24,7 +24,7 @@ export default function StatesGrid({ states }: StatesGridProps) {
             href="/packages"
             className="mt-6 inline-flex items-center gap-2 bg-gradient-gold px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#0a192f] shadow-md"
           >
-            Explore Packages <ArrowRight className="h-4 w-4" />
+            Explore Packages <MaterialIcon name="arrow_forward" size={16} />
           </Link>
         </div>
       ) : (
@@ -45,7 +45,7 @@ export default function StatesGrid({ states }: StatesGridProps) {
 
               <div className="relative z-10">
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-[#d4af37]">
-                  <MapPin className="h-3.5 w-3.5" /> India
+                  <MaterialIcon name="location_on" size={14} /> India
                 </span>
                 <h3 className="mt-1 text-2xl font-bold text-white transition-colors group-hover:text-[#d4af37]">
                   {st.name}
@@ -54,7 +54,7 @@ export default function StatesGrid({ states }: StatesGridProps) {
                   <p className="mt-1 text-xs text-slate-300 line-clamp-2">{st.description}</p>
                 )}
                 <div className="mt-4 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#d4af37]">
-                  Explore Destinations <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                  Explore Destinations <MaterialIcon name="arrow_forward" size={14} className="transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
             </Link>

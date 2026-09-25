@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Package } from "@/types/package";
-import { Clock, MapPin, Star, ArrowRight, ShieldCheck } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface PackagesGridProps {
   packages: Package[];
@@ -55,7 +55,7 @@ export default function PackagesGrid({ packages, activeType = "all" }: PackagesG
             href="/destinations"
             className="mt-6 inline-flex items-center gap-2 bg-gradient-gold px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#0a192f] shadow-md"
           >
-            Explore Destinations <ArrowRight className="h-4 w-4" />
+            Explore Destinations <MaterialIcon name="arrow_forward" size={16} />
           </Link>
         </div>
       ) : (
@@ -77,7 +77,7 @@ export default function PackagesGrid({ packages, activeType = "all" }: PackagesG
                   {pkg.packageType}
                 </span>
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-xs font-semibold text-white">
-                  <MapPin className="h-3.5 w-3.5 text-[#d4af37]" />
+                  <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" />
                   <span>{typeof pkg.destination === "object" ? (pkg.destination as any)?.name : pkg.region}</span>
                 </div>
               </div>
@@ -85,12 +85,12 @@ export default function PackagesGrid({ packages, activeType = "all" }: PackagesG
               <div className="flex flex-1 flex-col p-6">
                 <div className="flex items-center justify-between text-xs text-slate-500">
                   <span className="flex items-center gap-1 font-semibold text-slate-700">
-                    <Clock className="h-3.5 w-3.5 text-[#d4af37]" />
+                    <MaterialIcon name="schedule" size={14} className="text-[#d4af37]" />
                     {pkg.duration || `${pkg.days}D / ${pkg.nights}N`}
                   </span>
                   {pkg.rating && (
                     <span className="flex items-center gap-1 text-amber-500 font-bold">
-                      <Star className="h-3.5 w-3.5 fill-amber-500" />
+                      <MaterialIcon name="star" size={14} fill className="text-amber-500" />
                       {pkg.rating}
                     </span>
                   )}
@@ -106,7 +106,7 @@ export default function PackagesGrid({ packages, activeType = "all" }: PackagesG
                       key={i}
                       className="inline-flex items-center gap-1 bg-[#faf8f5] px-2.5 py-1 text-[11px] font-medium text-slate-700 border border-[#e8e3d9]"
                     >
-                      <ShieldCheck className="h-3 w-3 text-emerald-600" /> {inc}
+                      <MaterialIcon name="verified" size={12} className="text-emerald-600" /> {inc}
                     </span>
                   ))}
                 </div>
@@ -124,7 +124,7 @@ export default function PackagesGrid({ packages, activeType = "all" }: PackagesG
                     href={`/packages/${pkg.slug}`}
                     className="inline-flex items-center gap-1.5 bg-gradient-gold px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#0a192f] shadow-sm transition-transform hover:scale-105"
                   >
-                    View Tour <ArrowRight className="h-3.5 w-3.5" />
+                    View Tour <MaterialIcon name="arrow_forward" size={14} />
                   </Link>
                 </div>
               </div>

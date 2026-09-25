@@ -3,20 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Menu,
-  X,
-  ArrowRight,
-  Compass,
-  Plane,
-  Building2,
-  FileCheck,
-  Palmtree,
-  Briefcase,
-  Car,
-  Ship,
-  ChevronDown,
-} from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import NavbarSearch from "./NavbarSearch";
 import BrandLogo from "./BrandLogo";
 import { Button } from "@/components/ui/Button";
@@ -26,43 +13,43 @@ const serviceDropdownItems = [
     title: "Flight Booking",
     description: "Domestic & International commercial flights",
     href: "/flights",
-    icon: Plane,
+    iconName: "flight_takeoff",
   },
   {
     title: "Hotel Booking",
     description: "Worldwide 4-star, 5-star luxury resorts & stays",
     href: "/hotels",
-    icon: Building2,
+    iconName: "hotel",
   },
   {
     title: "Visa Assistance",
     description: "End-to-end documentation, slot booking & filing",
     href: "/visa",
-    icon: FileCheck,
+    iconName: "assignment",
   },
   {
     title: "Holiday Packages",
     description: "Curated domestic & international tour packages",
     href: "/packages",
-    icon: Palmtree,
+    iconName: "luggage",
   },
   {
     title: "Corporate Travel & Events",
     description: "MICE, Executive offsites, dealer meets & events",
     href: "/events",
-    icon: Briefcase,
+    iconName: "corporate_fare",
   },
   {
     title: "Cabs & Transfers",
     description: "Airport pickups/drops, executive sedans & fleet",
     href: "/services/transport/cabs",
-    icon: Car,
+    iconName: "local_taxi",
   },
   {
     title: "Cruise Holidays (Water)",
     description: "Ocean liners, luxury stateroom voyages & cruises",
     href: "/services",
-    icon: Ship,
+    iconName: "directions_boat",
   },
 ];
 
@@ -73,6 +60,34 @@ const navLinks = [
   { name: "Packages", href: "/packages" },
   { name: "Contact", href: "/contact-us" },
 ];
+
+interface FlipTextProps {
+  text: string;
+  className?: string;
+  flippedClassName?: string;
+}
+
+const FlipText: React.FC<FlipTextProps> = ({
+  text,
+  className = "",
+  flippedClassName = "text-[#d4af37]",
+}) => {
+  return (
+    <span className="relative inline-flex flex-col overflow-hidden h-[1.35em] leading-[1.35em] select-none align-middle">
+      <span
+        className={`inline-block transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:-translate-y-full ${className}`}
+      >
+        {text}
+      </span>
+      <span
+        aria-hidden="true"
+        className={`absolute top-full left-0 inline-block transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:-translate-y-full ${flippedClassName}`}
+      >
+        {text}
+      </span>
+    </span>
+  );
+};
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -133,26 +148,9 @@ export const Navbar: React.FC = () => {
     };
   }, [isOpen]);
 
-  // Determine dynamic background classes
+  // Determine dynamic background classes (matching Footer #071324 luxury theme)
   const getHeaderBg = () => {
-    if (isOpen) {
-      return "bg-[#0a192f] border-b border-[#d4af37]/30 shadow-2xl";
-    }
-
-    if (isHomepage) {
-      if (!isScrolled) {
-        // Transparent hero overlay with subtle blur filter
-        return "bg-[#0a192f]/20 backdrop-blur-md border-b border-white/10 shadow-sm";
-      }
-      // Scrolled state on homepage
-      return "bg-[#0a192f]/85 backdrop-blur-xl border-b border-[#d4af37]/30 shadow-2xl";
-    }
-
-    // Other pages
-    if (!isScrolled) {
-      return "bg-[#0a192f]/75 backdrop-blur-md border-b border-[#d4af37]/25 shadow-md";
-    }
-    return "bg-[#0a192f]/90 backdrop-blur-xl border-b border-[#d4af37]/30 shadow-2xl";
+    return "bg-[#071324] border-b border-[#d4af37]/30 shadow-2xl";
   };
 
   return (
@@ -184,11 +182,11 @@ export const Navbar: React.FC = () => {
                       className={`relative group px-3 py-2 text-xs uppercase tracking-widest font-semibold transition-colors duration-200 bg-transparent flex items-center gap-1 ${
                         isActive
                           ? "text-[#d4af37]"
-                          : "text-gray-200 hover:text-[#d4af37]"
+                          : "text-gray-200"
                       }`}
                     >
-                      <span className="relative z-10">{link.name}</span>
-                      <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 group-hover/services:rotate-180" />
+                      <FlipText text={link.name} flippedClassName="text-[#d4af37]" />
+                      <MaterialIcon name="expand_more" size={14} className="transition-transform duration-200 group-hover/services:rotate-180" />
 
                       {/* Underline Stick */}
                       <span
@@ -198,29 +196,31 @@ export const Navbar: React.FC = () => {
                       />
                     </Link>
 
-                    {/* White Luxury Dropdown Menu */}
-                    <div className="absolute top-full -left-4 w-[380px] pt-2 opacity-0 invisible group-hover/services:opacity-100 group-hover/services:visible transition-all duration-200 ease-out transform group-hover/services:translate-y-0 translate-y-2 z-50">
-                      <div className="bg-white rounded-xl shadow-2xl border border-slate-100 p-2.5 overflow-hidden">
+                    {/* White Luxury Dropdown Menu with #d4af37 Hover */}
+                    <div className="absolute top-full -left-2 w-[320px] pt-2 opacity-0 invisible group-hover/services:opacity-100 group-hover/services:visible transition-all duration-200 ease-out transform group-hover/services:translate-y-0 translate-y-2 z-50">
+                      <div
+                        style={{ backgroundColor: "#ffffff" }}
+                        className="bg-white shadow-2xl border border-slate-200 p-2.5 overflow-hidden"
+                      >
                         <div className="space-y-1">
                           {serviceDropdownItems.map((item) => {
-                            const IconComponent = item.icon;
                             return (
                               <Link
                                 key={item.title}
                                 href={item.href}
-                                className="flex items-center gap-3.5 p-2.5 rounded-lg transition-all duration-150 hover:bg-slate-50 group/item"
+                                className="flex items-center gap-3.5 p-2.5 transition-all duration-150 hover:bg-[#d4af37] group/item"
                               >
                                 {/* Icon box */}
-                                <div className="h-10 w-10 shrink-0 rounded-lg bg-[#0a192f]/5 border border-[#d4af37]/30 text-[#b89228] flex items-center justify-center group-hover/item:bg-[#0a192f] group-hover/item:text-[#d4af37] group-hover/item:border-[#d4af37] transition-all">
-                                  <IconComponent className="w-5 h-5" />
+                                <div className="h-10 w-10 shrink-0 bg-[#0a192f] text-[#d4af37] flex items-center justify-center transition-all group-hover/item:bg-black group-hover/item:text-[#d4af37]">
+                                  <MaterialIcon name={item.iconName} size={20} />
                                 </div>
 
                                 {/* Text content */}
                                 <div className="flex flex-col min-w-0 flex-1">
-                                  <span className="text-[13px] font-bold text-[#0a192f] group-hover/item:text-[#b89228] transition-colors leading-tight">
+                                  <span className="text-[13px] font-bold text-[#0a192f] group-hover/item:text-black transition-colors leading-tight">
                                     {item.title}
                                   </span>
-                                  <span className="text-[11px] text-slate-500 truncate leading-snug mt-0.5">
+                                  <span className="text-[11px] text-slate-500 group-hover/item:text-black/80 font-medium truncate leading-snug mt-0.5 transition-colors">
                                     {item.description}
                                   </span>
                                 </div>
@@ -241,10 +241,10 @@ export const Navbar: React.FC = () => {
                   className={`relative group px-3 py-2 text-xs uppercase tracking-widest font-semibold transition-colors duration-200 bg-transparent ${
                     isActive
                       ? "text-[#d4af37]"
-                      : "text-gray-200 hover:text-[#d4af37]"
+                      : "text-gray-200"
                   }`}
                 >
-                  <span className="relative z-10">{link.name}</span>
+                  <FlipText text={link.name} flippedClassName="text-[#d4af37]" />
 
                   {/* Underline Stick: Enters from Left on hover, Exits to Right on unhover */}
                   <span
@@ -268,10 +268,10 @@ export const Navbar: React.FC = () => {
               <Button
                 variant="primary"
                 size="sm"
-                className="uppercase tracking-widest text-[11px] font-bold py-2.5 px-4 flex items-center gap-1.5 shadow-md"
+                className="group uppercase tracking-widest text-[11px] font-bold py-2.5 px-4 flex items-center gap-1.5 shadow-md overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
               >
-                Explore Trips
-                <ArrowRight className="w-3.5 h-3.5" />
+                <FlipText text="Explore Trips" className="text-black" flippedClassName="text-black font-black" />
+                <MaterialIcon name="arrow_forward" size={16} className="transition-transform duration-300 group-hover:translate-x-1 text-black" />
               </Button>
             </Link>
           </div>
@@ -284,14 +284,14 @@ export const Navbar: React.FC = () => {
               aria-label={isOpen ? "Close menu" : "Open menu"}
               className="p-2 rounded-md border border-[#d4af37]/40 bg-transparent backdrop-blur-md text-[#d4af37] focus:outline-none"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? <MaterialIcon name="close" size={24} /> : <MaterialIcon name="menu" size={24} />}
             </button>
           </div>
         </div>
 
         {/* Mobile Dropdown Menu */}
         {isOpen && (
-          <div className="lg:hidden border-t border-[#d4af37]/30 bg-[#0a192f]/95 backdrop-blur-xl py-4 px-2 space-y-3 max-h-[80vh] overflow-y-auto">
+          <div className="lg:hidden border-t border-[#d4af37]/30 bg-[#071324] backdrop-blur-xl py-4 px-2 space-y-3 max-h-[80vh] overflow-y-auto">
             {/* Mobile Search Bar */}
             <div className="px-2 pb-2">
               <NavbarSearch />
@@ -311,19 +311,21 @@ export const Navbar: React.FC = () => {
                         <Link
                           href={link.href}
                           onClick={() => setIsOpen(false)}
-                          className={`text-xs font-bold uppercase tracking-wider ${
+                          className={`group text-xs font-bold uppercase tracking-wider ${
                             isActive ? "text-[#d4af37]" : "text-gray-200"
                           }`}
                         >
-                          {link.name}
+                          <FlipText text={link.name} flippedClassName="text-[#d4af37]" />
                         </Link>
                         <button
                           type="button"
                           onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
                           className="p-1 text-[#d4af37]"
                         >
-                          <ChevronDown
-                            className={`w-4 h-4 transition-transform ${
+                          <MaterialIcon
+                            name="expand_more"
+                            size={16}
+                            className={`transition-transform ${
                               mobileServicesOpen ? "rotate-180" : ""
                             }`}
                           />
@@ -333,7 +335,6 @@ export const Navbar: React.FC = () => {
                       {mobileServicesOpen && (
                         <div className="ml-4 pl-2 border-l border-[#d4af37]/30 space-y-1 py-1">
                           {serviceDropdownItems.map((item) => {
-                            const IconComponent = item.icon;
                             return (
                               <Link
                                 key={item.title}
@@ -341,7 +342,7 @@ export const Navbar: React.FC = () => {
                                 onClick={() => setIsOpen(false)}
                                 className="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-300 hover:text-[#d4af37]"
                               >
-                                <IconComponent className="w-4 h-4 text-[#d4af37]" />
+                                <MaterialIcon name={item.iconName} className="text-[#d4af37]" size={16} />
                                 <span>{item.title}</span>
                               </Link>
                             );
@@ -357,13 +358,13 @@ export const Navbar: React.FC = () => {
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-l-2 bg-transparent ${
+                    className={`group px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors border-l-2 bg-transparent ${
                       isActive
                         ? "border-[#d4af37] text-[#d4af37]"
-                        : "border-transparent text-gray-200 hover:text-[#d4af37]"
+                        : "border-transparent text-gray-200"
                     }`}
                   >
-                    {link.name}
+                    <FlipText text={link.name} flippedClassName="text-[#d4af37]" />
                   </Link>
                 );
               })}
@@ -374,10 +375,10 @@ export const Navbar: React.FC = () => {
                 <Button
                   variant="primary"
                   size="md"
-                  className="w-full uppercase tracking-widest text-xs font-bold py-3 flex items-center justify-center gap-2"
+                  className="group w-full uppercase tracking-widest text-xs font-bold py-3 flex items-center justify-center gap-2 overflow-hidden"
                 >
-                  <Compass className="w-4 h-4" />
-                  Explore Tour Packages
+                  <MaterialIcon name="travel_explore" size={16} className="text-black" />
+                  <FlipText text="Explore Tour Packages" className="text-black" flippedClassName="text-black font-black" />
                 </Button>
               </Link>
             </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { PhoneCall, Shield, Sparkles } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { Package } from "@/types/package";
 
 interface PackageBookingStickyProps {
@@ -41,11 +41,11 @@ export default function PackageBookingSticky({ pkg }: PackageBookingStickyProps)
         href={`/enquiry?packageId=${pkg._id}&packageTitle=${encodeURIComponent(pkg.title)}`}
         className="mt-6 flex w-full items-center justify-center gap-2 bg-gradient-gold py-3.5 text-xs font-bold uppercase tracking-wider text-[#0a192f] shadow-lg transition-transform hover:scale-[1.02]"
       >
-        <PhoneCall className="h-4 w-4" /> Request Custom Quote
+        <MaterialIcon name="call" size={16} /> Request Custom Quote
       </Link>
 
       <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
-        <Shield className="h-3.5 w-3.5 text-[#d4af37]" /> Verified Hotels & Transports
+        <MaterialIcon name="verified" size={14} className="text-[#d4af37]" /> Verified Hotels & Transports
       </div>
     </aside>
   );

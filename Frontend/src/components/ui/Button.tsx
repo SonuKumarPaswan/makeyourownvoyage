@@ -24,14 +24,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-bold tracking-wider uppercase transition-all duration-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#d4af37] disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
+      "inline-flex items-center justify-center font-bold tracking-wider uppercase transition-all duration-200 rounded-none focus:outline-none focus:ring-1 focus:ring-[#d4af37] disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
 
     // Map primary -> gold, secondary -> navy for flexibility
     const normalizedVariant =
       variant === "primary" ? "gold" : variant === "secondary" ? "navy" : variant;
 
     const variants: Record<string, string> = {
-      gold: "bg-[#d4af37] text-[#0a192f] hover:bg-[#c49f27] shadow-md active:scale-[0.98]",
+      gold: "bg-[#d4af37] text-black hover:bg-[#c49f27] shadow-md active:scale-[0.98]",
       navy: "bg-[#0a192f] text-white hover:bg-[#102a45] shadow-md active:scale-[0.98]",
       outline:
         "border border-[#d4af37] text-[#0a192f] bg-transparent hover:bg-[#d4af37]/10 active:scale-[0.98]",

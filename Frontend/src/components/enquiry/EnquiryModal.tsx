@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle2, AlertCircle, Loader2, Sparkles, Send, Phone, Mail, User, MapPin } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { enquiryApi } from "@/lib/api/enquiry.api";
 import { EnquiryCategory } from "@/types/enquiry";
 import { Button } from "@/components/ui/Button";
@@ -132,13 +132,13 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 border border-gray-700 hover:border-[#d4af37] transition-colors"
         >
-          <X className="w-5 h-5" />
+          <MaterialIcon name="close" size={20} />
         </button>
 
         {isSuccess ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-green-900/40 border border-green-500 text-green-400 mx-auto flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-10 h-10" />
+              <MaterialIcon name="check_circle" size={40} />
             </div>
             <h3 className="text-2xl font-black uppercase text-white mb-2">
               Voyage Request Received!
@@ -161,7 +161,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
             {/* Header */}
             <div className="mb-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#d4af37] text-[10px] font-bold uppercase tracking-widest mb-2">
-                <Sparkles className="w-3 h-3" /> Quick Voyage Consultation
+                <MaterialIcon name="auto_awesome" size={14} /> Quick Voyage Consultation
               </div>
               <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
                 {defaultTitle}
@@ -173,7 +173,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
 
             {errorMessage && (
               <div className="mb-4 p-3 bg-red-950/80 border border-red-500 text-red-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+                <MaterialIcon name="error" className="text-red-400 shrink-0" size={16} />
                 <span>{errorMessage}</span>
               </div>
             )}
@@ -187,7 +187,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     Your Name *
                   </label>
                   <div className="flex items-center bg-[#0f2444] border border-gray-700 px-3 py-2">
-                    <User className="w-3.5 h-3.5 text-[#d4af37] mr-2 shrink-0" />
+                    <MaterialIcon name="person" className="text-[#d4af37] mr-2 shrink-0" size={16} />
                     <input
                       type="text"
                       required
@@ -204,7 +204,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     Contact Phone *
                   </label>
                   <div className="flex items-center bg-[#0f2444] border border-gray-700 px-3 py-2">
-                    <Phone className="w-3.5 h-3.5 text-[#d4af37] mr-2 shrink-0" />
+                    <MaterialIcon name="call" className="text-[#d4af37] mr-2 shrink-0" size={16} />
                     <input
                       type="tel"
                       required
@@ -224,7 +224,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     Email Address *
                   </label>
                   <div className="flex items-center bg-[#0f2444] border border-gray-700 px-3 py-2">
-                    <Mail className="w-3.5 h-3.5 text-[#d4af37] mr-2 shrink-0" />
+                    <MaterialIcon name="mail" className="text-[#d4af37] mr-2 shrink-0" size={16} />
                     <input
                       type="email"
                       required
@@ -241,7 +241,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     Your City / Departure
                   </label>
                   <div className="flex items-center bg-[#0f2444] border border-gray-700 px-3 py-2">
-                    <MapPin className="w-3.5 h-3.5 text-[#d4af37] mr-2 shrink-0" />
+                    <MaterialIcon name="location_on" className="text-[#d4af37] mr-2 shrink-0" size={16} />
                     <input
                       type="text"
                       placeholder="e.g. Delhi NCR"
@@ -261,9 +261,10 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                   </label>
                   <input
                     type="date"
+                    min={new Date().toLocaleDateString("en-CA")}
                     value={travelDate}
                     onChange={(e) => setTravelDate(e.target.value)}
-                    className="w-full bg-[#0f2444] border border-gray-700 px-3 py-2 text-white focus:outline-none [color-scheme:dark]"
+                    className="w-full bg-[#0f2444] border border-gray-700 px-3 py-2 text-white focus:outline-none [color-scheme:dark] accent-[#d4af37]"
                   />
                 </div>
 
@@ -277,10 +278,13 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                     className="w-full bg-[#0f2444] border border-gray-700 px-3 py-2 text-white focus:outline-none cursor-pointer"
                   >
                     <option value={1} className="bg-[#0a192f]">1 Solo Traveler</option>
-                    <option value={2} className="bg-[#0a192f]">2 Adults (Couple)</option>
+                    <option value={2} className="bg-[#0a192f]">2 Adults (Couple / Pair)</option>
+                    <option value={3} className="bg-[#0a192f]">3 Adults (Small Family)</option>
                     <option value={4} className="bg-[#0a192f]">4 Adults (Family / Friends)</option>
+                    <option value={6} className="bg-[#0a192f]">6-10 Adults (Small Group)</option>
                     <option value={15} className="bg-[#0a192f]">Corporate MICE (10 - 25 Pax)</option>
-                    <option value={50} className="bg-[#0a192f]">Large Group (50+ Pax)</option>
+                    <option value={50} className="bg-[#0a192f]">Large Group (25 - 50 Pax)</option>
+                    <option value={100} className="bg-[#0a192f]">Mega Group / Summit (50+ Pax)</option>
                   </select>
                 </div>
               </div>
@@ -310,12 +314,12 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <MaterialIcon name="progress_activity" className="animate-spin text-black" size={16} />
                       Submitting Enquiry...
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
+                      <MaterialIcon name="send" size={16} />
                       Submit For Immediate Quotation
                     </>
                   )}

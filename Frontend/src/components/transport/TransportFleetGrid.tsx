@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Users, Briefcase, Fuel, PhoneCall } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { Transport, TransportCategory } from "@/types/transport";
 
 interface TransportFleetGridProps {
@@ -34,7 +34,7 @@ export default function TransportFleetGrid({
             href={`/enquiry?enquiryType=custom_trip&notes=${encodeURIComponent(category + " Rental")}`}
             className="mt-6 inline-flex items-center gap-2 bg-gradient-gold px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#0a192f]"
           >
-            <PhoneCall className="h-4 w-4" /> Request {category} Booking Quote
+            <MaterialIcon name="call" size={16} /> Request {category} Booking Quote
           </Link>
         </div>
       ) : (
@@ -63,17 +63,17 @@ export default function TransportFleetGrid({
                 <div className="mt-4 grid grid-cols-2 gap-2 border border-[#e8e3d9] bg-[#faf8f5] p-3 text-xs text-slate-700">
                   {item.capacity?.seating && (
                     <span className="flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5 text-[#d4af37]" /> {item.capacity.seating} Seats
+                      <MaterialIcon name="group" size={14} className="text-[#d4af37]" /> {item.capacity.seating} Seats
                     </span>
                   )}
                   {item.capacity?.luggageBags !== undefined && (
                     <span className="flex items-center gap-1.5">
-                      <Briefcase className="h-3.5 w-3.5 text-[#d4af37]" /> {item.capacity.luggageBags} Bags
+                      <MaterialIcon name="luggage" size={14} className="text-[#d4af37]" /> {item.capacity.luggageBags} Bags
                     </span>
                   )}
                   {item.specifications?.fuelType && (
                     <span className="flex items-center gap-1.5">
-                      <Fuel className="h-3.5 w-3.5 text-[#d4af37]" /> {item.specifications.fuelType}
+                      <MaterialIcon name="local_gas_station" size={14} className="text-[#d4af37]" /> {item.specifications.fuelType}
                     </span>
                   )}
                   {item.specifications?.helmetProvidedCount !== undefined && (

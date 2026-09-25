@@ -1,5 +1,5 @@
 import React from "react";
-import { Sun } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface DestinationBestTimeProps {
   bestTimeToVisit?: {
@@ -16,7 +16,7 @@ export default function DestinationBestTime({
   return (
     <section className="border border-[#d4af37]/30 bg-gradient-to-br from-[#0a192f] to-[#102a45] p-6 text-white shadow-lg">
       <div className="flex items-center gap-2 text-[#d4af37]">
-        <Sun className="h-5 w-5" />
+        <MaterialIcon name="wb_sunny" size={20} />
         <h3 className="text-lg font-bold">Best Time to Visit</h3>
       </div>
       {bestTimeToVisit.months && (

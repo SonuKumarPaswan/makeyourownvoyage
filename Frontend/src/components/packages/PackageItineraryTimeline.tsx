@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Hotel as HotelIcon, Sparkles } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import type { ItineraryDay } from "@/types/package";
 
 interface PackageItineraryTimelineProps {
@@ -12,7 +12,7 @@ export default function PackageItineraryTimeline({
   return (
     <section className="border border-[#e8e3d9] bg-white p-6 shadow-sm">
       <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-        <Calendar className="h-5 w-5 text-[#d4af37]" />
+        <MaterialIcon name="calendar_month" size={20} className="text-[#d4af37]" />
         <h3 className="text-xl font-bold text-[#0a192f]">Day-by-Day Itinerary</h3>
       </div>
 
@@ -38,7 +38,7 @@ export default function PackageItineraryTimeline({
                         key={aIdx}
                         className="flex items-start gap-2.5 border border-[#e8e3d9] bg-[#faf8f5] p-3 text-xs"
                       >
-                        <Sparkles className="h-4 w-4 shrink-0 text-[#d4af37] mt-0.5" />
+                        <MaterialIcon name="auto_awesome" size={16} className="shrink-0 text-[#d4af37] mt-0.5" />
                         <div>
                           <p className="font-semibold text-[#0a192f]">
                             {act.time ? `[${act.time}] ` : ""}
@@ -55,7 +55,7 @@ export default function PackageItineraryTimeline({
               {/* Overnight Hotel */}
               {day.overnight?.enabled && (
                 <div className="mt-4 flex items-center gap-2 bg-amber-50/60 p-3 text-xs border border-amber-200 text-amber-900">
-                  <HotelIcon className="h-4 w-4 text-[#d4af37] shrink-0" />
+                  <MaterialIcon name="hotel" size={16} className="text-[#d4af37] shrink-0" />
                   <span>
                     <strong>Night Stay:</strong> {day.overnight.location || "Luxury Hotel"} •{" "}
                     {day.overnight.roomType || "Deluxe Room"} (Check-in: {day.overnight.checkIn || "12:00 PM"})

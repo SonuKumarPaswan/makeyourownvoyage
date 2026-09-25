@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Bed, Users, Maximize, Check, ShieldCheck, Coffee, Sparkles } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 import { Hotel, HotelRoom } from "@/types/hotel";
 import { Button } from "@/components/ui/Button";
 
@@ -67,7 +67,7 @@ export const HotelRoomTypes: React.FC<HotelRoomTypesProps> = ({
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#0a192f] text-[#d4af37] text-xs font-bold uppercase tracking-widest mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
+            <MaterialIcon name="auto_awesome" size={14} />
             MakeMyTrip Verified Inventory
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#0a192f]">
@@ -107,15 +107,15 @@ export const HotelRoomTypes: React.FC<HotelRoomTypesProps> = ({
 
                   <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
                     <div className="flex items-center gap-1.5 font-medium">
-                      <Maximize className="w-3.5 h-3.5 text-[#d4af37]" />
+                      <MaterialIcon name="square_foot" size={14} className="text-[#d4af37]" />
                       {room.roomSize?.value || 320} {room.roomSize?.unit || "sqft"}
                     </div>
                     <div className="flex items-center gap-1.5 font-medium">
-                      <Bed className="w-3.5 h-3.5 text-[#d4af37]" />
+                      <MaterialIcon name="bed" size={14} className="text-[#d4af37]" />
                       {room.bedType || "King Bed"}
                     </div>
                     <div className="flex items-center gap-1.5 font-medium col-span-2">
-                      <Users className="w-3.5 h-3.5 text-[#d4af37]" />
+                      <MaterialIcon name="group" size={14} className="text-[#d4af37]" />
                       Max {room.occupancy?.maxGuests || 3} Guests ({room.occupancy?.adults || 2} Adults, {room.occupancy?.children || 1} Child)
                     </div>
                   </div>
@@ -135,13 +135,13 @@ export const HotelRoomTypes: React.FC<HotelRoomTypesProps> = ({
                       {room.mealPlan && room.mealPlan.length > 0 ? (
                         room.mealPlan.map((mp, i) => (
                           <div key={i} className="flex items-center gap-2 text-xs font-semibold text-green-700 bg-green-50 p-2 border border-green-200">
-                            <Coffee className="w-4 h-4 text-green-600 shrink-0" />
+                            <MaterialIcon name="coffee" size={16} className="text-green-600 shrink-0" />
                             {mp}
                           </div>
                         ))
                       ) : (
                         <div className="flex items-center gap-2 text-xs font-medium text-gray-700 bg-gray-50 p-2 border border-gray-200">
-                          <Check className="w-4 h-4 text-gray-600 shrink-0" />
+                          <MaterialIcon name="check" size={16} className="text-gray-600 shrink-0" />
                           Room Only Plan (EP)
                         </div>
                       )}
@@ -153,7 +153,7 @@ export const HotelRoomTypes: React.FC<HotelRoomTypesProps> = ({
                     <div className="grid grid-cols-2 gap-1.5 text-xs text-gray-600">
                       {room.amenities?.map((amenity, i) => (
                         <div key={i} className="flex items-center gap-1.5">
-                          <Check className="w-3 h-3 text-[#d4af37]" />
+                          <MaterialIcon name="check" size={12} className="text-[#d4af37]" />
                           <span className="truncate">{amenity}</span>
                         </div>
                       ))}
@@ -161,7 +161,7 @@ export const HotelRoomTypes: React.FC<HotelRoomTypesProps> = ({
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 text-[11px] text-gray-500">
-                    <ShieldCheck className="w-4 h-4 text-blue-600" />
+                    <MaterialIcon name="verified_user" size={16} className="text-[#d4af37]" />
                     Free cancellation up to 24 hours prior to check-in
                   </div>
                 </div>

@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Destination } from "@/types/destination";
-import { ArrowRight, Compass } from "lucide-react";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 interface DestinationsGridProps {
   destinations: Destination[];
@@ -51,14 +51,14 @@ export default function DestinationsGrid({
 
       {destinations.length === 0 ? (
         <div className="my-16 border border-dashed border-[#d4af37]/40 bg-white p-12 text-center">
-          <Compass className="mx-auto h-12 w-12 text-[#d4af37]" />
+          <MaterialIcon name="explore" size={48} className="mx-auto text-[#d4af37]" />
           <h3 className="mt-4 text-xl font-bold text-[#0a192f]">No Destinations Found</h3>
           <p className="mt-2 text-sm text-slate-600">Explore our states and holiday packages.</p>
           <Link
             href="/states"
             className="mt-6 inline-flex items-center gap-2 bg-gradient-gold px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#0a192f]"
           >
-            Browse States <ArrowRight className="h-4 w-4" />
+            Browse States <MaterialIcon name="arrow_forward" size={16} />
           </Link>
         </div>
       ) : (
@@ -101,7 +101,7 @@ export default function DestinationsGrid({
                       {dest.attractions?.length || 0} Key Sights
                     </span>
                     <span className="flex items-center gap-1 font-bold text-[#d4af37]">
-                      View Guide <ArrowRight className="h-3.5 w-3.5" />
+                      View Guide <MaterialIcon name="arrow_forward" size={14} />
                     </span>
                   </div>
                 </div>
