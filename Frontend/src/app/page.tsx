@@ -72,12 +72,28 @@ export const metadata: Metadata = {
   },
 };
 
+import { getHomepageFeed } from "@/lib/api/homepage-feed";
+import { getPackages } from "@/lib/api/packages.api";
+import type { Collection } from "@/types/homepage-feed";
+
 export default async function HomePage() {
- 
+  let feedData = null;
+  let packagesData = null;
+
+  try {
+    const [feedRes, pkgRes] = await Promise.all([
+      getHomepageFeed().catch(() => null),
+      getPackages({ limit: 12 }).catch(() => null),
+    ]);
+    feedData = feedRes;
+    packagesData = Array.isArray(pkgRes?.data) ? pkgRes.data : [];
+  } catch (error) {
+    console.error("Failed to fetch backend homepage feed for hero:", error);
+  }
 
   return (
     <>
-      <Hero />
+      <Hero initialFeed={feedData} initialPackages={packagesData} />
 
       <TravelSearch />
 
