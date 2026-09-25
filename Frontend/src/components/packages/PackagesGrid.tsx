@@ -33,11 +33,10 @@ export default function PackagesGrid({ packages, activeType = "all" }: PackagesG
             <Link
               key={t.value}
               href={t.value === "all" ? "/packages" : `/packages?type=${t.value}`}
-              className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all border ${
-                activeType === t.value
+              className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all border ${activeType === t.value
                   ? "bg-[#d4af37] text-[#0a192f] border-[#d4af37] shadow-sm"
                   : "bg-white text-slate-700 border-[#e8e3d9] hover:border-[#d4af37] hover:text-[#d4af37]"
-              }`}
+                }`}
             >
               {t.label}
             </Link>

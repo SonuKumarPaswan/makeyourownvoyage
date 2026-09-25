@@ -11,31 +11,59 @@ const escapeRegex = (string) => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
+// Stop words to extract intent keywords from natural English queries
+const STOP_WORDS = new Set(["in", "at", "for", "the", "to", "and", "of", "with", "a", "an", "is", "on", "by"]);
+
+// Build smart regex filters supporting multi-word phrases and word tokenization
+const buildSmartSearchFilter = (queryString, fields = []) => {
+    const raw = String(queryString || "").trim();
+    if (!raw) return {};
+
+    const fullRegex = new RegExp(escapeRegex(raw), "i");
+    const tokens = raw
+        .split(/\s+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 1 && !STOP_WORDS.has(t.toLowerCase()));
+
+    const fieldConditions = [];
+
+    // 1. Direct full match on any specified field
+    fields.forEach((field) => {
+        fieldConditions.push({ [field]: fullRegex });
+    });
+
+    // 2. If multi-word, match individual tokens
+    if (tokens.length > 1) {
+        tokens.forEach((token) => {
+            const tokenRegex = new RegExp(escapeRegex(token), "i");
+            fields.forEach((field) => {
+                fieldConditions.push({ [field]: tokenRegex });
+            });
+        });
+    }
+
+    return fieldConditions.length > 0 ? { $or: fieldConditions } : {};
+};
+
 // 1. GET /api/search - Global Multi-Category Search
 export const globalSearch = async (req, res) => {
     try {
         const { q, type = "all", limit = 6 } = req.query;
         const cleanQuery = String(q || "").trim();
-        const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 6), 50);
 
         const searchType = String(type).toLowerCase().trim();
         const shouldSearchAll = searchType === "all" || !searchType;
 
-        // Parallel tasks preparation
+        // Parallel tasks preparation with intelligent word matching
         const tasks = {};
 
         // 1. Destinations
         if (shouldSearchAll || searchType === "destinations" || searchType === "destination") {
+            const destFilter = buildSmartSearchFilter(cleanQuery, ["name", "slug", "country", "shortDescription", "type", "attractions.name"]);
             tasks.destinations = Destination.find({
                 isPublished: { $ne: false },
-                $or: [
-                    { name: regex },
-                    { shortDescription: regex },
-                    { country: regex },
-                    { type: regex },
-                    { "attractions.name": regex },
-                ],
+                ...destFilter,
             })
                 .populate("state", "name slug")
                 .select("name slug shortDescription type images country state")
@@ -45,12 +73,10 @@ export const globalSearch = async (req, res) => {
 
         // 2. States
         if (shouldSearchAll || searchType === "states" || searchType === "state") {
+            const stateFilter = buildSmartSearchFilter(cleanQuery, ["name", "slug", "description"]);
             tasks.states = State.find({
                 isPublished: { $ne: false },
-                $or: [
-                    { name: regex },
-                    { description: regex },
-                ],
+                ...stateFilter,
             })
                 .select("name slug description image")
                 .limit(maxLimit)
@@ -59,14 +85,10 @@ export const globalSearch = async (req, res) => {
 
         // 3. Packages
         if (shouldSearchAll || searchType === "packages" || searchType === "package") {
+            const pkgFilter = buildSmartSearchFilter(cleanQuery, ["title", "slug", "region", "packageType", "duration", "tags"]);
             tasks.packages = Package.find({
                 isActive: { $ne: false },
-                $or: [
-                    { title: regex },
-                    { region: regex },
-                    { packageType: regex },
-                    { duration: regex },
-                ],
+                ...pkgFilter,
             })
                 .select("title slug region packageType duration days nights startingPrice image")
                 .limit(maxLimit)
@@ -75,15 +97,12 @@ export const globalSearch = async (req, res) => {
 
         // 4. Hotels
         if (shouldSearchAll || searchType === "hotels" || searchType === "hotel") {
+            const isHotelIntent = cleanQuery.toLowerCase().includes("hotel") || cleanQuery.toLowerCase().includes("resort") || cleanQuery.toLowerCase().includes("stay");
+            const hotelFilter = buildSmartSearchFilter(cleanQuery, ["name", "slug", "location.city", "location.state", "location.area", "propertyType", "description"]);
+            
             tasks.hotels = Hotel.find({
                 status: { $ne: "inactive" },
-                $or: [
-                    { name: regex },
-                    { "location.city": regex },
-                    { "location.state": regex },
-                    { "location.area": regex },
-                    { propertyType: regex },
-                ],
+                ...(isHotelIntent && Object.keys(hotelFilter).length === 0 ? {} : hotelFilter),
             })
                 .select("name slug propertyType starCategory location rooms images")
                 .limit(maxLimit)
@@ -92,16 +111,10 @@ export const globalSearch = async (req, res) => {
 
         // 5. Transport (Cabs, Bikes, Travellers, Buses)
         if (shouldSearchAll || searchType === "transports" || searchType === "transport" || searchType === "cabs") {
+            const transportFilter = buildSmartSearchFilter(cleanQuery, ["title", "slug", "brand", "modelName", "category", "vehicleType", "availableCities"]);
             tasks.transports = Transport.find({
                 status: { $ne: "inactive" },
-                $or: [
-                    { title: regex },
-                    { brand: regex },
-                    { modelName: regex },
-                    { category: regex },
-                    { vehicleType: regex },
-                    { availableCities: regex },
-                ],
+                ...transportFilter,
             })
                 .select("title slug category vehicleType brand modelName capacity pricing images availableCities")
                 .limit(maxLimit)
@@ -110,12 +123,9 @@ export const globalSearch = async (req, res) => {
 
         // 6. Activities
         if (shouldSearchAll || searchType === "activities" || searchType === "activity") {
+            const activityFilter = buildSmartSearchFilter(cleanQuery, ["title", "type", "description"]);
             tasks.activities = ActivityMaster.find({
-                $or: [
-                    { title: regex },
-                    { type: regex },
-                    { description: regex },
-                ],
+                ...activityFilter,
             })
                 .populate("destination", "name slug")
                 .select("title type approxDuration description image destination")
@@ -159,82 +169,122 @@ export const globalSearch = async (req, res) => {
     }
 };
 
+// In-memory cache for high-frequency suggestion queries (60s TTL)
+const suggestionsCache = new Map();
+const CACHE_TTL_MS = 60 * 1000;
+
 // 2. GET /api/search/suggestions (or /autocomplete) - Live Typeahead Autocomplete
 export const searchSuggestions = async (req, res) => {
     try {
         const { q, limit = 8 } = req.query;
-        const cleanQuery = String(q || "").trim();
+        const cleanQuery = String(q || "").trim().toLowerCase();
+        if (!cleanQuery) {
+            return res.status(200).json({ success: true, query: "", suggestions: [] });
+        }
+
+        const cacheKey = `${cleanQuery}:${limit}`;
+        const cached = suggestionsCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+            return res.status(200).json({
+                success: true,
+                query: cleanQuery,
+                suggestions: cached.data,
+            });
+        }
+
         const regex = new RegExp(escapeRegex(cleanQuery), "i");
         const maxLimit = Math.min(Math.max(1, Number(limit) || 8), 25);
 
-        // Fetch small projections in parallel across all core entities
+        // Fetch ultra-fast indexed field matches in parallel
         const [destinations, states, packages, hotels, transports] = await Promise.all([
             Destination.find({
                 isPublished: { $ne: false },
                 $or: [
                     { name: regex },
-                    { shortDescription: regex },
+                    { slug: regex },
                     { country: regex },
-                    { "attractions.name": regex },
                 ],
             })
-                .populate("state", "name slug")
-                .select("name slug shortDescription type images state")
+                .populate("state", "name slug image")
+                .select("name slug shortDescription type images image media state")
                 .limit(4)
                 .lean(),
             State.find({
                 isPublished: { $ne: false },
                 $or: [
                     { name: regex },
-                    { description: regex },
+                    { slug: regex },
                 ],
             })
-                .select("name slug image")
+                .select("name slug image media")
                 .limit(4)
                 .lean(),
             Package.find({
                 isActive: { $ne: false },
                 $or: [
                     { title: regex },
+                    { slug: regex },
                     { region: regex },
-                    { packageType: regex },
                 ],
             })
-                .select("title slug startingPrice image region")
+                .select("title slug startingPrice image gallery thumbnail region")
                 .limit(4)
                 .lean(),
             Hotel.find({
                 status: { $ne: "inactive" },
                 $or: [
                     { name: regex },
+                    { slug: regex },
                     { "location.city": regex },
                     { "location.state": regex },
+                    { "location.area": regex },
+                    { propertyType: regex },
+                    ...(cleanQuery.includes("hotel") || cleanQuery.includes("stay") || cleanQuery.includes("resort")
+                        ? [{ status: "active" }]
+                        : []),
                 ],
             })
-                .select("name slug location.city images")
-                .limit(3)
+                .select("name slug location images image media starCategory propertyType")
+                .limit(4)
                 .lean(),
             Transport.find({
                 status: { $ne: "inactive" },
                 $or: [
                     { title: regex },
+                    { slug: regex },
                     { brand: regex },
-                    { availableCities: regex },
                 ],
             })
-                .select("title slug category images")
+                .select("title slug category images image")
                 .limit(2)
                 .lean(),
         ]);
+
+        const resolveItemImg = (item) => {
+            if (!item) return "";
+            if (typeof item.image === "string" && item.image.trim()) return item.image;
+            if (item.image?.url && typeof item.image.url === "string") return item.image.url;
+            if (Array.isArray(item.images) && item.images.length > 0) {
+                if (typeof item.images[0] === "string" && item.images[0].trim()) return item.images[0];
+                if (item.images[0]?.url) return item.images[0].url;
+            }
+            if (Array.isArray(item.gallery) && item.gallery.length > 0) {
+                if (typeof item.gallery[0] === "string" && item.gallery[0].trim()) return item.gallery[0];
+                if (item.gallery[0]?.url) return item.gallery[0].url;
+            }
+            if (item.media?.coverImage?.url) return item.media.coverImage.url;
+            if (item.thumbnail && typeof item.thumbnail === "string") return item.thumbnail;
+            return "";
+        };
 
         const suggestions = [
             ...destinations.map((d) => ({
                 title: d.name,
                 slug: d.slug,
                 type: "destination",
-                url: `/destinations/${d.slug}`,
+                url: d.state?.slug ? `/destinations/${d.state.slug}/${d.slug}` : `/destinations/${d.slug}`,
                 subtitle: d.state?.name ? `Destination in ${d.state.name}` : (d.shortDescription || "Top Destination"),
-                image: d.images?.[0]?.url || "",
+                image: resolveItemImg(d) || resolveItemImg(d.state) || "",
             })),
             ...states.map((s) => ({
                 title: s.name,
@@ -242,7 +292,7 @@ export const searchSuggestions = async (req, res) => {
                 type: "state",
                 url: `/states/${s.slug}`,
                 subtitle: "State / Region Catalog",
-                image: s.image?.url || "",
+                image: resolveItemImg(s) || "",
             })),
             ...packages.map((p) => ({
                 title: p.title,
@@ -250,7 +300,7 @@ export const searchSuggestions = async (req, res) => {
                 type: "package",
                 url: `/packages/${p.slug}`,
                 subtitle: `Tour Package • ₹${(p.startingPrice || 0).toLocaleString("en-IN")}`,
-                image: p.image || "",
+                image: resolveItemImg(p) || "",
             })),
             ...hotels.map((h) => ({
                 title: h.name,
@@ -258,7 +308,7 @@ export const searchSuggestions = async (req, res) => {
                 type: "hotel",
                 url: `/hotels/${h.slug}`,
                 subtitle: `Hotel in ${h.location?.city || "India"}`,
-                image: h.images?.[0]?.url || "",
+                image: resolveItemImg(h) || "",
             })),
             ...transports.map((t) => ({
                 title: t.title,
@@ -266,9 +316,20 @@ export const searchSuggestions = async (req, res) => {
                 type: "transport",
                 url: `/services/transport/cabs`,
                 subtitle: `${t.category || "Vehicle"} Rental`,
-                image: t.images?.[0]?.url || "",
+                image: resolveItemImg(t) || "",
             })),
         ].slice(0, maxLimit);
+
+        suggestionsCache.set(cacheKey, {
+            timestamp: Date.now(),
+            data: suggestions,
+        });
+
+        // Limit cache size to 200 items
+        if (suggestionsCache.size > 200) {
+            const oldestKey = suggestionsCache.keys().next().value;
+            if (oldestKey) suggestionsCache.delete(oldestKey);
+        }
 
         return res.status(200).json({
             success: true,

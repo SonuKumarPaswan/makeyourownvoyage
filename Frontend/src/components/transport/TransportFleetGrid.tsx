@@ -90,8 +90,8 @@ export default function TransportFleetGrid({
                       {item.pricing?.perKmRate
                         ? `₹${item.pricing.perKmRate}/km`
                         : item.pricing?.perDayRate
-                        ? `₹${item.pricing.perDayRate}/day`
-                        : "On Request"}
+                          ? `₹${item.pricing.perDayRate}/day`
+                          : "On Request"}
                     </p>
                   </div>
                   <Link

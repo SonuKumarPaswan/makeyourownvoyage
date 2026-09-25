@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import MaterialIcon from "@/components/ui/MaterialIcon";
+import { FlipText } from "@/components/ui/FlipText";
 
 const CTASection = () => {
   return (
@@ -14,17 +15,17 @@ const CTASection = () => {
           {/* Content */}
           <div className="relative z-10 mx-auto max-w-3xl">
             {/* Label */}
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#d4af37]">
+            <p className="text-xs font-normal text-[#d4af37]">
               Your Next Adventure Awaits
             </p>
 
             {/* Heading */}
-            <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
-              Ready to Start Your Journey?
+            <h2 className="mt-3 text-3xl font-normal font-serif tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
+              Ready to start your journey?
             </h2>
 
             {/* Description */}
-            <p className="mx-auto mt-4 max-w-2xl text-xs sm:text-sm leading-relaxed text-gray-300 font-light">
+            <p className="mx-auto mt-4 max-w-2xl text-xs sm:text-sm leading-relaxed text-gray-300 font-normal">
               Explore amazing destinations, discover curated luxury travel deals and
               plan your bespoke voyage with our senior travel specialists.
             </p>
@@ -33,15 +34,15 @@ const CTASection = () => {
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/packages"
-                className="inline-flex items-center justify-center gap-2 bg-[#d4af37] hover:bg-[#c49f27] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-black transition shadow-lg"
+                className="group/cta-btn inline-flex items-center justify-center gap-2 bg-[#d4af37] hover:bg-[#c49f27] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] px-7 py-3.5 text-xs font-medium text-black transition-all duration-300 shadow-lg overflow-hidden"
               >
-                <span>Explore Packages</span>
-                <MaterialIcon name="arrow_forward" size={16} />
+                <FlipText text="Explore Packages" className="text-black" flippedClassName="text-black" />
+                <MaterialIcon name="arrow_forward" size={16} className="transition-transform duration-300 group-hover/cta-btn:translate-x-1 text-black" />
               </Link>
 
               <Link
                 href="/flights"
-                className="inline-flex items-center justify-center gap-2 border border-[#d4af37]/50 bg-black/40 hover:bg-[#d4af37] hover:text-black px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm transition shadow-lg group"
+                className="inline-flex items-center justify-center gap-2 border border-[#d4af37]/50 bg-black/40 hover:bg-[#d4af37] hover:text-black px-7 py-3.5 text-xs font-medium text-white backdrop-blur-sm transition shadow-lg group"
               >
                 <span>Search Flights</span>
                 <MaterialIcon name="flight_takeoff" className="text-[#d4af37] group-hover:text-black" size={16} />

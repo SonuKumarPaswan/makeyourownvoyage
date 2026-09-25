@@ -53,15 +53,16 @@ const FAQ = () => {
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
-            Frequently Asked Questions
-          </p>
+          <div className="flex items-center justify-center gap-2 text-xs font-normal text-muted">
+            <span className="text-primary text-sm leading-none">✦</span>
+            <span>Frequently Asked Questions</span>
+          </div>
 
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+          <h2 className="mt-4 text-3xl sm:text-4xl font-normal leading-[1.15] text-heading font-serif tracking-tight">
             Have Questions?
           </h2>
 
-          <p className="mt-4 text-base leading-7 text-muted">
+          <p className="mt-3 text-sm leading-relaxed text-muted font-normal">
             Find answers to some of the most common questions about booking
             flights, hotels, packages and other travel services.
           </p>

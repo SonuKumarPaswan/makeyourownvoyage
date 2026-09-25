@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import MaterialIcon from "@/components/ui/MaterialIcon";
+import { FlipText } from "@/components/ui/FlipText";
 import type { HomepageFeedResponse, Collection } from "@/types/homepage-feed";
 import type { Package } from "@/types/package";
 import { getHomepageFeed } from "@/lib/api/homepage-feed";
@@ -59,16 +60,16 @@ const extractSeasonalSlides = (
         if (img) {
           slides.push({
             id: pkg._id || `pkg-${colIdx}-${pkgIdx}`,
-            tabName: (dest || pkg.title.split(" ")[0]).toUpperCase().slice(0, 16),
+            tabName: (dest || pkg.title.split(" ")[0]).slice(0, 16),
             tagline: col.badgeText
-              ? col.badgeText.toUpperCase()
-              : `${currentSeason.toUpperCase()} SPECIAL 2026`,
-            title: (pkg.title || col.title).toUpperCase(),
+              ? col.badgeText
+              : `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Special 2026`,
+            title: pkg.title || col.title,
             description:
               col.subtitle ||
-              "EXPERIENCE HANDCRAFTED ITINERARIES, 5-STAR AMENITIES & UNFORGETTABLE LUXURY VOYAGES.",
+              "Experience handcrafted itineraries, 5-star amenities & unforgettable luxury voyages.",
             duration: pkg.duration || "5 Days / 4 Nights",
-            bestSeason: `${currentSeason.toUpperCase()} Season`,
+            bestSeason: `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Season`,
             location: dest,
             packageSlug: pkg.slug || col.slug || "packages",
             exploreLink: `/packages?season=${encodeURIComponent(currentSeason)}`,
@@ -93,16 +94,16 @@ const extractSeasonalSlides = (
       if (img) {
         slides.push({
           id: col._id || `col-${colIdx}`,
-          tabName: (dest || col.title.split(" ")[0]).toUpperCase().slice(0, 16),
+          tabName: (dest || col.title.split(" ")[0]).slice(0, 16),
           tagline: col.badgeText
-            ? col.badgeText.toUpperCase()
-            : `${currentSeason.toUpperCase()} ESCAPE 2026`,
-          title: col.title.toUpperCase(),
+            ? col.badgeText
+            : `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Escape 2026`,
+          title: col.title,
           description:
             col.subtitle ||
-            "DISCOVER HANDCRAFTED SEASONAL PACKAGES WITH CURATED LUXURY EXPERIENCES.",
+            "Discover handcrafted seasonal packages with curated luxury experiences.",
           duration: "5 Days / 4 Nights",
-          bestSeason: `${currentSeason.toUpperCase()} Season`,
+          bestSeason: `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Season`,
           location: dest || "Voyage",
           packageSlug: col.slug || "packages",
           exploreLink: `/packages?season=${encodeURIComponent(currentSeason)}`,
@@ -126,12 +127,12 @@ const extractSeasonalSlides = (
       if (img) {
         slides.push({
           id: pkg._id || `direct-${idx}`,
-          tabName: (dest || pkg.title.split(" ")[0]).toUpperCase().slice(0, 16),
-          tagline: `${currentSeason.toUpperCase()} GETAWAY 2026`,
-          title: pkg.title.toUpperCase(),
-          description: "SPECIAL HANDPICKED GETAWAY WITH DELUXE STAYS AND SIGHTSEEING.",
+          tabName: (dest || pkg.title.split(" ")[0]).slice(0, 16),
+          tagline: `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Getaway 2026`,
+          title: pkg.title,
+          description: "Special handpicked getaway with deluxe stays and sightseeing.",
           duration: pkg.duration || "3 Days / 2 Nights",
-          bestSeason: `${currentSeason.toUpperCase()} Season`,
+          bestSeason: `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Season`,
           location: dest,
           packageSlug: pkg.slug || "packages",
           exploreLink: `/packages?season=${encodeURIComponent(currentSeason)}`,
@@ -158,12 +159,12 @@ const extractSeasonalSlides = (
       if (img) {
         slides.push({
           id: p._id || `pkg-api-${idx}`,
-          tabName: (dest || p.title.split(" ")[0]).toUpperCase().slice(0, 16),
-          tagline: `${currentSeason.toUpperCase()} VOYAGE 2026`,
-          title: p.title.toUpperCase(),
-          description: `DISCOVER ${dest.toUpperCase()} WITH CURATED ACCOMMODATION & GUIDED ITINERARIES.`,
+          tabName: (dest || p.title.split(" ")[0]).slice(0, 16),
+          tagline: `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Voyage 2026`,
+          title: p.title,
+          description: `Discover ${dest} with curated accommodation & guided itineraries.`,
           duration: p.duration || `${p.days || 5} Days / ${p.nights || 4} Nights`,
-          bestSeason: `${currentSeason.toUpperCase()} Season`,
+          bestSeason: `${currentSeason.charAt(0).toUpperCase() + currentSeason.slice(1)} Season`,
           location: dest,
           packageSlug: p.slug || "packages",
           exploreLink: `/packages?season=${encodeURIComponent(currentSeason)}`,
@@ -296,8 +297,8 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
       <section className="relative w-full min-h-[720px] bg-[#060b13] flex items-center justify-center pt-24 pb-12">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 border-2 border-[#d4af37] border-t-transparent animate-spin" />
-          <span className="text-xs uppercase tracking-widest text-[#d4af37] font-bold">
-            Loading {activeSeason.toUpperCase()} Packages...
+          <span className="text-xs text-[#d4af37] font-medium">
+            Loading {activeSeason} packages...
           </span>
         </div>
       </section>
@@ -309,13 +310,13 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
       <section className="relative w-full min-h-[500px] bg-[#060b13] text-white flex items-center justify-center p-8">
         <div className="text-center max-w-md">
           <MaterialIcon name="auto_awesome" className="text-[#d4af37] mx-auto mb-3" size={32} />
-          <h2 className="text-xl font-bold uppercase mb-2">No {activeSeason.toUpperCase()} Packages Found</h2>
+          <h2 className="text-xl font-normal mb-2">No {activeSeason} packages found</h2>
           <p className="text-xs text-gray-400 mb-4">
             Upload or tag packages with `{activeSeason}` in Admin Panel to auto-display them here.
           </p>
           <Link
             href="/packages"
-            className="inline-block bg-[#d4af37] text-black font-bold uppercase text-xs px-5 py-2.5"
+            className="inline-block bg-[#d4af37] text-black font-medium text-xs px-5 py-2.5"
           >
             Explore All Packages
           </Link>
@@ -343,9 +344,8 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
       {/* Seamless Infinite Sliding Track */}
       <div
         onTransitionEnd={handleTransitionEnd}
-        className={`absolute inset-0 flex h-full z-0 ${
-          enableTransition ? "transition-transform duration-700 ease-in-out" : ""
-        }`}
+        className={`absolute inset-0 flex h-full z-0 ${enableTransition ? "transition-transform duration-700 ease-in-out" : ""
+          }`}
         style={{
           width: `${totalExtended * 100}%`,
           transform: `translateX(-${slideOffsetPercent}%)`,
@@ -377,19 +377,19 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
         <div className="max-w-2xl">
           {/* Subtitle / Seasonal Tagline */}
           <div className="mb-2">
-            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-[#d4af37]">
+            <span className="text-xs sm:text-sm font-medium tracking-[0.15em] text-[#d4af37]">
               {active.tagline}
             </span>
           </div>
 
-          {/* Package / Destination Title */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-tight text-white mb-3 sm:mb-4 leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+          {/* Package / Destination Title (Regular case, no bold, editorial serif) */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-normal text-white mb-3 sm:mb-4 leading-[1.15] font-serif tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
             {active.title}
           </h1>
 
           {/* Description with Signature Gold Accent Line */}
           <div className="relative pl-3.5 sm:pl-4 border-l-2 border-[#d4af37] mb-4 sm:mb-5 py-1 pr-2">
-            <p className="text-[11px] sm:text-xs md:text-[13px] font-medium text-white uppercase tracking-wide leading-relaxed max-w-xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
+            <p className="text-sm sm:text-base font-normal text-white/95 tracking-normal leading-relaxed max-w-xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
               &ldquo;{active.description}&rdquo;
             </p>
           </div>
@@ -400,10 +400,10 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
             <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-md">
               <MaterialIcon name="schedule" className="text-[#d4af37]" size={16} />
               <div>
-                <span className="block text-[8px] uppercase font-bold text-gray-300 leading-none">
+                <span className="block text-[10px] font-normal text-gray-300 leading-none">
                   Duration
                 </span>
-                <span className="text-[11px] font-bold text-white leading-tight">
+                <span className="text-xs font-medium text-white leading-tight">
                   {active.duration}
                 </span>
               </div>
@@ -413,10 +413,10 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
             <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 shadow-md">
               <MaterialIcon name="explore" className="text-[#d4af37]" size={16} />
               <div>
-                <span className="block text-[8px] uppercase font-bold text-gray-300 leading-none">
+                <span className="block text-[10px] font-normal text-gray-300 leading-none">
                   Best Season
                 </span>
-                <span className="text-[11px] font-bold text-white leading-tight">
+                <span className="text-xs font-medium text-white leading-tight">
                   {active.bestSeason}
                 </span>
               </div>
@@ -425,13 +425,13 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-3">
-            {/* Primary Button -> All Current Season Packages (Monsoon/Winter) */}
+            {/* Primary Button -> All Current Season Packages */}
             <Link
               href={`/packages?season=${encodeURIComponent(activeSeason)}`}
-              className="inline-flex items-center gap-1.5 bg-[#d4af37] text-black font-bold uppercase text-[11px] tracking-wider px-4 sm:px-5 py-2.5 transition hover:bg-[#c49f27] shadow-lg"
+              className="group/hero-btn inline-flex items-center gap-1.5 bg-[#d4af37] text-black font-medium text-xs px-4 sm:px-5 py-2.5 transition-all duration-300 hover:bg-[#c49f27] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] shadow-lg overflow-hidden"
             >
               <MaterialIcon name="travel_explore" className="text-black" size={16} />
-              <span>Explore {activeSeason.toUpperCase()} Packages</span>
+              <FlipText text={`Explore ${activeSeason.charAt(0).toUpperCase() + activeSeason.slice(1)} Packages`} className="text-black" flippedClassName="text-black" />
             </Link>
 
             {/* Secondary Button -> Specific Active Tour / Itinerary */}
@@ -441,7 +441,7 @@ export const Hero: React.FC<HeroProps> = ({ initialFeed, initialPackages }) => {
                   ? `/${active.packageSlug}`
                   : `/packages/${active.packageSlug}`
               }
-              className="inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md border border-[#d4af37]/40 text-white font-bold uppercase text-[11px] tracking-wider px-4 sm:px-5 py-2.5 transition hover:bg-[#d4af37] hover:text-black shadow-lg group"
+              className="inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md border border-[#d4af37]/40 text-white font-medium text-xs px-4 sm:px-5 py-2.5 transition hover:bg-[#d4af37] hover:text-black shadow-lg group"
             >
               <MaterialIcon name="location_on" className="text-[#d4af37] group-hover:text-black" size={16} />
               <span>

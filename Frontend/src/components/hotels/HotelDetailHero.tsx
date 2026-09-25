@@ -18,10 +18,10 @@ export const HotelDetailHero: React.FC<HotelDetailHeroProps> = ({
   const images = hotel.images && hotel.images.length > 0
     ? hotel.images
     : [
-        { url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80", alt: hotel.name, type: "cover" },
-        { url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80", alt: "Room", type: "room" },
-        { url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80", alt: "Pool", type: "pool" },
-      ];
+      { url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80", alt: hotel.name, type: "cover" },
+      { url: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80", alt: "Room", type: "room" },
+      { url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80", alt: "Pool", type: "pool" },
+    ];
 
   const primaryImage = images[0]?.url;
   const secondaryImages = images.slice(1, 5);

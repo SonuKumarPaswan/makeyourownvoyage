@@ -54,11 +54,10 @@ export const HotelsGrid: React.FC<HotelsGridProps> = ({
               <button
                 key={pt}
                 onClick={() => setSelectedPropertyType(pt)}
-                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-semibold border transition-all whitespace-nowrap ${
-                  selectedPropertyType === pt
+                className={`px-3 py-1.5 text-xs uppercase tracking-wider font-semibold border transition-all whitespace-nowrap ${selectedPropertyType === pt
                     ? "bg-[#0a192f] text-[#d4af37] border-[#0a192f]"
                     : "bg-white text-gray-700 border-gray-300 hover:border-[#0a192f]"
-                }`}
+                  }`}
               >
                 {pt === "all" ? "All Properties" : pt}
               </button>
