@@ -15,10 +15,9 @@ export async function getSearchSuggestions(
     }
 
     return apiFetch<SearchSuggestionsResponse>(
-        `/search/suggestions?q=${encodeURIComponent(query)} & limit= ${limit} `
-    )
+        `/search/suggestions?q=${encodeURIComponent(query.trim())}&limit=${limit}`
+    );
 }
-
 
 export async function globalSearch(
     query: string,
@@ -26,7 +25,6 @@ export async function globalSearch(
     limit: number = 20
 ): Promise<GlobalSearchResponse> {
     return apiFetch<GlobalSearchResponse>(
-        `/search?q=${encodeURIComponent(query)}&type=${type}&limit=${limit} `
-    )
-
+        `/search?q=${encodeURIComponent(query.trim())}&type=${type}&limit=${limit}`
+    );
 }

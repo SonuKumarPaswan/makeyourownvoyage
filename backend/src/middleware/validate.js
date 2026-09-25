@@ -15,6 +15,18 @@ export const validate = (schema, source = "body") => (req, res, next) => {
     });
   }
 
-  req[source] = value;
+  // In Express 5, req.query and req.params are getters without setters.
+  // Object.defineProperty safely overrides them on the request instance.
+  try {
+    Object.defineProperty(req, source, {
+      value,
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+  } catch {
+    req[source] = value;
+  }
+
   next();
 };

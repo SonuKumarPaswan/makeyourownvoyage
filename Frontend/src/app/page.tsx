@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-
 import Hero from "@/components/home/Hero";
 import TravelSearch from "@/components/home/TravelSearch";
 import PopularDestinations from "@/components/home/PopularDestinations";
