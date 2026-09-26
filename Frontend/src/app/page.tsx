@@ -5,6 +5,7 @@ import TravelSearch from "@/components/home/TravelSearch";
 import TravelStyles from "@/components/home/TravelStyles";
 import PopularDestinations from "@/components/home/PopularDestinations";
 import FeaturedPackages from "@/components/home/FeaturedPackages";
+import HomeBannerSlider from "@/components/home/HomeBannerSlider";
 import TourExperiences from "@/components/home/TourExperiences";
 import FlightDeals from "@/components/home/FlightDeals";
 import HotelDeals from "@/components/home/HotelDeals";
@@ -125,6 +126,8 @@ export default async function HomePage() {
       />
 
       <FeaturedPackages />
+
+      <HomeBannerSlider />
 
       <HotelDeals initialHotels={hotelsData} />
 

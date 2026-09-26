@@ -1,47 +1,54 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 
-const faqs = [
+interface FAQItem {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+const FAQS: FAQItem[] = [
   {
     id: 1,
-    question: "How can I book a flight through Make Your Own Voyage?",
+    question: "How does booking with Make Your Own Voyage work?",
     answer:
-      "You can search for flights by entering your departure city, destination, travel date and number of travellers. Compare the available options and continue with the booking process.",
+      "Select your desired destination, dates, and package style. You can customize your stays, private transfers, and sightseeing itineraries online, or speak directly with our 24/7 travel specialists for a tailored quote.",
   },
   {
     id: 2,
-    question: "Can I book hotels and holiday packages as well?",
+    question: "Can I customize holiday packages with flights and cabs?",
     answer:
-      "Yes. You can explore and book hotels, holiday packages, flights and cabs through Make Your Own Voyage from their respective sections.",
+      "Yes, absolutely. Every package is completely customizable. You can add doorstep private cab transfers (Sedan/Innova/Crysta), verified luxury hotels, domestic flights, and guided excursions to match your preferences.",
   },
   {
     id: 3,
-    question: "How do I know if my booking is confirmed?",
+    question: "Are there any hidden fees or extra charges?",
     answer:
-      "After completing your booking, you will receive your booking details and confirmation through the contact information provided during the booking process.",
+      "No. We practice complete price transparency. All inclusions, government taxes, driver allowances, toll charges, and hotel tariffs are clearly itemized before you confirm your reservation.",
   },
   {
     id: 4,
-    question: "Can I cancel or modify my booking?",
+    question: "What is your cancellation and refund policy?",
     answer:
-      "Cancellation and modification options depend on the booking type and the applicable terms and conditions. Check your booking details or contact our support team for assistance.",
+      "We offer flexible cancellation policies depending on the airline and hotel partner terms. Clear refund timelines and minimal cancellation charges are outlined during your booking confirmation.",
   },
   {
     id: 5,
-    question: "Are the prices shown on the website final?",
+    question: "How do I receive my booking vouchers and tickets?",
     answer:
-      "Prices may vary based on availability, travel dates, demand and applicable taxes or fees. The final amount will be displayed before you complete your booking.",
+      "Immediately upon confirmation, all verified booking vouchers, hotel confirmation numbers, flight e-tickets, and assigned driver details are delivered directly to your email and WhatsApp.",
   },
   {
     id: 6,
-    question: "How can I contact customer support?",
+    question: "Is 24/7 customer and on-trip assistance available?",
     answer:
-      "You can contact our support team through the Contact Us page. Our team can assist you with bookings, travel plans and other queries.",
+      "Yes. Our dedicated travel concierge and ground support team are available 24 hours a day, 7 days a week to assist you before, during, and after your trip.",
   },
 ];
 
-const FAQ = () => {
+export default function FAQ() {
   const [openId, setOpenId] = useState<number | null>(1);
 
   const toggleFAQ = (id: number) => {
@@ -49,133 +56,115 @@ const FAQ = () => {
   };
 
   return (
-    <section className="bg-background py-16 sm:py-20">
-      <div className="mx-auto max-w-4xl px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="flex items-center justify-center gap-2 text-xs font-normal text-muted">
-            <span className="text-primary text-sm leading-none">✦</span>
-            <span>Frequently Asked Questions</span>
+    <section className="bg-background py-16 sm:py-24 border-t border-border/40">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          {/* Left Column: Heading, Badge & Info */}
+          <div className="lg:col-span-5 flex flex-col justify-start lg:sticky lg:top-28">
+            {/* Pill Badge */}
+           
+
+            {/* Main Editorial Heading */}
+            <h2 className="mt-6 text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.12] text-heading font-serif tracking-tight">
+              Frequently asked <br />
+              <span className="text-[#d4af37] font-serif">
+                questions
+              </span>
+            </h2>
+
+            {/* Description Subtitle */}
+            <p className="mt-5 text-sm sm:text-base text-muted leading-relaxed font-normal max-w-md">
+              Choose personalized travel packages that fit your itinerary and
+              budget. No hidden fees, no surprises—just transparent pricing and
+              seamless holiday planning.
+            </p>
+
+            {/* Contact Support Mini Box */}
+            <div className="mt-8 flex items-center gap-3 text-sm text-muted">
+              <span>Have a specific query?</span>
+              <Link
+                href="/contact"
+                className="font-medium text-heading underline underline-offset-4 hover:text-primary transition-colors"
+              >
+                Contact Support →
+              </Link>
+            </div>
           </div>
 
-          <h2 className="mt-4 text-3xl sm:text-4xl font-normal leading-[1.15] text-heading font-serif tracking-tight">
-            Have Questions?
-          </h2>
+          {/* Right Column: Stacked Rounded FAQ Cards */}
+          <div className="lg:col-span-7 space-y-3.5 sm:space-y-4">
+            {FAQS.map((faq) => {
+              const isOpen = openId === faq.id;
 
-          <p className="mt-3 text-sm leading-relaxed text-muted font-normal">
-            Find answers to some of the most common questions about booking
-            flights, hotels, packages and other travel services.
-          </p>
-        </div>
-
-        {/* FAQ List */}
-        <div className="mt-10 space-y-4">
-          {faqs.map((faq) => {
-            const isOpen = openId === faq.id;
-
-            return (
-              <div
-                key={faq.id}
-                className={`overflow-hidden rounded-2xl border bg-card transition ${
-                  isOpen
-                    ? "border-primary/30 shadow-sm"
-                    : "border-border"
-                }`}
-              >
-                {/* Question */}
-                <button
-                  type="button"
-                  onClick={() => toggleFAQ(faq.id)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-6 px-5 py-5 text-left sm:px-6"
+              return (
+                <div
+                  key={faq.id}
+                  className={`faq-card-rounded transition-all duration-300 border overflow-hidden ${
+                    isOpen
+                      ? "bg-[#fdfaf3] border-[#d4af37]/40 shadow-xs"
+                      : "bg-[#fbfbfe] hover:bg-white border-slate-200/80 shadow-xs"
+                  }`}
+                  style={{ borderRadius: "1.25rem" }}
                 >
-                  <span className="text-base font-semibold text-heading sm:text-lg">
-                    {faq.question}
-                  </span>
-
-                  <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition ${
-                      isOpen
-                        ? "bg-primary text-white"
-                        : "bg-primary-light text-primary"
-                    }`}
+                  {/* Card Header / Question Button */}
+                  <button
+                    type="button"
+                    onClick={() => toggleFAQ(faq.id)}
+                    aria-expanded={isOpen}
+                    className="flex w-full items-center justify-between gap-4 p-5 sm:p-6 text-left cursor-pointer transition-colors"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className={`h-4 w-4 transition-transform duration-300 ${
-                        isOpen ? "rotate-180" : ""
+                    <span className="text-base sm:text-lg font-medium text-heading leading-snug">
+                      {faq.question}
+                    </span>
+
+                    {/* Circular Chevron Toggle Button with Brand Royal Gold */}
+                    <span
+                      className={`banner-circle-btn dest-circle-btn flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center transition-all duration-300 ${
+                        isOpen
+                          ? "bg-[#d4af37] text-white shadow-sm"
+                          : "bg-[#d4af37]/15 text-[#936e20] hover:bg-[#d4af37]/25"
                       }`}
+                      style={{ borderRadius: "9999px" }}
                     >
-                      <path
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="m6 9 6 6 6-6"
-                      />
-                    </svg>
-                  </span>
-                </button>
+                        className={`h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </span>
+                  </button>
 
-                {/* Answer */}
-                <div
-                  className={`grid transition-all duration-300 ${
-                    isOpen
-                      ? "grid-rows-[1fr] opacity-100"
-                      : "grid-rows-[0fr] opacity-0"
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    <div className="border-t border-border px-5 pb-5 pt-4 sm:px-6">
-                      <p className="text-sm leading-7 text-muted sm:text-base">
-                        {faq.answer}
-                      </p>
+                  {/* Accordion Answer Collapse */}
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isOpen
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0 border-t border-border/30">
+                        <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted font-normal">
+                          {faq.answer}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom Support CTA */}
-        <div className="mt-10 rounded-2xl border border-primary/20 bg-primary-light p-6 text-center sm:p-8">
-          <h3 className="text-xl font-bold text-heading">
-            Still have questions?
-          </h3>
-
-          <p className="mt-2 text-sm leading-6 text-muted">
-            Our travel support team is here to help you with your travel
-            plans and bookings.
-          </p>
-
-          <a
-            href="/contact"
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white transition hover:bg-primary-hover"
-          >
-            Contact Support
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 12h14m-6-6 6 6-6 6"
-              />
-            </svg>
-          </a>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default FAQ;
+}
