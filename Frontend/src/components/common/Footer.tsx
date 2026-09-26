@@ -97,20 +97,30 @@ export const Footer: React.FC = () => {
           {/* Col 4: Concierge Contact */}
           <div className="lg:col-span-3">
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#d4af37] mb-4 pb-2 border-b border-[#d4af37]/30">
-              Concierge Desk
+              Noida Head Office & Desk
             </h3>
             <div className="space-y-3 text-xs text-gray-300">
               <div className="flex items-start gap-2.5">
                 <MaterialIcon name="location_on" size={16} className="text-[#d4af37] shrink-0 mt-0.5" />
-                <span>Voyage Corporate Towers, Connaught Place, New Delhi, India</span>
+                <span className="leading-relaxed">
+                  Suite B-05, 127, C Block Road, C Block, Sector 63, Noida, Uttar Pradesh 201309, India
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <MaterialIcon name="call" size={16} className="text-[#d4af37] shrink-0" />
-                <span>+91 98765 43210 / +91 11 2345 6789</span>
+                <a href="tel:+917291000328" className="hover:text-[#d4af37] transition-colors font-medium">
+                  +91 72910 00328
+                </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <MaterialIcon name="mail" size={16} className="text-[#d4af37] shrink-0" />
-                <span>concierge@makeyourownvoyage.com</span>
+                <a href="mailto:Info@makeyourownvoyage.com" className="hover:text-[#d4af37] transition-colors">
+                  Info@makeyourownvoyage.com
+                </a>
+              </div>
+              <div className="flex items-start gap-2.5 pt-1 text-[11px] text-gray-400">
+                <MaterialIcon name="schedule" size={15} className="text-[#d4af37] shrink-0 mt-0.5" />
+                <span>Mon - Sat: 09:00 AM - 08:30 PM (24/7 Helpline)</span>
               </div>
             </div>
 
@@ -142,7 +152,11 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-6">
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/contact" className="hover:text-white transition-colors">Contact Concierge</Link>
+            <Link href="/contact-us" className="hover:text-white transition-colors">Contact Concierge</Link>
+            <Link href="/admin/dashboard" className="text-[#d4af37] hover:underline transition-colors flex items-center gap-1 font-medium">
+              <MaterialIcon name="admin_panel_settings" size={14} />
+              <span>Admin Portal</span>
+            </Link>
           </div>
         </div>
       </div>

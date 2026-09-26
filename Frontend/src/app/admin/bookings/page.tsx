@@ -2,329 +2,300 @@
 
 import React, { useState, useEffect } from "react";
 import MaterialIcon from "@/components/ui/MaterialIcon";
-import { apiFetch } from "@/lib/api/client";
+import { adminEnquiriesApi } from "@/lib/api/admin.api";
 
 interface EnquiryItem {
   _id: string;
-  enquiryCode: string;
-  enquiryType: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  city?: string;
-  specialRequests?: string;
-  status: string;
-  createdAt: string;
-  flightDetails?: {
-    fromCity?: string;
-    toCity?: string;
-    departureDate?: string;
-    returnDate?: string;
-    travelClass?: string;
-  };
-  hotelDetails?: {
-    hotelName?: string;
-    city?: string;
-    roomType?: string;
-    checkInDate?: string;
-    checkOutDate?: string;
-  };
-  packageDetails?: {
-    packageTitle?: string;
-    travelDate?: string;
-    packageCategory?: string;
-  };
-  transportDetails?: {
-    pickupLocation?: string;
-    dropLocation?: string;
-    vehicleType?: string;
-    serviceType?: string;
-    pickupDate?: string;
-  };
+  name?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  category?: string;
+  type?: string;
+  status?: "new" | "in-progress" | "contacted" | "converted" | "cancelled" | string;
+  destination?: string;
+  packageName?: string;
+  hotelName?: string;
+  travelDate?: string;
+  travellers?: number;
+  message?: string;
+  notes?: string;
+  quoteAmount?: number;
+  assignedTo?: string;
+  createdAt?: string;
 }
 
-export default function AdminEnquiriesPage() {
+export default function AdminBookingsPage() {
   const [enquiries, setEnquiries] = useState<EnquiryItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [filterType, setFilterType] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // Detail & Status Update Drawer / Modal
   const [selectedEnquiry, setSelectedEnquiry] = useState<EnquiryItem | null>(null);
-  const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+  const [newStatus, setNewStatus] = useState("new");
+  const [agentNotes, setAgentNotes] = useState("");
+  const [quoteAmount, setQuoteAmount] = useState<number | undefined>(undefined);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [notification, setNotification] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
-  const fetchEnquiries = async () => {
-    setIsLoading(true);
+  const loadData = async () => {
     try {
-      const res = await apiFetch<{ success: boolean; data: EnquiryItem[] }>(
-        "/enquiries/admin/all"
-      ).catch(() => null);
-
-      if (res?.data && Array.isArray(res.data)) {
-        setEnquiries(res.data);
+      setLoading(true);
+      const res = await adminEnquiriesApi.getAll({ limit: 100 });
+      if (res?.data) {
+        setEnquiries(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
-      console.error("Admin enquiries fetch error:", err);
+      console.error("Error loading enquiries:", err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchEnquiries();
+    loadData();
   }, []);
 
-  const handleUpdateStatus = async (id: string, newStatus: string) => {
-    setStatusUpdateLoading(true);
+  const showToast = (type: "success" | "error", msg: string) => {
+    setNotification({ type, msg });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  const handleOpenDetail = (enq: EnquiryItem) => {
+    setSelectedEnquiry(enq);
+    setNewStatus(enq.status || "new");
+    setAgentNotes(enq.notes || "");
+    setQuoteAmount(enq.quoteAmount);
+  };
+
+  const handleUpdateStatus = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEnquiry) return;
+    setIsUpdating(true);
+
     try {
-      await apiFetch(`/enquiries/admin/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ status: newStatus }),
+      await adminEnquiriesApi.updateStatus(selectedEnquiry._id, {
+        status: newStatus,
+        notes: agentNotes,
+        quoteAmount: quoteAmount ? Number(quoteAmount) : undefined,
       });
 
+      showToast("success", "Enquiry lead status updated successfully!");
       setEnquiries((prev) =>
-        prev.map((e) => (e._id === id ? { ...e, status: newStatus } : e))
+        prev.map((item) =>
+          item._id === selectedEnquiry._id
+            ? { ...item, status: newStatus, notes: agentNotes, quoteAmount }
+            : item
+        )
       );
-      if (selectedEnquiry && selectedEnquiry._id === id) {
-        setSelectedEnquiry((prev) => (prev ? { ...prev, status: newStatus } : null));
-      }
-    } catch (err) {
-      console.error("Status update error:", err);
+      setSelectedEnquiry(null);
+    } catch (err: any) {
+      showToast("error", err.message || "Failed to update status. Check token.");
     } finally {
-      setStatusUpdateLoading(false);
+      setIsUpdating(false);
     }
   };
 
-  const getServiceIcon = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case "flight":
-        return <MaterialIcon name="flight" size={16} className="text-sky-400" />;
-      case "hotel":
-        return <MaterialIcon name="apartment" size={16} className="text-amber-400" />;
-      case "package":
-      case "weekend_trip":
-        return <MaterialIcon name="travel_explore" size={16} className="text-emerald-400" />;
-      case "transport":
-        return <MaterialIcon name="directions_car" size={16} className="text-purple-400" />;
-      default:
-        return <MaterialIcon name="description" size={16} className="text-[#d4af37]" />;
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this enquiry record?")) return;
+    try {
+      await adminEnquiriesApi.delete(id);
+      showToast("success", "Enquiry deleted.");
+      setEnquiries((prev) => prev.filter((e) => e._id !== id));
+      if (selectedEnquiry?._id === id) setSelectedEnquiry(null);
+    } catch (err: any) {
+      showToast("error", err.message || "Failed to delete enquiry.");
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case "new":
-        return "bg-blue-500/20 text-blue-300 border-blue-500/40";
-      case "in_progress":
-      case "contacted":
-        return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-      case "quoted":
-      case "converted":
-        return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
-      case "cancelled":
-        return "bg-rose-500/20 text-rose-300 border-rose-500/40";
-      default:
-        return "bg-slate-500/20 text-slate-300 border-slate-500/40";
-    }
-  };
-
-  const filteredEnquiries = enquiries.filter((item) => {
-    if (filterType !== "all" && item.enquiryType !== filterType) return false;
-    if (filterStatus !== "all" && item.status !== filterStatus) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return (
-        item.customerName?.toLowerCase().includes(q) ||
-        item.customerEmail?.toLowerCase().includes(q) ||
-        item.customerPhone?.toLowerCase().includes(q) ||
-        item.enquiryCode?.toLowerCase().includes(q)
-      );
-    }
-    return true;
+  const filtered = enquiries.filter((e) => {
+    const customer = (e.name || e.fullName || "").toLowerCase();
+    const contact = (e.email || e.phone || "").toLowerCase();
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = customer.includes(query) || contact.includes(query);
+    const matchesStatus = selectedStatus === "all" || e.status === selectedStatus;
+    const matchesCategory = selectedCategory === "all" || (e.category || e.type) === selectedCategory;
+    return matchesSearch && matchesStatus && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen bg-[#060b13] text-white p-4 sm:p-6 lg:p-8">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+    <div className="space-y-6">
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-xs font-semibold shadow-2xl flex items-center gap-2 ${
+            notification.type === "success"
+              ? "bg-emerald-600 text-white"
+              : "bg-rose-600 text-white"
+          }`}
+        >
+          <MaterialIcon
+            name={notification.type === "success" ? "check_circle" : "error"}
+            size={18}
+          />
+          <span>{notification.msg}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] uppercase tracking-widest font-extrabold text-[#d4af37]">
-              Concierge CRM & Leads
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white">
-            Customer Enquiries & Quotations
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            Enquiries &amp; CRM Leads
           </h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Manage incoming holiday enquiries, hotel quotes, custom itineraries, and lead follow-ups.
+          </p>
         </div>
 
         <button
-          type="button"
-          onClick={fetchEnquiries}
-          className="inline-flex items-center gap-2 bg-[#0a192f] border border-[#d4af37]/40 text-[#d4af37] text-xs font-bold uppercase tracking-wider px-4 py-2.5 hover:bg-[#d4af37] hover:text-black transition cursor-pointer"
+          onClick={loadData}
+          className="px-3.5 py-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white border border-gray-700 text-xs font-semibold transition flex items-center gap-1.5 self-start sm:self-auto"
         >
-          <MaterialIcon name="refresh" size={14} className={isLoading ? "animate-spin" : ""} />
+          <MaterialIcon name="refresh" size={16} />
           <span>Refresh Leads</span>
         </button>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="my-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Search */}
-        <div className="relative">
-          <MaterialIcon name="search" size={16} className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* Filter Toolbar */}
+      <div className="bg-[#0a1526] border border-gray-800 p-4 rounded-xl flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="relative w-full sm:w-80">
+          <MaterialIcon
+            name="search"
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
           <input
             type="text"
-            placeholder="Search by Name, Phone, Email, Code..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#0a192f] border border-white/15 pl-9 pr-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#d4af37]"
+            placeholder="Search by customer name, phone, email..."
+            className="w-full bg-[#070e17] border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-xs text-white outline-none focus:border-[#d4af37]"
           />
         </div>
 
-        {/* Filter by Category */}
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="bg-[#0a192f] border border-white/15 px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37] cursor-pointer"
-        >
-          <option value="all">All Service Categories</option>
-          <option value="flight">Flights</option>
-          <option value="hotel">Hotels</option>
-          <option value="package">Holiday Packages</option>
-          <option value="transport">Airport Transfers / Fleet</option>
-          <option value="custom">Visa / Cruise / Corporate / Custom</option>
-        </select>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="bg-[#070e17] border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-[#d4af37]"
+          >
+            <option value="all">All Statuses</option>
+            <option value="new">New</option>
+            <option value="in-progress">In-Progress</option>
+            <option value="contacted">Contacted</option>
+            <option value="converted">Converted</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
 
-        {/* Filter by Status */}
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="bg-[#0a192f] border border-white/15 px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37] cursor-pointer"
-        >
-          <option value="all">All Lead Statuses</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="quoted">Quoted</option>
-          <option value="converted">Converted</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="bg-[#070e17] border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-[#d4af37]"
+          >
+            <option value="all">All Categories</option>
+            <option value="package">Package Enquiry</option>
+            <option value="hotel">Hotel Stay</option>
+            <option value="flight">Flight Booking</option>
+            <option value="transport">Transport / Cab</option>
+            <option value="custom">Custom Concierge</option>
+          </select>
+        </div>
       </div>
 
-      {/* Enquiries Table / List */}
-      <div className="bg-[#0a192f] border border-white/10 overflow-hidden shadow-2xl">
+      {/* Enquiries Table */}
+      <div className="bg-[#0a1526] border border-gray-800 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#081325] border-b border-white/10 uppercase tracking-wider text-[10px] text-gray-400 font-bold">
+          <table className="w-full text-left text-xs text-gray-300">
+            <thead className="bg-[#070e17] text-gray-400 uppercase text-[10px] tracking-wider border-b border-gray-800">
               <tr>
-                <th className="py-3.5 px-4">Code / Service</th>
-                <th className="py-3.5 px-4">Customer Contact</th>
-                <th className="py-3.5 px-4">Requirement Details</th>
-                <th className="py-3.5 px-4">Date / Time</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
+                <th className="p-3.5">Customer</th>
+                <th className="p-3.5">Category</th>
+                <th className="p-3.5">Details</th>
+                <th className="p-3.5">Quote / Value</th>
+                <th className="p-3.5">Status</th>
+                <th className="p-3.5">Received</th>
+                <th className="p-3.5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 font-medium">
-              {isLoading ? (
+            <tbody className="divide-y divide-gray-800/60">
+              {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-400">
-                    <MaterialIcon name="refresh" size={24} className="animate-spin text-[#d4af37] mx-auto mb-2" />
-                    <span>Loading real-time quotation requests...</span>
+                  <td colSpan={7} className="p-8 text-center text-gray-500">
+                    Loading CRM leads...
                   </td>
                 </tr>
-              ) : filteredEnquiries.length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-400">
-                    <span>No enquiries found matching your filters.</span>
+                  <td colSpan={7} className="p-8 text-center text-gray-500">
+                    No enquiries match the selected filter.
                   </td>
                 </tr>
               ) : (
-                filteredEnquiries.map((enq) => (
-                  <tr
-                    key={enq._id}
-                    className="hover:bg-white/5 transition-colors cursor-pointer"
-                    onClick={() => setSelectedEnquiry(enq)}
-                  >
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        {getServiceIcon(enq.enquiryType)}
-                        <div>
-                          <span className="font-bold text-[#d4af37] font-mono block">
-                            {enq.enquiryCode}
-                          </span>
-                          <span className="text-[10px] uppercase text-gray-400">
-                            {enq.enquiryType}
-                          </span>
-                        </div>
+                filtered.map((enq) => (
+                  <tr key={enq._id} className="hover:bg-gray-800/30 transition">
+                    <td className="p-3.5">
+                      <div className="font-semibold text-white">
+                        {enq.name || enq.fullName || "Guest Traveller"}
                       </div>
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-white">{enq.customerName}</div>
-                      <div className="text-[11px] text-gray-300 flex items-center gap-1">
-                        <MaterialIcon name="call" size={12} className="text-[#d4af37]" />
-                        <span>{enq.customerPhone}</span>
+                      <div className="text-[11px] text-gray-400 font-mono">
+                        {enq.phone || "-"}
                       </div>
-                      <div className="text-[10px] text-gray-400">{enq.customerEmail}</div>
+                      <div className="text-[11px] text-gray-500">{enq.email || "-"}</div>
                     </td>
-
-                    <td className="py-3.5 px-4 max-w-xs truncate">
-                      {enq.flightDetails && (
-                        <span>
-                          {enq.flightDetails.fromCity} ➔ {enq.flightDetails.toCity} (
-                          {enq.flightDetails.travelClass || "Economy"})
-                        </span>
-                      )}
-                      {enq.hotelDetails && (
-                        <span>
-                          {enq.hotelDetails.hotelName || enq.hotelDetails.city} (
-                          {enq.hotelDetails.roomType || "Standard"})
-                        </span>
-                      )}
-                      {enq.packageDetails && (
-                        <span>{enq.packageDetails.packageTitle || "Holiday Package"}</span>
-                      )}
-                      {enq.transportDetails && (
-                        <span>
-                          {enq.transportDetails.pickupLocation} ➔ {enq.transportDetails.dropLocation} (
-                          {enq.transportDetails.vehicleType})
-                        </span>
-                      )}
-                      {enq.specialRequests && !enq.flightDetails && !enq.hotelDetails && (
-                        <span className="text-gray-300">{enq.specialRequests}</span>
-                      )}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-gray-400 text-[11px]">
-                      {new Date(enq.createdAt).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <span
-                        className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(
-                          enq.status
-                        )}`}
-                      >
-                        {enq.status}
+                    <td className="p-3.5">
+                      <span className="px-2 py-0.5 rounded text-[10px] bg-gray-800 text-gray-300 border border-gray-700 capitalize">
+                        {enq.category || enq.type || "General"}
                       </span>
                     </td>
-
-                    <td className="py-3.5 px-4 text-right">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedEnquiry(enq);
-                        }}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold uppercase text-[#d4af37] hover:underline"
+                    <td className="p-3.5 text-gray-300 max-w-xs truncate">
+                      <div>{enq.destination || enq.packageName || enq.hotelName || "Trip Request"}</div>
+                      {enq.travelDate && (
+                        <div className="text-[10px] text-gray-400">Date: {enq.travelDate}</div>
+                      )}
+                    </td>
+                    <td className="p-3.5">
+                      {enq.quoteAmount ? (
+                        <span className="text-[#d4af37] font-bold">₹{enq.quoteAmount}</span>
+                      ) : (
+                        <span className="text-gray-500 text-[11px]">-</span>
+                      )}
+                    </td>
+                    <td className="p-3.5">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
+                          enq.status === "converted"
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            : enq.status === "contacted"
+                            ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                            : enq.status === "cancelled"
+                            ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                        }`}
                       >
-                        <MaterialIcon name="visibility" size={14} />
-                        <span>View</span>
-                      </button>
+                        {enq.status || "New"}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-gray-400 text-[11px]">
+                      {enq.createdAt ? new Date(enq.createdAt).toLocaleDateString() : "-"}
+                    </td>
+                    <td className="p-3.5 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleOpenDetail(enq)}
+                          className="px-2.5 py-1 rounded bg-[#d4af37] text-black font-semibold text-[11px] hover:bg-[#c49f27]"
+                        >
+                          View / Status
+                        </button>
+                        <button
+                          onClick={() => handleDelete(enq._id)}
+                          className="p-1 rounded hover:bg-rose-500/20 text-rose-400"
+                          title="Delete Lead"
+                        >
+                          <MaterialIcon name="delete" size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -334,173 +305,125 @@ export default function AdminEnquiriesPage() {
         </div>
       </div>
 
-      {/* Enquiry Detail Drawer / Modal */}
+      {/* Enquiry Detail & Status Update Drawer Modal */}
       {selectedEnquiry && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0a192f] border-2 border-[#d4af37] max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
-              <div className="flex items-center gap-2">
-                {getServiceIcon(selectedEnquiry.enquiryType)}
-                <div>
-                  <h3 className="text-lg font-bold uppercase text-white font-mono">
-                    {selectedEnquiry.enquiryCode}
-                  </h3>
-                  <span className="text-[11px] uppercase tracking-wider text-[#d4af37] font-bold">
-                    {selectedEnquiry.enquiryType} Quotation Lead
-                  </span>
-                </div>
-              </div>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#0e1b2e] border border-gray-700 rounded-xl max-w-xl w-full p-6 shadow-2xl space-y-5 my-8">
+            <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <MaterialIcon name="assignment" size={20} className="text-[#d4af37]" />
+                <span>Lead Enquiry Details</span>
+              </h2>
               <button
-                type="button"
                 onClick={() => setSelectedEnquiry(null)}
-                className="text-gray-400 hover:text-white p-1"
+                className="text-gray-400 hover:text-white"
               >
                 <MaterialIcon name="close" size={20} />
               </button>
             </div>
 
-            {/* Customer Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#081325] border border-white/10 p-3.5 mb-4">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-gray-400 block">Name</span>
-                <span className="text-sm font-bold text-white">{selectedEnquiry.customerName}</span>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold text-gray-400 block">Phone</span>
-                <a
-                  href={`tel:${selectedEnquiry.customerPhone}`}
-                  className="text-sm font-bold text-[#d4af37] hover:underline"
-                >
-                  {selectedEnquiry.customerPhone}
-                </a>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold text-gray-400 block">Email</span>
-                <a
-                  href={`mailto:${selectedEnquiry.customerEmail}`}
-                  className="text-xs font-medium text-gray-200 hover:underline break-all"
-                >
-                  {selectedEnquiry.customerEmail}
-                </a>
-              </div>
-            </div>
-
-            {/* Service Specific Information */}
-            <div className="space-y-3 mb-6">
-              <h4 className="text-xs uppercase font-extrabold tracking-widest text-[#d4af37]">
-                Requirement Breakdown
-              </h4>
-
-              {selectedEnquiry.flightDetails && (
-                <div className="bg-white/5 p-3.5 space-y-2 border border-white/10">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Route:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.flightDetails.fromCity} ➔ {selectedEnquiry.flightDetails.toCity}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Cabin Class:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.flightDetails.travelClass || "Economy"}
-                    </span>
-                  </div>
-                  {selectedEnquiry.flightDetails.departureDate && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">Departure Date:</span>
-                      <span className="font-bold text-white">
-                        {new Date(selectedEnquiry.flightDetails.departureDate).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {selectedEnquiry.hotelDetails && (
-                <div className="bg-white/5 p-3.5 space-y-2 border border-white/10">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Property / Destination:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.hotelDetails.hotelName || selectedEnquiry.hotelDetails.city}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Room & Guest Configuration:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.hotelDetails.roomType || "Standard"}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {selectedEnquiry.packageDetails && (
-                <div className="bg-white/5 p-3.5 space-y-2 border border-white/10">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Package Title:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.packageDetails.packageTitle}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {selectedEnquiry.transportDetails && (
-                <div className="bg-white/5 p-3.5 space-y-2 border border-white/10">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Pickup Location:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.transportDetails.pickupLocation}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Drop Destination:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.transportDetails.dropLocation}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Vehicle Type:</span>
-                    <span className="font-bold text-white">
-                      {selectedEnquiry.transportDetails.vehicleType}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {selectedEnquiry.specialRequests && (
-                <div className="bg-white/5 p-3.5 border border-white/10">
-                  <span className="text-[10px] uppercase font-bold text-gray-400 block mb-1">
-                    Special Inquiries & Notes:
+            {/* Readonly Info */}
+            <div className="bg-[#070e17] border border-gray-800 rounded-lg p-4 space-y-2.5 text-xs text-gray-300">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <span className="text-gray-500 block text-[10px] uppercase">Customer</span>
+                  <span className="font-semibold text-white">
+                    {selectedEnquiry.name || selectedEnquiry.fullName || "Guest"}
                   </span>
-                  <p className="text-xs text-gray-200 leading-relaxed">
-                    {selectedEnquiry.specialRequests}
+                </div>
+                <div>
+                  <span className="text-gray-500 block text-[10px] uppercase">Phone / WhatsApp</span>
+                  <span className="font-mono text-white">{selectedEnquiry.phone || "-"}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-gray-800/60">
+                <div>
+                  <span className="text-gray-500 block text-[10px] uppercase">Email</span>
+                  <span>{selectedEnquiry.email || "-"}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block text-[10px] uppercase">Category</span>
+                  <span className="capitalize">{selectedEnquiry.category || selectedEnquiry.type || "-"}</span>
+                </div>
+              </div>
+
+              {selectedEnquiry.message && (
+                <div className="pt-2 border-t border-gray-800/60">
+                  <span className="text-gray-500 block text-[10px] uppercase mb-1">
+                    Customer Message / Requirements
+                  </span>
+                  <p className="bg-[#0a1526] p-2.5 rounded border border-gray-800 text-gray-200">
+                    {selectedEnquiry.message}
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Quick Status Action Buttons */}
-            <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-              <span className="text-xs uppercase font-bold text-gray-400">Update Lead Status:</span>
-              <div className="flex flex-wrap gap-2">
-                {["new", "contacted", "quoted", "converted", "cancelled"].map((st) => (
-                  <button
-                    key={st}
-                    type="button"
-                    disabled={statusUpdateLoading}
-                    onClick={() => handleUpdateStatus(selectedEnquiry._id, st)}
-                    className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider border transition cursor-pointer ${
-                      selectedEnquiry.status === st
-                        ? "bg-[#d4af37] text-black border-[#d4af37]"
-                        : "bg-[#081325] text-gray-300 border-white/20 hover:border-[#d4af37]"
-                    }`}
+            {/* Status Update Form */}
+            <form onSubmit={handleUpdateStatus} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-semibold text-gray-300 uppercase block mb-1">
+                    Update Lead Status
+                  </label>
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value)}
+                    className="w-full bg-[#070e17] border border-gray-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#d4af37]"
                   >
-                    {st}
-                  </button>
-                ))}
+                    <option value="new">New (Unassigned)</option>
+                    <option value="in-progress">In-Progress</option>
+                    <option value="contacted">Contacted Customer</option>
+                    <option value="converted">Converted (Booked)</option>
+                    <option value="cancelled">Cancelled / Lost</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-semibold text-gray-300 uppercase block mb-1">
+                    Quote / Booking Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    value={quoteAmount || ""}
+                    onChange={(e) => setQuoteAmount(e.target.value ? Number(e.target.value) : undefined)}
+                    placeholder="e.g. 45000"
+                    className="w-full bg-[#070e17] border border-gray-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#d4af37]"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-gray-300 uppercase block mb-1">
+                  Internal Agent Notes
+                </label>
+                <textarea
+                  rows={3}
+                  value={agentNotes}
+                  onChange={(e) => setAgentNotes(e.target.value)}
+                  placeholder="Notes on customer preferences, customized quote shared, or follow-up schedule..."
+                  className="w-full bg-[#070e17] border border-gray-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#d4af37]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEnquiry(null)}
+                  className="px-4 py-2 rounded-lg text-xs bg-gray-800 text-gray-300 hover:bg-gray-700"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="px-5 py-2 rounded-lg text-xs font-semibold bg-[#d4af37] text-black hover:bg-[#c49f27] transition flex items-center gap-1.5"
+                >
+                  {isUpdating ? "Saving..." : "Save Status & Notes"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

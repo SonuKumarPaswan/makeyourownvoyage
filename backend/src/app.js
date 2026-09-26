@@ -28,6 +28,7 @@ import searchRoutes from "./routes/search.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import collectionRoutes from "./routes/collection.routes.js";
 import seoRoutes from "./routes/seo.routes.js";
+import visaRoutes from "./routes/visa.routes.js";
 
 
 const app = express();
@@ -102,6 +103,7 @@ app.use("/api/itinerary-templates", templateRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/states", stateRoutes);
 app.use("/api/destinations", destinationRoutes);
+app.use("/api/visas", visaRoutes);
 app.use("/api/faq", faqRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/collections", collectionRoutes);

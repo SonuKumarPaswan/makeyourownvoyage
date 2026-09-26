@@ -1,13 +1,27 @@
 import { Destination } from "./destination";
 
 export type PackageType =
-  | "domestic"
-  | "weekend"
+  | "sea_beach"
+  | "trekking_tour"
+  | "single_tour"
+  | "weekend_trips"
+  | "mountain_trips"
+  | "group_trips"
+  | "honeymoon"
   | "family"
   | "couple"
   | "corporate"
+  | "adventure"
+  | "luxury"
+  | "pilgrimage"
+  | "heritage"
+  | "road_trip"
+  | "domestic"
+  | "weekend"
   | "group"
-  | "custom";
+  | "custom"
+  | "holiday"
+  | string;
 
 export interface Activity {
   _id?: string;
@@ -76,6 +90,7 @@ export interface Package {
   slug: string;
   destination: Destination | string;
   packageType: PackageType;
+  categories?: string[];
   region: string;
   days: number;
   nights: number;
@@ -84,6 +99,7 @@ export interface Package {
   primaryTransport?: any;
   sourceTemplate?: string;
   corporateFacilities?: CorporateFacilities;
+  functions?: any[];
   startingPrice: number;
   currency: string;
   minPax: number;

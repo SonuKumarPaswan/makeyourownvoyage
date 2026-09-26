@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Navbar from "@/components/common/Navbar";
+import Footer from "@/components/common/Footer";
 import Hero from "@/components/home/Hero";
 import TravelSearch from "@/components/home/TravelSearch";
 import TravelStyles from "@/components/home/TravelStyles";
@@ -113,39 +115,42 @@ export default async function HomePage() {
   }
 
   return (
-    <>
-      <Hero initialFeed={feedData} initialPackages={packagesData} />
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <Hero initialFeed={feedData} initialPackages={packagesData} />
 
-      <TravelSearch />
+        <TravelSearch />
 
-      <TravelStyles />
+        <TravelStyles />
 
-      <PopularDestinations
-        initialDestinations={destinationsData}
-        initialStates={statesData}
-      />
+        <PopularDestinations
+          initialDestinations={destinationsData}
+          initialStates={statesData}
+        />
 
-      <FeaturedPackages />
+        <FeaturedPackages />
 
-      <HomeBannerSlider />
+        <HomeBannerSlider />
 
-      <HotelDeals initialHotels={hotelsData} />
+        <HotelDeals initialHotels={hotelsData} />
 
-      <FlightDeals />
-      <TourExperiences />
+        <FlightDeals />
+        <TourExperiences />
 
+        <WhyChooseUs />
 
-      <WhyChooseUs />
+        <HowItWorks />
 
-      <HowItWorks />
+        <Testimonials />
 
-      <Testimonials />
+        <TravelBlog />
 
-      <TravelBlog />
+        <FAQ />
 
-      <FAQ />
-
-      <CTASection />
-    </>
+        <CTASection />
+      </main>
+      <Footer />
+    </div>
   );
 }

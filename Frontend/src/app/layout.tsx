@@ -129,9 +129,7 @@ export default function RootLayout({
       </head>
       <body className={`${plusJakartaSans.className} font-sans antialiased text-text bg-background`}>
         <SmoothScroll>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          {children}
         </SmoothScroll>
       </body>
     </html>

@@ -25,10 +25,21 @@ export default function PackageDetailHero({ pkg }: PackageDetailHeroProps) {
 
       <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-12 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="bg-[#d4af37] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#0a192f]">
-            {pkg.packageType}
-          </span>
-          <span className="inline-flex items-center gap-1 border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+          {Array.isArray(pkg.categories) && pkg.categories.length > 0 ? (
+            pkg.categories.map((cat) => (
+              <span
+                key={cat}
+                className="bg-[#d4af37] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#0a192f] rounded-xs shadow-xs"
+              >
+                {cat.replace(/_/g, " ")}
+              </span>
+            ))
+          ) : (
+            <span className="bg-[#d4af37] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#0a192f] rounded-xs shadow-xs">
+              {pkg.packageType?.replace(/_/g, " ") || "Sea Beach"}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1 border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md rounded-xs">
             <MaterialIcon name="location_on" size={14} className="text-[#d4af37]" />
             {destinationName}
           </span>

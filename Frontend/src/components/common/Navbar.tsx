@@ -167,7 +167,7 @@ export const Navbar: React.FC = () => {
           <BrandLogo theme="dark" onClick={() => setIsOpen(false)} />
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {navLinks.map((link) => {
               const isActive =
                 link.href === "/"
@@ -179,14 +179,14 @@ export const Navbar: React.FC = () => {
                   <div key={link.href} className="relative group/services py-5">
                     <Link
                       href={link.href}
-                      className={`relative group px-3.5 py-2 text-sm font-medium transition-colors duration-200 bg-transparent flex items-center gap-1 ${
+                      className={`relative group px-3 py-1.5 text-xs font-medium tracking-wide transition-colors duration-200 bg-transparent flex items-center gap-1 ${
                         isActive
                           ? "text-[#d4af37]"
                           : "text-gray-200"
                       }`}
                     >
                       <FlipText text={link.name} flippedClassName="text-[#d4af37]" />
-                      <MaterialIcon name="expand_more" size={14} className="transition-transform duration-200 group-hover/services:rotate-180" />
+                      <MaterialIcon name="expand_more" size={13} className="transition-transform duration-200 group-hover/services:rotate-180" />
 
                       {/* Underline Stick */}
                       <span
@@ -238,7 +238,7 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative group px-3.5 py-2 text-sm font-medium transition-colors duration-200 bg-transparent ${
+                  className={`relative group px-3 py-1.5 text-xs font-medium tracking-wide transition-colors duration-200 bg-transparent ${
                     isActive
                       ? "text-[#d4af37]"
                       : "text-gray-200"
@@ -246,7 +246,7 @@ export const Navbar: React.FC = () => {
                 >
                   <FlipText text={link.name} flippedClassName="text-[#d4af37]" />
 
-                  {/* Underline Stick: Enters from Left on hover, Exits to Right on unhover */}
+                  {/* Underline Stick */}
                   <span
                     className={`absolute bottom-0 left-0 h-[2px] w-full bg-[#d4af37] transition-transform duration-300 ease-out origin-right group-hover:origin-left ${
                       isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
@@ -258,20 +258,30 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
             {/* Global Search Autocomplete Bar */}
-            <div className="w-56 xl:w-64">
+            <div className="w-52 xl:w-60">
               <NavbarSearch />
             </div>
+
+            {/* Circular Sign In Button */}
+            <Link
+              href="/login"
+              aria-label="Sign In / Account"
+              title="Sign In / Account"
+              className="banner-circle-btn rounded-full h-10 w-10 shrink-0 border border-[#d4af37]/60 bg-[#0a192f]/90 text-[#d4af37] hover:bg-[#d4af37] hover:text-black hover:border-[#d4af37] transition-all flex items-center justify-center shadow-md group relative"
+            >
+              <MaterialIcon name="person" size={20} className="transition-transform group-hover:scale-110" />
+            </Link>
 
             <Link href="/packages">
               <Button
                 variant="primary"
                 size="sm"
-                className="group text-xs font-medium py-2.5 px-4 flex items-center gap-1.5 shadow-md overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                className="group text-xs font-medium py-2 px-3.5 flex items-center gap-1.5 shadow-md overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
               >
                 <FlipText text="Explore Trips" className="text-black" flippedClassName="text-black" />
-                <MaterialIcon name="arrow_forward" size={16} className="transition-transform duration-300 group-hover:translate-x-1 text-black" />
+                <MaterialIcon name="arrow_forward" size={15} className="transition-transform duration-300 group-hover:translate-x-1 text-black" />
               </Button>
             </Link>
           </div>
@@ -370,7 +380,16 @@ export const Navbar: React.FC = () => {
               })}
             </div>
 
-            <div className="pt-2 px-2">
+            <div className="pt-2 px-2 space-y-2">
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-xs font-semibold py-2.5 px-4 border border-[#d4af37]/50 rounded-lg text-[#d4af37] flex items-center justify-center gap-2 hover:bg-[#d4af37] hover:text-black transition"
+              >
+                <MaterialIcon name="person" size={16} />
+                <span>Sign In to Voyage Account</span>
+              </Link>
+
               <Link href="/packages" onClick={() => setIsOpen(false)}>
                 <Button
                   variant="primary"

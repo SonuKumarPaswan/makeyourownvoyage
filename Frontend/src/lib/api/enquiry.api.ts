@@ -11,6 +11,16 @@ import {
 
 export const enquiryApi = {
   /**
+   * Universal Create / Submit Enquiry
+   */
+  async createEnquiry(payload: any): Promise<any> {
+    return apiFetch<any>(API_ENDPOINTS.ENQUIRIES, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  /**
    * Submit Universal Multi-Category Enquiry
    */
   async submitUniversal(payload: BaseEnquiryPayload): Promise<EnquiryResponse> {

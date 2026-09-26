@@ -55,8 +55,23 @@ export const createPackage = async (req, res) => {
         } = req.body;
 
         // Safely parse JSON strings if sent via multipart/form-data
+        if (restPackageData.categories) {
+            restPackageData.categories = parseJsonField(restPackageData.categories, restPackageData.categories);
+            if (typeof restPackageData.categories === "string") {
+                restPackageData.categories = restPackageData.categories.split(",").map((c) => c.trim()).filter(Boolean);
+            }
+        }
+        if (Array.isArray(restPackageData.categories) && restPackageData.categories.length > 0) {
+            if (!restPackageData.packageType || !restPackageData.categories.includes(restPackageData.packageType)) {
+                restPackageData.packageType = restPackageData.categories[0];
+            }
+        } else if (restPackageData.packageType) {
+            restPackageData.categories = [restPackageData.packageType];
+        }
+
         if (restPackageData.priceSlabs) restPackageData.priceSlabs = parseJsonField(restPackageData.priceSlabs, restPackageData.priceSlabs);
         if (restPackageData.corporateFacilities) restPackageData.corporateFacilities = parseJsonField(restPackageData.corporateFacilities, restPackageData.corporateFacilities);
+        if (restPackageData.functions) restPackageData.functions = parseJsonField(restPackageData.functions, restPackageData.functions || []);
         if (restPackageData.inclusions) restPackageData.inclusions = parseJsonField(restPackageData.inclusions, restPackageData.inclusions);
         if (restPackageData.exclusions) restPackageData.exclusions = parseJsonField(restPackageData.exclusions, restPackageData.exclusions);
         if (restPackageData.gallery) restPackageData.gallery = parseJsonField(restPackageData.gallery, restPackageData.gallery || []);
@@ -193,6 +208,8 @@ export const getAllPackages = async (req, res) => {
         const {
             destination,
             packageType,
+            category,
+            categories,
             region,
             minPrice,
             maxPrice,
@@ -219,8 +236,21 @@ export const getAllPackages = async (req, res) => {
             }
         }
 
-        if (packageType) {
-            query.packageType = packageType;
+        const filterCat = packageType || category || categories;
+        if (filterCat && filterCat !== "all") {
+            const catList = String(filterCat).split(",").map((c) => c.trim()).filter(Boolean);
+            if (catList.length === 1) {
+                query.$or = [
+                    { packageType: catList[0] },
+                    { categories: catList[0] },
+                    { categories: { $in: [catList[0]] } },
+                ];
+            } else if (catList.length > 1) {
+                query.$or = [
+                    { packageType: { $in: catList } },
+                    { categories: { $in: catList } },
+                ];
+            }
         }
 
         if (region) {
@@ -350,8 +380,23 @@ export const updatePackage = async (req, res) => {
         const updates = { ...req.body };
 
         // Safely parse JSON strings if sent via multipart/form-data
+        if (updates.categories) {
+            updates.categories = parseJsonField(updates.categories, updates.categories);
+            if (typeof updates.categories === "string") {
+                updates.categories = updates.categories.split(",").map((c) => c.trim()).filter(Boolean);
+            }
+        }
+        if (Array.isArray(updates.categories) && updates.categories.length > 0) {
+            if (!updates.packageType || !updates.categories.includes(updates.packageType)) {
+                updates.packageType = updates.categories[0];
+            }
+        } else if (updates.packageType) {
+            updates.categories = [updates.packageType];
+        }
+
         if (updates.priceSlabs) updates.priceSlabs = parseJsonField(updates.priceSlabs, updates.priceSlabs);
         if (updates.corporateFacilities) updates.corporateFacilities = parseJsonField(updates.corporateFacilities, updates.corporateFacilities);
+        if (updates.functions) updates.functions = parseJsonField(updates.functions, updates.functions);
         if (updates.inclusions) updates.inclusions = parseJsonField(updates.inclusions, updates.inclusions);
         if (updates.exclusions) updates.exclusions = parseJsonField(updates.exclusions, updates.exclusions);
         if (updates.gallery) updates.gallery = parseJsonField(updates.gallery, updates.gallery);

@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import MaterialIcon from "@/components/ui/MaterialIcon";
 
 export const metadata: Metadata = {
   title: "Contact Us | Make Your Own Voyage",
-
   description:
-    "Contact Make Your Own Voyage for flight booking, hotel booking, holiday packages, visa assistance, airport transfers and customized travel enquiries.",
-
+    "Contact Make Your Own Voyage for flight booking, hotel booking, holiday packages, visa assistance, corporate travel and customized travel enquiries. Noida Head Office.",
   keywords: [
     "contact Make Your Own Voyage",
-    "travel enquiry",
+    "travel enquiry Noida",
     "travel agency contact",
     "flight booking enquiry",
     "hotel booking enquiry",
@@ -18,233 +17,222 @@ export const metadata: Metadata = {
     "visa assistance",
     "travel support",
   ],
-
   alternates: {
-    canonical: "https://www.makeyourownvoyage.com/contact",
+    canonical: "https://www.makeyourownvoyage.com/contact-us",
   },
-
   openGraph: {
     title: "Contact Us | Make Your Own Voyage",
     description:
-      "Get in touch with Make Your Own Voyage for travel bookings, holiday packages and customized travel assistance.",
-    url: "https://www.makeyourownvoyage.com/contact",
+      "Get in direct touch with Make Your Own Voyage for travel bookings, holiday packages and customized concierge assistance.",
+    url: "https://www.makeyourownvoyage.com/contact-us",
     siteName: "Make Your Own Voyage",
     type: "website",
-    images: [
-      {
-        url: "https://www.makeyourownvoyage.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Contact Make Your Own Voyage",
-      },
-    ],
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "Contact Us | Make Your Own Voyage",
-    description:
-      "Contact Make Your Own Voyage for travel bookings and enquiries.",
-    images: ["https://www.makeyourownvoyage.com/og-image.jpg"],
-  },
-
-  robots: {
-    index: true,
-    follow: true,
   },
 };
 
 export default function ContactUsPage() {
   return (
-    <main className="min-h-screen bg-background">
-      {/* ================= HERO ================= */}
-      <section className="bg-primary-light">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+    <main className="min-h-screen bg-background pt-24 pb-20">
+      {/* ================= HERO HEADER ================= */}
+      <section className="bg-background py-10 sm:py-14 border-b border-border/40">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-              Get In Touch
-            </span>
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-xs font-medium text-heading">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white text-[10px] leading-none">
+                ✦
+              </span>
+              <span>24/7 Concierge &amp; Travel Desk</span>
+            </div>
 
-            <h1 className="mt-5 text-4xl font-bold tracking-tight text-heading sm:text-5xl">
-              Contact Us
+            <h1 className="mt-4 text-3xl sm:text-5xl font-bold text-heading tracking-tight">
+              Contact <span className="text-primary">Make Your Own Voyage</span>
             </h1>
 
-            <p className="mt-5 text-lg leading-8 text-text">
-              Have a question about flights, hotels, holiday packages or your
-              next trip? Get in touch with Make Your Own Voyage and our team
-              will help you with your travel enquiry.
+            <p className="mt-4 text-sm sm:text-base text-muted leading-relaxed font-normal">
+              Whether you are planning a family holiday, corporate offsite, flight booking, or doorstep cab transfer, our dedicated travel specialists are here to assist you 24/7.
             </p>
           </div>
         </div>
       </section>
 
       {/* ================= CONTACT SECTION ================= */}
-      <section className="py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-          {/* Contact Information */}
-          <div>
-            <span className="text-sm font-semibold uppercase tracking-wider text-primary">
-              Contact Information
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:px-8 items-start">
+          {/* Left Column: Official Contact Information Card */}
+          <div className="lg:col-span-6 bg-card border border-border/80 p-6 sm:p-8 md:p-10 shadow-sm rounded-xl">
+            {/* Top Badge */}
+            <span className="text-xs font-semibold tracking-wider text-primary uppercase block">
+              Noida Head Office &amp; Desk
             </span>
 
-            <h2 className="mt-3 text-3xl font-bold text-heading">
-              Let&apos;s Plan Your Journey
+            {/* Main Heading */}
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-heading">
+              Get in Direct Touch
             </h2>
 
-            <p className="mt-5 leading-7 text-text">
-              Whether you need help with flight bookings, hotels, holiday
-              packages or a customized trip, send us your requirements and
-              we&apos;ll get back to you.
+            {/* Subtitle */}
+            <p className="mt-2 text-xs sm:text-sm text-muted leading-relaxed">
+              Corporate travel accounts and vacation seekers enjoy 24/7 dedicated concierge assistance.
             </p>
 
-            <div className="mt-8 space-y-4">
-              {/* Email */}
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-xl">
-                    ✉️
-                  </div>
+            <div className="my-6 border-t border-border/60" />
 
-                  <div>
-                    <h3 className="font-bold text-heading">Email</h3>
-
-                    <a
-                      href="mailto:info@makeyourownvoyage.com"
-                      className="mt-1 block text-sm text-primary hover:underline"
-                    >
-                      info@makeyourownvoyage.com
-                    </a>
-                  </div>
+            {/* 4 Contact Info Blocks */}
+            <div className="space-y-6">
+              {/* 1. CALL & WHATSAPP HOTLINE */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                  <MaterialIcon name="call" size={20} />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold tracking-wider text-muted uppercase block">
+                    Call &amp; WhatsApp Hotline
+                  </span>
+                  <a
+                    href="tel:+917291000328"
+                    className="mt-1 block text-lg sm:text-xl font-bold text-heading hover:text-primary transition-colors tracking-tight"
+                  >
+                    +91 72910 00328
+                  </a>
                 </div>
               </div>
 
-              {/* Phone */}
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary-light text-xl">
-                    📞
-                  </div>
-
-                  <div>
-                    <h3 className="font-bold text-heading">Phone</h3>
-
-                    <a
-                      href="tel:+919999999999"
-                      className="mt-1 block text-sm text-primary hover:underline"
-                    >
-                      +91 99999 99999
-                    </a>
-                  </div>
+              {/* 2. OFFICIAL OPERATIONS EMAIL */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                  <MaterialIcon name="mail" size={20} />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold tracking-wider text-muted uppercase block">
+                    Official Operations Email
+                  </span>
+                  <a
+                    href="mailto:Info@makeyourownvoyage.com"
+                    className="mt-1 block text-base sm:text-lg font-semibold text-heading hover:text-primary transition-colors"
+                  >
+                    Info@makeyourownvoyage.com
+                  </a>
                 </div>
               </div>
 
-              {/* Travel Enquiry */}
-              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-light text-xl">
-                    🌍
-                  </div>
+              {/* 3. CORPORATE HEAD OFFICE */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                  <MaterialIcon name="location_on" size={20} />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold tracking-wider text-muted uppercase block">
+                    Corporate Head Office
+                  </span>
+                  <p className="mt-1 text-xs sm:text-sm text-heading leading-relaxed max-w-sm font-normal">
+                    Suite B-05, 127, C Block Road, C Block, Sector 63, Noida, Uttar Pradesh 201309, India
+                  </p>
+                </div>
+              </div>
 
-                  <div>
-                    <h3 className="font-bold text-heading">
-                      Travel Enquiry
-                    </h3>
-
-                    <p className="mt-1 text-sm leading-6 text-muted">
-                      Tell us about your destination, travel dates and
-                      requirements.
-                    </p>
-                  </div>
+              {/* 4. DESK OPERATING HOURS */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                  <MaterialIcon name="schedule" size={20} />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold tracking-wider text-muted uppercase block">
+                    Desk Operating Hours
+                  </span>
+                  <p className="mt-1 text-xs sm:text-sm text-heading font-medium leading-relaxed">
+                    Mon - Sat: 09:00 AM - 08:30 PM <br />
+                    <span className="text-primary text-xs font-semibold">(24/7 Dedicated Corporate Helpline)</span>
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-            <h2 className="text-2xl font-bold text-heading">
-              Send Us an Enquiry
+          {/* Right Column: Interactive Send Enquiry Form */}
+          <div className="lg:col-span-6 bg-card border border-border/80 p-6 sm:p-8 md:p-10 shadow-sm rounded-xl">
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Online Request
+            </span>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-heading">
+              Send Us a Travel Enquiry
             </h2>
-
-            <p className="mt-2 text-sm text-muted">
-              Fill in your details and tell us how we can help.
+            <p className="mt-2 text-xs sm:text-sm text-muted">
+              Submit your trip requirements and a senior travel specialist will contact you with custom options.
             </p>
 
-            <form className="mt-8 space-y-5">
-              <div className="grid gap-5 sm:grid-cols-2">
+            <form className="mt-6 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label
                     htmlFor="name"
-                    className="mb-2 block text-sm font-semibold text-heading"
+                    className="mb-1.5 block text-xs font-semibold text-heading uppercase tracking-wider"
                   >
-                    Full Name
+                    Full Name *
                   </label>
-
                   <input
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Enter your name"
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    required
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full border border-border bg-background px-3.5 py-2.5 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="email"
-                    className="mb-2 block text-sm font-semibold text-heading"
+                    className="mb-1.5 block text-xs font-semibold text-heading uppercase tracking-wider"
                   >
-                    Email Address
+                    Email Address *
                   </label>
-
                   <input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="Enter your email"
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    required
+                    placeholder="e.g. rahul@gmail.com"
+                    className="w-full border border-border bg-background px-3.5 py-2.5 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
                   />
                 </div>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label
                     htmlFor="phone"
-                    className="mb-2 block text-sm font-semibold text-heading"
+                    className="mb-1.5 block text-xs font-semibold text-heading uppercase tracking-wider"
                   >
-                    Phone Number
+                    Phone / WhatsApp *
                   </label>
-
                   <input
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="Enter phone number"
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    required
+                    placeholder="e.g. +91 98765 43210"
+                    className="w-full border border-border bg-background px-3.5 py-2.5 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="service"
-                    className="mb-2 block text-sm font-semibold text-heading"
+                    className="mb-1.5 block text-xs font-semibold text-heading uppercase tracking-wider"
                   >
                     Travel Service
                   </label>
-
                   <select
                     id="service"
                     name="service"
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-heading outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    className="w-full border border-border bg-background px-3.5 py-2.5 text-sm text-heading outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
                   >
-                    <option value="">Select service</option>
+                    <option value="package">Holiday Tour Package</option>
+                    <option value="hotel">Luxury Hotel / Resort</option>
                     <option value="flight">Flight Booking</option>
-                    <option value="hotel">Hotel Booking</option>
-                    <option value="package">Holiday Package</option>
+                    <option value="corporate">Corporate MICE &amp; Offsite</option>
+                    <option value="cab">Doorstep Cab Transfer</option>
                     <option value="visa">Visa Assistance</option>
-                    <option value="cab">Airport Transfer</option>
-                    <option value="custom">Customized Trip</option>
                   </select>
                 </div>
               </div>
@@ -252,25 +240,24 @@ export default function ContactUsPage() {
               <div>
                 <label
                   htmlFor="message"
-                  className="mb-2 block text-sm font-semibold text-heading"
+                  className="mb-1.5 block text-xs font-semibold text-heading uppercase tracking-wider"
                 >
-                  Your Enquiry
+                  Trip Details &amp; Special Requests
                 </label>
-
                 <textarea
                   id="message"
                   name="message"
-                  rows={6}
-                  placeholder="Tell us about your travel requirements..."
-                  className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10"
+                  rows={4}
+                  placeholder="Destination, expected travel dates, number of travellers, or customized requirements..."
+                  className="w-full resize-none border border-border bg-background px-3.5 py-2.5 text-sm text-heading outline-none transition placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-primary px-6 py-3.5 font-semibold text-white transition hover:bg-primary-hover"
+                className="w-full bg-[#d4af37] text-black font-semibold text-xs uppercase tracking-wider py-3.5 hover:bg-[#c49f27] transition-all shadow-md cursor-pointer"
               >
-                Send Enquiry
+                Submit Travel Enquiry →
               </button>
             </form>
           </div>
@@ -278,39 +265,42 @@ export default function ContactUsPage() {
       </section>
 
       {/* ================= QUICK LINKS ================= */}
-      <section className="border-t border-border bg-card py-16">
-        <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
-          <h2 className="text-2xl font-bold text-heading sm:text-3xl">
-            Explore Our Travel Services
+      <section className="border-t border-border/40 bg-card py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center lg:px-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-heading">
+            Explore Make Your Own Voyage Portfolios
           </h2>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/flights"
-              className="rounded-xl bg-primary-light px-5 py-3 font-semibold text-primary transition hover:bg-primary hover:text-white"
-            >
-              Flight Booking
-            </Link>
-
-            <Link
-              href="/hotels"
-              className="rounded-xl bg-secondary-light px-5 py-3 font-semibold text-secondary transition hover:bg-secondary hover:text-white"
-            >
-              Hotel Booking
-            </Link>
-
+          <div className="mt-6 flex flex-wrap justify-center gap-3 sm:gap-4">
             <Link
               href="/packages"
-              className="rounded-xl bg-accent-light px-5 py-3 font-semibold text-accent-hover transition hover:bg-accent hover:text-white"
+              className="border border-border bg-background px-4 py-2 text-xs font-medium text-heading transition hover:border-primary hover:text-primary"
             >
               Holiday Packages
             </Link>
-
+            <Link
+              href="/hotels"
+              className="border border-border bg-background px-4 py-2 text-xs font-medium text-heading transition hover:border-primary hover:text-primary"
+            >
+              Hotels &amp; Resorts
+            </Link>
+            <Link
+              href="/flights"
+              className="border border-border bg-background px-4 py-2 text-xs font-medium text-heading transition hover:border-primary hover:text-primary"
+            >
+              Flight Deals
+            </Link>
+            <Link
+              href="/blog/states"
+              className="border border-border bg-background px-4 py-2 text-xs font-medium text-heading transition hover:border-primary hover:text-primary"
+            >
+              Travel Blogs &amp; Guides
+            </Link>
             <Link
               href="/about-us"
-              className="rounded-xl border border-border px-5 py-3 font-semibold text-heading transition hover:border-primary hover:text-primary"
+              className="border border-border bg-background px-4 py-2 text-xs font-medium text-heading transition hover:border-primary hover:text-primary"
             >
-              About Us
+              About Company
             </Link>
           </div>
         </div>

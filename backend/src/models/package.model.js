@@ -133,6 +133,76 @@ const ItineraryDaySchema = new mongoose.Schema(
 );
 
 
+// for functions / events / features in a package
+const PackageFunctionSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        type: {
+            type: String,
+            enum: [
+                'conference',
+                'team_building',
+                'gala_dinner',
+                'cocktail_night',
+                'award_ceremony',
+                'welcome_reception',
+                'pool_party',
+                'theme_night',
+                'product_launch',
+                'exhibition',
+                'workshop',
+                'cultural_night',
+                'sightseeing_tour',
+                'custom_event',
+                'other',
+            ],
+            default: 'conference',
+        },
+        day: {
+            type: Number,
+            default: 1,
+        },
+        timing: {
+            type: String,
+            default: '',
+            trim: true,
+        },
+        duration: {
+            type: String,
+            default: '',
+            trim: true,
+        },
+        venue: {
+            type: String,
+            default: '',
+            trim: true,
+        },
+        capacity: {
+            type: Number,
+            default: 0,
+        },
+        description: {
+            type: String,
+            default: '',
+            trim: true,
+        },
+        inclusions: [{ type: String }],
+        isIncluded: {
+            type: Boolean,
+            default: true,
+        },
+        extraCost: {
+            type: Number,
+            default: 0,
+        },
+    },
+    { _id: true }
+);
+
 //main package model
 const PackageSchema = new mongoose.Schema(
     {
@@ -152,17 +222,36 @@ const PackageSchema = new mongoose.Schema(
             required: true,
             index: true,
         },
+        categories: {
+            type: [{ type: String, trim: true }],
+            default: ["sea_beach"],
+            index: true,
+        },
         packageType: {
             type: String,
             enum: [
-                "domestic",
-                "weekend",
+                "sea_beach",
+                "trekking_tour",
+                "single_tour",
+                "weekend_trips",
+                "mountain_trips",
+                "group_trips",
+                "honeymoon",
                 "family",
                 "couple",
                 "corporate",
+                "adventure",
+                "luxury",
+                "pilgrimage",
+                "heritage",
+                "road_trip",
+                "domestic",
+                "weekend",
                 "group",
                 "custom",
+                "holiday",
             ],
+            default: "sea_beach",
             required: true,
             index: true,
         },
@@ -201,13 +290,19 @@ const PackageSchema = new mongoose.Schema(
             default: null,
         },
 
-        // Corporate MICE Specific Features
+        // Corporate Facilities & Events
         corporateFacilities: {
             conferenceHallIncluded: { type: Boolean, default: false },
             projectorAndAVSetup: { type: Boolean, default: false },
             djAndSoundSystem: { type: Boolean, default: false },
             teamBuildingFacilitator: { type: Boolean, default: false },
             stageAndBackdrop: { type: Boolean, default: false },
+        },
+
+        // Package Functions, Events & Addon Functions
+        functions: {
+            type: [PackageFunctionSchema],
+            default: [],
         },
 
         // B2B Pricing Slabs
@@ -277,6 +372,7 @@ const PackageSchema = new mongoose.Schema(
 // Production Indexes for Public Listing & Filtering
 PackageSchema.index({ destination: 1, isActive: 1 });
 PackageSchema.index({ packageType: 1, isActive: 1 });
+PackageSchema.index({ categories: 1, isActive: 1 });
 PackageSchema.index({ isFeatured: 1, isActive: 1 });
 
 PackageSchema.pre('save', function (next) {
@@ -290,6 +386,16 @@ PackageSchema.pre('save', function (next) {
             Date.now().toString().slice(-4);
     }
     this.duration = `${this.days || 1} Days / ${this.nights !== undefined ? this.nights : 0} Nights`;
+
+    // Synchronize categories and packageType
+    if (Array.isArray(this.categories) && this.categories.length > 0) {
+        if (!this.packageType || !this.categories.includes(this.packageType)) {
+            this.packageType = this.categories[0];
+        }
+    } else if (this.packageType) {
+        this.categories = [this.packageType];
+    }
+
     if (typeof next === 'function') next();
 });
 const Package = mongoose.model('Package', PackageSchema);
