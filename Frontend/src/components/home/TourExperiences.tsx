@@ -69,10 +69,7 @@ export const TourExperiences: React.FC = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mx-auto max-w-3xl text-center mb-12 sm:mb-16">
-          <div className="flex items-center justify-center gap-2 text-xs font-normal text-muted mb-2">
-            <span className="text-primary text-sm leading-none">✦</span>
-            <span>Tour Categories</span>
-          </div>
+          
 
           <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-normal leading-[1.15] text-[#d4af37] font-serif tracking-tight">
             Choose your perfect tour experience

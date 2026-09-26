@@ -86,44 +86,16 @@ const FlightDeals = () => {
   return (
     <section className="bg-background py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-normal text-muted">
-              <span className="text-primary text-sm leading-none">✦</span>
-              <span>Fly More, Spend Less</span>
-            </div>
+        {/* Centered Header */}
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <h2 className="text-3xl sm:text-4xl font-normal leading-[1.15] text-[#d4af37] font-serif tracking-tight">
+            Best Flight Deals
+          </h2>
 
-            <h2 className="mt-4 text-3xl sm:text-4xl font-normal leading-[1.15] text-heading font-serif tracking-tight">
-              Best Flight Deals
-            </h2>
-
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted font-normal">
-              Find attractive flight fares on popular routes and plan your
-              next journey with ease.
-            </p>
-          </div>
-
-          {/* Arrows */}
-          <div className="hidden gap-2 sm:flex">
-            <button
-              type="button"
-              onClick={() => scroll("left")}
-              aria-label="Previous flights"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white text-heading shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"
-            >
-              ←
-            </button>
-
-            <button
-              type="button"
-              onClick={() => scroll("right")}
-              aria-label="Next flights"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white text-heading shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"
-            >
-              →
-            </button>
-          </div>
+          <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted font-normal">
+            Find attractive flight fares on popular routes and plan your
+            next journey with ease.
+          </p>
         </div>
 
         {/* Flight Cards */}
@@ -233,34 +205,56 @@ const FlightDeals = () => {
           ))}
         </div>
 
-        {/* Bottom */}
-        <div className="mt-5 flex items-center justify-between">
-          {/* Mobile Arrows */}
-          <div className="flex gap-2 sm:hidden">
+        {/* Bottom Navigation Controls & View All */}
+        <div className="mt-6 flex items-center justify-between">
+          {/* Slider Arrows */}
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={() => scroll("left")}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading"
+              className="dest-circle-btn flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading shadow-xs transition hover:border-primary hover:bg-primary hover:text-white active:scale-95"
               aria-label="Previous flights"
             >
-              ←
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
             </button>
 
             <button
               type="button"
               onClick={() => scroll("right")}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading"
+              className="dest-circle-btn flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading shadow-xs transition hover:border-primary hover:bg-primary hover:text-white active:scale-95"
               aria-label="Next flights"
             >
-              →
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
           </div>
 
           <Link
             href="/flights"
-            className="ml-auto inline-flex items-center gap-2 font-semibold text-primary transition hover:text-primary-hover"
+            className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-primary-hover"
           >
-            View All Flights
+            <span>View All Flights</span>
             <span>→</span>
           </Link>
         </div>

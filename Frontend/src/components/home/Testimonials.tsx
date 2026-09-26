@@ -1,240 +1,215 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useState, useEffect } from "react";
 
-const testimonials = [
+interface Testimonial {
+  id: number;
+  name: string;
+  location: string;
+  trip: string;
+  rating: number;
+  review: string;
+  initials: string;
+  bgGradient: string;
+}
+
+const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "Rahul Sharma",
-    location: "Delhi, India",
-    trip: "Goa Trip",
-    rating: 5,
+    name: "Rahul Thakur",
+    location: "Gurugram, India",
+    trip: "Goa Vacation",
+    rating: 4.6,
     review:
-      "My Goa trip was very smooth from start to finish. The booking process was simple and the package was exactly as described. Had a really great experience.",
-    initials: "RS",
+      "My Goa trip was exceptionally smooth from start to finish. The booking process was simple, transparent, and the hotel was exactly as promised. Make Your Own Voyage made our family holiday completely stress-free and truly unforgettable.",
+    initials: "RT",
+    bgGradient: "from-amber-600 to-yellow-500",
   },
   {
     id: 2,
-    name: "Priya Verma",
+    name: "Vikash Panwar",
     location: "Mumbai, India",
-    trip: "Kashmir Trip",
-    rating: 5,
+    trip: "Kashmir Paradise",
+    rating: 4.7,
     review:
-      "We booked our Kashmir holiday package through Make Your Own Voyage and everything was well organized. The hotel and travel arrangements were excellent.",
-    initials: "PV",
+      "We booked our Kashmir holiday package through Make Your Own Voyage and everything was flawlessly organized. From our private cab driver in Srinagar to the luxury stay in Gulmarg, the attention to detail was unmatched.",
+    initials: "VP",
+    bgGradient: "from-sky-700 to-blue-500",
   },
   {
     id: 3,
-    name: "Amit Kumar",
-    location: "Bangalore, India",
-    trip: "Dubai Trip",
-    rating: 5,
+    name: "Abdul Rehman",
+    location: "Noida, India",
+    trip: "Dubai Getaway",
+    rating: 4.5,
     review:
-      "The entire booking experience was easy and convenient. I especially liked how quickly I could compare different travel options and choose what suited me.",
-    initials: "AK",
+      "The entire booking experience was effortless and convenient. I loved how quickly I could customize our Dubai package with flight options, city tours, and desert safari without any hidden charges. Will definitely book again!",
+    initials: "AR",
+    bgGradient: "from-emerald-700 to-teal-500",
   },
   {
     id: 4,
-    name: "Neha Singh",
-    location: "Lucknow, India",
-    trip: "Manali Trip",
-    rating: 5,
+    name: "Suhani Chaudhary",
+    location: "Greater Noida, India",
+    trip: "Manali Adventure",
+    rating: 5.0,
     review:
-      "Our Manali vacation was memorable. The package was well planned and the support team was helpful whenever we had questions.",
-    initials: "NS",
+      "Our Manali vacation was magical. The itinerary was perfectly balanced between sightseeing and relaxation. The 24/7 concierge support team was always responsive whenever we had questions during the journey.",
+    initials: "SC",
+    bgGradient: "from-indigo-700 to-violet-500",
   },
   {
     id: 5,
     name: "Vikas Gupta",
-    location: "Jaipur, India",
-    trip: "Kerala Trip",
-    rating: 5,
+    location: "Delhi, India",
+    trip: "Kerala Backwaters",
+    rating: 4.3,
     review:
-      "Very convenient platform for planning a holiday. We found a good package at a reasonable price and had a wonderful Kerala experience.",
+      "Outstanding platform for planning holidays. We found an authentic houseboat package at a great price and had a breathtaking Kerala backwaters experience. Highly recommend Make Your Own Voyage to all travelers.",
     initials: "VG",
+    bgGradient: "from-rose-700 to-pink-500",
   },
 ];
 
 const Testimonials = () => {
-  const sliderRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const scroll = (direction: "left" | "right") => {
-    if (!sliderRef.current) return;
+  // Auto-scroll every 3 seconds
+  useEffect(() => {
+    if (isPaused) return;
 
-    sliderRef.current.scrollBy({
-      left: direction === "left" ? -420 : 420,
-      behavior: "smooth",
-    });
-  };
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const activeTestimonial = testimonials[activeIndex];
 
   return (
-    <section className="bg-background py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
-              Traveler Stories
-            </p>
+    <section
+      className="bg-background py-16 sm:py-20 lg:py-24 border-t border-border/40"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        {/* Main Heading */}
+        <div className="mb-10 sm:mb-14 flex items-center justify-between">
+          <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-normal leading-[1.15] text-[#d4af37] font-serif tracking-tight">
+            What Our Travelers Say
+          </h2>
 
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
-              What Our Travelers Say
-            </h2>
-
-            <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-              Hear from travelers who have planned their journeys with
-              Make Your Own Voyage.
-            </p>
-          </div>
-
-          {/* Desktop Arrows */}
-          <div className="hidden gap-2 sm:flex">
-            <button
-              type="button"
-              onClick={() => scroll("left")}
-              aria-label="Previous testimonials"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white text-heading shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m15 18-6-6 6-6"
-                />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => scroll("right")}
-              aria-label="Next testimonials"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white text-heading shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-5 w-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m9 18 6-6-6-6"
-                />
-              </svg>
-            </button>
+          {/* Progress Indicator Dots */}
+          <div className="hidden sm:flex items-center gap-1.5">
+            {testimonials.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setActiveIndex(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  idx === activeIndex
+                    ? "w-7 bg-primary"
+                    : "w-2 bg-border hover:bg-muted"
+                }`}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Testimonials */}
-        <div
-          ref={sliderRef}
-          className="mt-10 flex gap-6 overflow-x-auto scroll-smooth pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {testimonials.map((testimonial) => (
-            <article
-              key={testimonial.id}
-              className="min-w-[310px] max-w-[310px] shrink-0 rounded-2xl border border-border bg-card p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:min-w-[390px] sm:max-w-[390px]"
-            >
-              {/* Quote Icon */}
-              <div className="flex items-center justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-light text-primary">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="h-6 w-6"
-                  >
-                    <path d="M7.17 6A5.17 5.17 0 0 0 2 11.17V18h6v-6H5.98a3.2 3.2 0 0 1 3.19-3V6H7.17Zm11 0A5.17 5.17 0 0 0 13 11.17V18h6v-6h-2.02a3.2 3.2 0 0 1 3.19-3V6h-1Z" />
-                  </svg>
-                </div>
+        {/* Testimonial Quote Area */}
+        <div className="relative">
+          <div className="flex items-start gap-4 sm:gap-6">
+            {/* Large Decorative Quote Icon */}
+            <div className="shrink-0 text-3xl sm:text-4xl lg:text-5xl font-serif text-heading select-none leading-none pt-1">
+              <svg
+                viewBox="0 0 32 32"
+                className="h-8 w-8 sm:h-10 sm:w-10 fill-current text-[#0a192f]"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M10 8c-4.418 0-8 3.582-8 8 0 4.418 3.582 8 8 8 1.487 0 2.875-.407 4.072-1.111C13.565 25.42 10.42 27.5 7 28l-1 2c6.627 0 12-5.373 12-12 0-5.523-4.477-10-10-10zm16 0c-4.418 0-8 3.582-8 8 0 4.418 3.582 8 8 8 1.487 0 2.875-.407 4.072-1.111C29.565 25.42 26.42 27.5 23 28l-1 2c6.627 0 12-5.373 12-12 0-5.523-4.477-10-10-10z" />
+              </svg>
+            </div>
 
-                {/* Rating */}
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: testimonial.rating }).map(
-                    (_, index) => (
-                      <svg
-                        key={index}
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="h-4 w-4 text-accent"
-                      >
-                        <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z" />
-                      </svg>
-                    )
-                  )}
-                </div>
-              </div>
-
-              {/* Review */}
-              <p className="mt-6 text-[15px] leading-7 text-text">
-                “{testimonial.review}”
+            {/* Testimonial Text */}
+            <div className="flex-1">
+              <p className="text-base sm:text-lg md:text-xl lg:text-[22px] leading-relaxed text-heading font-serif font-normal min-h-[120px] transition-all duration-300">
+                {activeTestimonial.review}
               </p>
 
-              {/* User */}
-              <div className="mt-6 flex items-center gap-3 border-t border-border pt-5">
-                {/* Avatar */}
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-                  {testimonial.initials}
+              {/* Exact Star Ratings Rendering */}
+              <div className="mt-4 flex items-center gap-2">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const fillPercentage = Math.max(
+                      0,
+                      Math.min(100, (activeTestimonial.rating - (star - 1)) * 100)
+                    );
+                    return (
+                      <span
+                        key={star}
+                        className="relative inline-block text-base leading-none text-slate-300 select-none"
+                      >
+                        ★
+                        <span
+                          className="absolute top-0 left-0 overflow-hidden text-[#d4af37]"
+                          style={{ width: `${fillPercentage}%` }}
+                        >
+                          ★
+                        </span>
+                      </span>
+                    );
+                  })}
                 </div>
 
-                <div className="min-w-0">
-                  <h3 className="font-bold text-heading">
-                    {testimonial.name}
-                  </h3>
-
-                  <p className="mt-0.5 text-xs text-muted">
-                    {testimonial.location}
-                  </p>
-                </div>
-
-                <div className="ml-auto text-right">
-                  <p className="text-xs text-muted">Trip</p>
-
-                  <p className="text-sm font-semibold text-primary">
-                    {testimonial.trip}
-                  </p>
-                </div>
+                <span className="text-xs font-bold text-heading">
+                  {activeTestimonial.rating.toFixed(1)}
+                </span>
+                <span className="text-xs font-medium text-muted">
+                  • Verified Experience
+                </span>
               </div>
-            </article>
-          ))}
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="mt-4 flex items-center justify-between sm:hidden">
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => scroll("left")}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading"
-              aria-label="Previous testimonials"
-            >
-              ←
-            </button>
-
-            <button
-              type="button"
-              onClick={() => scroll("right")}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading"
-              aria-label="Next testimonials"
-            >
-              →
-            </button>
+            </div>
           </div>
 
-          <span className="text-sm text-muted">
-            Happy Travelers
-          </span>
+          {/* Traveler Switcher Pill & Avatars Bar */}
+          <div className="mt-10 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-4 pl-0 sm:pl-14">
+            {/* Active Traveler Pill */}
+            <div className="testimonial-pill flex items-center gap-3 bg-[#0a192f] py-2 pl-2 pr-5 text-white shadow-lg border border-[#d4af37]/30 transition-all duration-300">
+              <div className="testimonial-avatar flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center bg-gradient-to-br from-[#d4af37] to-[#936e20] text-sm font-bold text-[#0a192f] border-2 border-[#d4af37] shadow-inner">
+                {activeTestimonial.initials}
+              </div>
+
+              <div className="min-w-0 pr-1">
+                <p className="text-sm sm:text-base font-semibold text-white tracking-wide truncate">
+                  {activeTestimonial.name}
+                </p>
+                <p className="text-[11px] sm:text-xs text-[#d4af37] font-normal truncate">
+                  {activeTestimonial.trip} • {activeTestimonial.location}
+                </p>
+              </div>
+            </div>
+
+            {/* Inactive Traveler Circular Monogram Avatars */}
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              {testimonials.map((t, idx) => {
+                if (idx === activeIndex) return null;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setActiveIndex(idx)}
+                    aria-label={`View review from ${t.name}`}
+                    className={`testimonial-avatar flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center bg-gradient-to-br ${t.bgGradient} text-xs font-bold text-white shadow-xs opacity-75 border-2 border-transparent transition-all duration-300 hover:scale-105 hover:opacity-100 hover:border-[#d4af37] active:scale-95`}
+                  >
+                    {t.initials}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,175 +1,275 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+"use client";
 
-const blogs = [
+import React, { useRef } from "react";
+import Link from "next/link";
+import MaterialIcon from "@/components/ui/MaterialIcon";
+
+interface DestinationBlog {
+  id: number;
+  state: string;
+  title: string;
+  excerpt: string;
+  location: string;
+  rating: number;
+  reviewCount: number;
+  tag: string;
+  slug: string;
+  stateSlug: string;
+  gradient: string;
+  photosCount: number;
+  iconName: string;
+}
+
+const blogs: DestinationBlog[] = [
   {
     id: 1,
-    title: "10 Best Places to Visit in India in 2026",
+    state: "Himachal Pradesh",
+    title: "Himachal Pradesh Valley & Snow Trails",
     excerpt:
-      "Discover beautiful destinations, hidden gems and unforgettable experiences for your next trip across India.",
-    category: "Travel Guide",
-    date: "Sep 15, 2026",
-    readTime: "6 min read",
-    gradient: "from-amber-900 via-orange-950 to-slate-900",
-    slug: "best-places-to-visit-in-india-2026",
+      "Experience snow-capped peaks, pine valleys, colonial retreats in Shimla, and thrilling adventure in Manali & Spiti.",
+    location: "Manali, Shimla, Dharamshala, Spiti",
+    rating: 4.9,
+    reviewCount: 48,
+    tag: "Featured",
+    slug: "himachal-pradesh-blog",
+    stateSlug: "himachal-pradesh",
+    gradient: "from-blue-900 via-indigo-950 to-slate-900",
+    photosCount: 24,
+    iconName: "terrain",
   },
   {
     id: 2,
-    title: "Complete Guide to Planning a Goa Trip",
+    state: "Jammu Kashmir",
+    title: "Jammu & Kashmir Heavenly Paradise",
     excerpt:
-      "From beaches and activities to hotels and local experiences, here's everything you need for a memorable Goa holiday.",
-    category: "Destination Guide",
-    date: "Sep 10, 2026",
-    readTime: "5 min read",
-    gradient: "from-teal-900 via-emerald-950 to-slate-900",
-    slug: "complete-goa-travel-guide",
+      "Glide on Dal Lake in traditional Shikaras, explore snowfields of Gulmarg, and uncover lush meadows of Pahalgam.",
+    location: "Srinagar, Gulmarg, Pahalgam, Sonmarg",
+    rating: 4.9,
+    reviewCount: 56,
+    tag: "Top Rated",
+    slug: "jammu-kashmir-blog",
+    stateSlug: "jammu-and-kashmir",
+    gradient: "from-teal-950 via-cyan-950 to-slate-900",
+    photosCount: 32,
+    iconName: "kayaking",
   },
   {
     id: 3,
-    title: "How to Plan a Budget-Friendly Vacation",
+    state: "Uttarakhand",
+    title: "Uttarakhand Sacred Valleys & Yoga",
     excerpt:
-      "Learn practical tips to save money on flights, hotels and packages while still enjoying a great travel experience.",
-    category: "Travel Tips",
-    date: "Sep 05, 2026",
-    readTime: "4 min read",
-    gradient: "from-indigo-950 via-slate-900 to-slate-950",
-    slug: "budget-friendly-vacation-tips",
+      "Immerse in spiritual river ghats of Rishikesh, tranquil lakes of Nainital, and panoramic Himalayan vistas in Mussoorie.",
+    location: "Rishikesh, Nainital, Mussoorie, Auli",
+    rating: 4.8,
+    reviewCount: 42,
+    tag: "Featured",
+    slug: "uttarakhand-blog",
+    stateSlug: "uttarakhand",
+    gradient: "from-emerald-950 via-teal-950 to-slate-900",
+    photosCount: 18,
+    iconName: "self_improvement",
+  },
+  {
+    id: 4,
+    state: "Uttar Pradesh",
+    title: "Uttar Pradesh Heritage & Sacred Ghats",
+    excerpt:
+      "Marvel at the timeless Taj Mahal in Agra, divine Ganga Aarti in Varanasi, and royal Awadhi culinary heritage in Lucknow.",
+    location: "Varanasi, Agra, Ayodhya, Lucknow",
+    rating: 4.7,
+    reviewCount: 39,
+    tag: "Popular",
+    slug: "uttar-pradesh-blog",
+    stateSlug: "uttar-pradesh",
+    gradient: "from-amber-950 via-orange-950 to-slate-900",
+    photosCount: 22,
+    iconName: "temple_hindu",
+  },
+  {
+    id: 5,
+    state: "Rajasthan",
+    title: "Royal Rajasthan Forts & Desert Safaris",
+    excerpt:
+      "Step into majestic palaces of Jaipur, golden dunes of Jaisalmer, and romantic lakeside royal Havelis of Udaipur.",
+    location: "Jaipur, Udaipur, Jaisalmer, Jodhpur",
+    rating: 4.9,
+    reviewCount: 64,
+    tag: "Featured",
+    slug: "rajasthan-blog",
+    stateSlug: "rajasthan",
+    gradient: "from-yellow-950 via-amber-950 to-slate-900",
+    photosCount: 40,
+    iconName: "castle",
   },
 ];
 
 const TravelBlog = () => {
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (!sliderRef.current) return;
+    const scrollAmount = 340;
+    sliderRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
   return (
-    <section className="bg-background py-14 sm:py-20 border-t border-border/40">
+    <section className="bg-background py-16 sm:py-20 lg:py-24 border-t border-border/40">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-normal text-muted">
-              <span className="text-primary text-sm leading-none">✦</span>
-              <span>Travel Inspiration</span>
-            </div>
+        {/* Centered Section Header */}
+        <div className="mx-auto max-w-2xl text-center mb-10 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-normal leading-[1.15] text-[#d4af37] font-serif tracking-tight">
+            Most Favorite Tour Places
+          </h2>
 
-            <h2 className="mt-4 text-3xl sm:text-4xl font-normal leading-[1.15] text-heading font-serif tracking-tight">
-              Travel Stories & Tips
-            </h2>
+          <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted font-normal">
+            Handcrafted travel guides and destination highlights across India&apos;s most iconic states.
+          </p>
+        </div>
 
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted font-normal">
-              Get travel inspiration, destination guides and useful tips to
-              make your next journey even better.
-            </p>
+        {/* 5 Destination Cards Carousel */}
+        <div className="relative">
+          <div
+            ref={sliderRef}
+            className="flex gap-6 overflow-x-auto scroll-smooth pb-6 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {blogs.map((blog) => (
+              <article
+                key={blog.id}
+                className="how-card-rounded group relative flex w-[300px] sm:w-[330px] md:w-[350px] shrink-0 flex-col justify-between overflow-hidden border border-border/90 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl select-none"
+              >
+                {/* Top Visual Banner with Badges */}
+                <div className="relative">
+                  <div
+                    className={`relative flex h-48 w-full items-center justify-center overflow-hidden bg-gradient-to-br ${blog.gradient} p-4`}
+                  >
+                    {/* Google Material Center Icon */}
+                    <div className="text-primary/70 transition-transform duration-500 group-hover:scale-110">
+                      <MaterialIcon name={blog.iconName} size={48} />
+                    </div>
+
+                    {/* Gradient Overlay for Depth */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+
+                    {/* Top Left Tag */}
+                    <span className="how-badge-circle absolute left-3.5 top-3.5 bg-[#0a192f]/90 border border-primary/40 px-3 py-1 text-[11px] font-semibold text-primary shadow-xs">
+                      {blog.tag}
+                    </span>
+
+                    {/* Top Right Heart/Bookmark Button */}
+                    <button
+                      type="button"
+                      aria-label="Save to favorites"
+                      className="how-badge-circle absolute right-3.5 top-3.5 flex h-8 w-8 items-center justify-center bg-black/40 text-white/90 backdrop-blur-xs transition hover:scale-110 hover:bg-primary hover:text-white"
+                    >
+                      <MaterialIcon name="favorite" size={16} />
+                    </button>
+
+                    {/* State Name Overlay */}
+                    <span className="absolute bottom-2.5 left-4 text-xs font-semibold text-white/95 tracking-wide uppercase">
+                      {blog.state}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Middle Content */}
+                <div className="p-5">
+                  {/* Title */}
+                  <Link href={`/blog/${blog.slug}`}>
+                    <h3 className="text-lg font-bold leading-snug text-heading font-serif transition-colors hover:text-primary">
+                      {blog.title}
+                    </h3>
+                  </Link>
+
+                  {/* Excerpt */}
+                  <p className="mt-2 text-xs leading-relaxed text-muted line-clamp-2 font-normal">
+                    {blog.excerpt}
+                  </p>
+                </div>
+
+                {/* Bottom Styled Card Box */}
+                <div className="border-t border-border/70 bg-[#faf6ed] p-4 text-xs">
+                  {/* Rating Line */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-primary font-semibold">
+                      <MaterialIcon name="star" size={15} fill className="text-primary" />
+                      <span className="text-heading font-bold">{blog.rating}</span>
+                      <span className="text-muted font-normal">({blog.reviewCount} Reviews)</span>
+                    </div>
+
+                    <Link
+                      href={`/blog/${blog.slug}`}
+                      className="inline-flex items-center gap-1 font-semibold text-primary transition hover:text-primary-hover"
+                    >
+                      <span>Read Guide</span>
+                      <MaterialIcon name="arrow_forward" size={14} />
+                    </Link>
+                  </div>
+
+                  {/* Location with Pin */}
+                  <div className="mt-2.5 flex items-center gap-1 text-muted truncate border-t border-border/50 pt-2">
+                    <MaterialIcon name="location_on" size={15} className="text-primary shrink-0" />
+                    <span className="truncate">{blog.location}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Navigation & View All States Link */}
+        <div className="mt-8 flex items-center justify-between">
+          {/* Slider Arrow Buttons with Google Icons */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              className="dest-circle-btn flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading shadow-xs transition hover:border-primary hover:bg-primary hover:text-white active:scale-95"
+              aria-label="Previous destination"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              className="dest-circle-btn flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-heading shadow-xs transition hover:border-primary hover:bg-primary hover:text-white active:scale-95"
+              aria-label="Next destination"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
           </div>
 
           <Link
-            href="/blog"
-            className="inline-flex shrink-0 items-center gap-2 font-medium text-primary transition hover:text-primary-hover"
+            href="/blog/states"
+            className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-primary-hover"
           >
-            <span>View All Articles</span>
-            <span>→</span>
-          </Link>
-        </div>
-
-        {/* Blog Cards */}
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {blogs.map((blog) => (
-            <article
-              key={blog.id}
-              className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              {/* Image / Gradient Banner */}
-              <Link href={`/blog/${blog.slug}`}>
-                <div className={`relative h-48 overflow-hidden bg-gradient-to-br ${blog.gradient} flex items-center justify-center p-6 text-center`}>
-                  <div>
-                    <span className="text-3xl text-[#d4af37]/60 block mb-1 font-serif">✦</span>
-                    <span className="text-white/80 text-xs font-normal">{blog.category}</span>
-                  </div>
-
-                  {/* Image Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-                  {/* Category */}
-                  <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-primary shadow-sm">
-                    {blog.category}
-                  </span>
-                </div>
-              </Link>
-
-              {/* Content */}
-              <div className="p-5">
-                {/* Meta */}
-                <div className="flex items-center gap-3 text-xs text-muted">
-                  <span>{blog.date}</span>
-
-                  <span className="h-1 w-1 rounded-full bg-border" />
-
-                  <span>{blog.readTime}</span>
-                </div>
-
-                {/* Title */}
-                <Link href={`/blog/${blog.slug}`}>
-                  <h3 className="mt-3 text-xl font-bold leading-7 text-heading transition group-hover:text-primary">
-                    {blog.title}
-                  </h3>
-                </Link>
-
-                {/* Excerpt */}
-                <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted">
-                  {blog.excerpt}
-                </p>
-
-                {/* Read More */}
-                <Link
-                  href={`/blog/${blog.slug}`}
-                  className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-primary transition hover:text-primary-hover"
-                >
-                  Read Article
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 12h14m-6-6 6 6-6 6"
-                    />
-                  </svg>
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="mt-10 text-center">
-          <p className="text-sm text-muted">
-            Looking for more travel inspiration?
-          </p>
-
-          <Link
-            href="/blog"
-            className="mt-3 inline-flex items-center gap-2 rounded-xl border border-primary px-6 py-3 font-semibold text-primary transition hover:bg-primary hover:text-white"
-          >
-            Explore Travel Blog
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 12h14m-6-6 6 6-6 6"
-              />
-            </svg>
+            <span>View All States</span>
+            <MaterialIcon name="arrow_forward" size={16} />
           </Link>
         </div>
       </div>

@@ -92,13 +92,13 @@
   --radius-2xl: 0px;
   --radius-3xl: 0px;
   --radius-4xl: 0px;
-  --radius-full: 0px;
+  --radius-full: 9999px;
   --radius: 0px;
 }
 
 /* ========================================================
    STRICT ZERO-CURVE / SHARP GEOMETRIC DESIGN SYSTEM
-   Enforces sharp 0px corners across all buttons, divs, and elements
+   Enforces sharp 0px corners across standard UI elements
 ======================================================== */
 *,
 *::before,
@@ -126,17 +126,36 @@ tbody,
 tr,
 th,
 td,
-.btn,
-[class*="rounded"] {
-  border-radius: 0px !important;
+.btn {
+  border-radius: 0px;
 }
 
-/* Exception for the circular brand logo emblem & custom curved UI elements */
+/* ========================================================
+   GLOBAL CIRCLE & ROUNDED-FULL BUTTON EXCEPTIONS
+   Guarantees all next/previous buttons, avatar pills, and circle icons are fully circular
+======================================================== */
+.rounded-full,
+[class*="rounded-full"],
+button[class*="rounded-full"],
+a[class*="rounded-full"],
+div[class*="rounded-full"],
+span[class*="rounded-full"],
+.dest-circle-btn,
+.dest-circle-btn *,
+.banner-circle-btn,
+.banner-circle-btn *,
+.banner-dot,
 .brand-logo-circle,
 .brand-logo-circle img,
 .brand-logo-circle *,
-.dest-circle-btn,
-.dest-circle-btn * {
+.how-badge-circle,
+.how-badge-circle *,
+.how-icon-circle,
+.how-icon-circle *,
+.testimonial-pill,
+.testimonial-pill *,
+.testimonial-avatar,
+.testimonial-avatar * {
   border-radius: 9999px !important;
 }
 
@@ -149,6 +168,34 @@ td,
 .tour-card-rounded,
 .tour-card-rounded img {
   border-radius: 1.25rem !important;
+}
+
+.how-card-rounded {
+  border-radius: 1.25rem !important;
+}
+
+.home-banner-rounded,
+.home-banner-rounded img,
+.home-banner-rounded a,
+.banner-card-rounded,
+.banner-card-rounded img,
+.faq-card-rounded {
+  border-radius: 1.25rem !important;
+}
+
+.faq-badge-rounded {
+  border-radius: 9999px !important;
+}
+
+.how-badge-circle,
+.how-badge-circle *,
+.how-icon-circle,
+.how-icon-circle *,
+.testimonial-pill,
+.testimonial-pill *,
+.testimonial-avatar,
+.testimonial-avatar * {
+  border-radius: 9999px !important;
 }
 
 
